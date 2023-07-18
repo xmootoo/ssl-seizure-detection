@@ -1,8 +1,10 @@
 # Libraries
 import numpy as np
+import torch
+from torch.utils.data import TensorDataset, DataLoader
 
 
-# Functions
+# Preprocessing functions for creating our pseudolabeled dataset to train our SSL model on
 def create_samples(A, T, step_size):
     """ 
     Function that creates samples of window length T with step size step_size from a multivariate timeseries A.
@@ -31,7 +33,7 @@ def create_samples(A, T, step_size):
 
 
 
-def sample_pairs(samples, times):
+def sample_pairs(samples, times, tau_pos, tau_neg):
     """ 
     Creates unique sample pairs from a list of samples and their corresponding time indexes.
 
@@ -50,19 +52,19 @@ def sample_pairs(samples, times):
     
     for i in range(K):
         for j in range(K):
-            if i != j:
+            diff = np.abs(times[i] - times[j])
+            if (i != j) & ((diff <= tau_pos) | (diff > tau_neg)):
                 x_i = samples[i]
                 x_j = samples[j]
                 pair = np.stack((x_i, x_j), axis = 0)
                 sample_pairs = np.concatenate((sample_pairs, pair[np.newaxis, :, :]), axis = 0)
-                time_differences = np.hstack((time_differences, np.abs(times[i] - times[j])))
+                time_differences = np.hstack((time_differences, diff))
         
     return sample_pairs, time_differences
 
 
 
-# Function that pseudolabels the sample pairs 0, 1, or none depending on their starting time indices
-def pseudolabel(sample_pairs, time_differences, tau_pos, tau_neg):
+def pseudolabels(sample_pairs, time_differences, tau_pos, tau_neg):
     """
     Function that pseudolabels unique sample pairs 0, 1, or none depending on their starting time indices.
 
@@ -79,35 +81,76 @@ def pseudolabel(sample_pairs, time_differences, tau_pos, tau_neg):
             pseudolabels = np.hstack((pseudolabels, 1))
         elif time_differences[i] > tau_neg:
             pseudolabels = np.hstack((pseudolabels, 0))
-        else:
-            pseudolabels = np.hstack((pseudolabels, None))
 
     return pseudolabels
 
 
 
+def dataloader(A, T, step_size, tau_pos, tau_neg, batch_size, shuffle = True, testing = False):
+    """
+    Function that creates a data loader from a multivariate timeseries A.
+
+    Args:
+        A (numpy array): Multivariate timeseries of shape (N,M).
+        T (int): Window length.
+        step_size (int): Window step.
+        tau_pos (int): Positive context threshold.
+        tau_neg (int): Negative context threshold.
+        batch_size (int): Batch size for data loader.
+
+    Returns:
+        data_loader (torch.utils.data.DataLoader): Data loader of samples and pseudolabels.
+    """
+    N, M = A.shape
+    
+    # Create samples, sample pairs, and pseudolabels
+    samples, times = create_samples(A, T, step_size)
+    pairs, time_differences = sample_pairs(samples, times, tau_pos, tau_neg)
+    labels = pseudolabels(pairs, time_differences, tau_pos, tau_neg)
+    
+    # Convert to torch tensors
+    X = torch.tensor(pairs, dtype=torch.float64)
+    Y = torch.tensor(labels, dtype=torch.uint8)
+    
+    # Create dataset
+    dataset = TensorDataset(X, Y)
+    
+    # Create data loader
+    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
+    
+    if testing == True:
+        return X, Y, dataset, data_loader
+    else:
+        return dataset, data_loader
 
 
 
 # Testing
 # Number of electrodes
-N = 20
+N = 22
 # Number of discrete time points
-M = 50
+M = 101
 # Multivariate timeseries (iEEG data)
 A = np.random.randn(N, M)
 # Window length
-T = 10
+T = 6
 # Window step
 step_size = 10
 # Tau positive and tau negative
-tau_pos = 200
-tau_neg = 700
-
+tau_pos = 3
+tau_neg = 41
+batch_size = 32
 
 # Test
-samples, times = create_samples(A, T, step_size)
 
-sample_pairs, time_differences = sample_pairs(samples, times)
+# A_x, A_y, dataset, data_loader = dataloader(A, T, step_size, tau_pos, tau_neg, batch_size, shuffle = False, testing = True)
 
-pseudolabels = pseudolabel(sample_pairs, time_differences, tau_pos, tau_neg)
+# pair_1 = A_x[0][0]
+# pair_2 = A_x[0][1]
+
+# for inputs, labels in data_loader:
+#     X_1, X_2 = inputs[:, 0], inputs[:, 1]
+#     for i in range(len(X_1)):
+#         print(X_1[i] == pair_1)
+#         print(X_2[i] == pair_2)
+#         break
