@@ -14,24 +14,24 @@ class GNN_embedder(nn.Module):
     Args:
         in_channels (int): Number of input features?
     """
-    def __init__(self, in_channels, out_channels, num_edge_features, num_heads, hidden_dim):
+    def __init__(self, in_channels, out_channels, num_edge_features, num_heads, hidden_dim, final_dim):
         super(GNN_embedder, self).__init__()
 
         # ECC layer
-        self.ecc_conv = NNConv(in_channels, out_channels, num_edge_features)
+        self.ECC = NNConv(in_channels, out_channels, num_edge_features)
 
         # GAT layer
-        self.gat_conv = GATConv(out_channels, hidden_dim, heads=num_heads)
+        self.GAT = GATConv(out_channels, hidden_dim, heads=num_heads)
 
         # Fully connected layer
-        self.fc = nn.Linear(hidden_dim * num_heads, 1)
+        self.fc = nn.Linear(hidden_dim * num_heads, final_dim)
 
     def forward(self, x, edge_index, edge_attr):
         # ECC Convolution
-        x = F.relu(self.ecc_conv(x, edge_index, edge_attr))
+        x = F.relu(self.ECC(x, edge_index, edge_attr))
 
         # GAT Convolution
-        x = F.relu(self.gat_conv(x, edge_index))
+        x = F.relu(self.GAT(x, edge_index))
 
         # Flatten the features
         x = x.view(x.size(0), -1)
@@ -67,11 +67,13 @@ class Contrast(nn.Module):
 # Logistic regression
 class LogisticRegression(nn.Module):
     """
-    The logistic regression module.
+    Logistic regression module.
 
     Args:
+        in_dim (int): Number of input features.
         
     Returns:
+        x (float): The probability of the input belonging to the positive class.
         
     """
     
