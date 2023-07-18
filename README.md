@@ -1,1 +1,1 @@
-# SLL_epilepsy
+# Self-Supervised Learning for Seizure Detection
