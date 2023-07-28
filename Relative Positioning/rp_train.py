@@ -5,8 +5,6 @@ from rp_model import GNN_embedder, Contrast, LogisticRegression
 from rp_preprocess import dataloader
 
 
-
-
 def train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs=10):
     optimizer = optim.Adam(
         list(model_enc.parameters()) + list(model_cont.parameters()) + list(model_logreg.parameters()),
@@ -42,7 +40,7 @@ def train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs
 
 
 
-# iEEG matrix
+# Filtered iEEG data
 A = np.random.rand(22, 400)
 
 # Hyperparameters
@@ -56,6 +54,12 @@ num_epochs = 50
 
 # Dataloader
 data_loader = dataloader(A, T, step_size, tau_pos, tau_neg, batch_size)
+
+# Dummy node features
+NF = np.random.rand(22, 9)
+
+# Dummy edge features
+EF = np.random.rand(22, 22, 9)
 
 # Loss
 criterion = nn.BCELoss()

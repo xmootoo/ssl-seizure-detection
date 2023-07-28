@@ -85,5 +85,3 @@ class LogisticRegression(nn.Module):
         x = torch.sigmoid(self.fc(x))
         
         return x
-    
-print("done")

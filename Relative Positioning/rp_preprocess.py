@@ -143,14 +143,14 @@ batch_size = 32
 
 # Test
 
-# A_x, A_y, dataset, data_loader = dataloader(A, T, step_size, tau_pos, tau_neg, batch_size, shuffle = False, testing = True)
+A_x, A_y, dataset, data_loader = dataloader(A, T, step_size, tau_pos, tau_neg, batch_size, shuffle = False, testing = True)
 
-# pair_1 = A_x[0][0]
-# pair_2 = A_x[0][1]
+pair_1 = A_x[0][0]
+pair_2 = A_x[0][1]
 
-# for inputs, labels in data_loader:
-#     X_1, X_2 = inputs[:, 0], inputs[:, 1]
-#     for i in range(len(X_1)):
-#         print(X_1[i] == pair_1)
-#         print(X_2[i] == pair_2)
-#         break
+for inputs, labels in data_loader:
+    X_1, X_2 = inputs[:, 0], inputs[:, 1]
+    for i in range(len(X_1)):
+        print(X_1[i] == pair_1)
+        print(X_2[i] == pair_2)
+        break
