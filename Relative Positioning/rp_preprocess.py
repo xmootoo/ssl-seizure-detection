@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import TensorDataset, DataLoader
 
 
-# Preprocessing functions for creating our pseudolabeled dataset to train our SSL model on
+# Preprocessing functions for creating our pseudolabeled dataset to train the SSL model on
 def create_samples(A, T, step_size):
     """ 
     Function that creates samples of window length T with step size step_size from a multivariate timeseries A.
@@ -85,47 +85,6 @@ def pseudolabels(sample_pairs, time_differences, tau_pos, tau_neg):
     return pseudolabels
 
 
-
-def dataloader(A, T, step_size, tau_pos, tau_neg, batch_size, shuffle = True, testing = False):
-    """
-    Function that creates a data loader from a multivariate timeseries A.
-
-    Args:
-        A (numpy array): Multivariate timeseries of shape (N,M).
-        T (int): Window length.
-        step_size (int): Window step.
-        tau_pos (int): Positive context threshold.
-        tau_neg (int): Negative context threshold.
-        batch_size (int): Batch size for data loader.
-
-    Returns:
-        data_loader (torch.utils.data.DataLoader): Data loader of samples and pseudolabels.
-    """
-    N, M = A.shape
-    
-    # Create samples, sample pairs, and pseudolabels
-    samples, times = create_samples(A, T, step_size)
-    pairs, time_differences = sample_pairs(samples, times, tau_pos, tau_neg)
-    labels = pseudolabels(pairs, time_differences, tau_pos, tau_neg)
-    
-    # Convert to torch tensors
-    X = torch.tensor(pairs, dtype=torch.float64)
-    Y = torch.tensor(labels, dtype=torch.uint8)
-    
-    # Create dataset
-    dataset = TensorDataset(X, Y)
-    
-    # Create data loader
-    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
-    
-    if testing == True:
-        return X, Y, dataset, data_loader
-    else:
-        return dataset, data_loader
-
-
-
-
 def adjaceny_to_edge_index(A):
     """ 
     Converts the binary adjacency matrix to the edge index that pytorch_geometric uses to track edges.
@@ -145,19 +104,89 @@ def adjaceny_to_edge_index(A):
     return edge_index
 
 
-def in_graph_rep():
-    # TODO: Implement input graph representation
-    pass
+
+def rp_data(A, T, step_size, tau_pos, tau_neg):
+    """
+    Function that creates the pseudolabeled dataset from a multivariate timeseries A. This will be passed to the preprocessing in BRAIN-GREG to create the pairs of
+    binary adjancency matrices, nodefeatures, and edge features.
+
+    Args:
+        A (numpy array): Multivariate timeseries of shape (N,M).
+        T (int): Window length.
+        step_size (int): Window step.
+        tau_pos (int): Positive context threshold.
+        tau_neg (int): Negative context threshold.
+        batch_size (int): Batch size for data loader.
+
+    Returns:
+        pairs (numpy array): The example pairs for the pseudolabeled dataset.
+        labels (numpy array): The corresponding label for each example pair.
+    """
+    
+    # Create samples, sample pairs, and pseudolabels
+    samples, times = create_samples(A, T, step_size)
+    pairs, time_differences = sample_pairs(samples, times, tau_pos, tau_neg)
+    labels = pseudolabels(pairs, time_differences, tau_pos, tau_neg)
+    
+    return pairs, labels
     
 
 
-# Test 1
-A = torch.tensor([[0., 1., 1., 0.],
-                  [1., 0., 0., 1.],
-                  [1., 0., 0., 1.],
-                  [0., 1., 1., 0.]])
+def dataloader(A, NF, EF, batch_size, shuffle = True, testing = False):
+    """
+    Function that creates a data loader from the input graph representation.
 
-print(adjaceny_to_edge_index(A))
+    Args:
+        A (numpy array): Pairs of adjacency matrices. Shape: (M, 2, N, N) where M is the number of pairs, and N is the number of nodes.
+        NF (numpy array): Pairs of node features. Shape: (M, 2, num_node_features).
+        EF (numpy array): Pairs of edge features. Shape: (M, 2, num_edge_features).
+        Y (numpy array): Pseudolabels. Shape: (M,).
+        batch_size (int): Batch size for DataLoader.
+
+    Returns:
+        data_loader (torch.utils.data.DataLoader): Data loader of samples and pseudolabels.
+    """
+    
+    # Shapes
+    M = A.shape[0]
+    N = A.shape[2]
+    num_node_features = NF.shape[2]
+    num_edge_features = EF.shape[2]
+    
+    # Convert to torch tensors
+    X = torch.tensor(pairs, dtype=torch.float64)
+    Y = torch.tensor(labels, dtype=torch.uint8)
+    
+    # Create dataset
+    dataset = TensorDataset(X, Y)
+    
+    # Create data loader
+    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
+    
+    if testing == True:
+        return X, Y, dataset, data_loader
+    else:
+        return dataset, data_loader
+
+
+
+
+
+# Test 1
+# A = torch.tensor([[0., 1., 1., 0.],
+#                   [1., 0., 0., 1.],
+#                   [1., 0., 0., 1.],
+#                   [0., 1., 1., 0.]])
+
+
+A = np.random.randint(2, size=(1, 2, 4, 4))
+
+B = np.random.randint(2, size=(3, 2, 9))
+
+
+print(A)
+
+# print(adjaceny_to_edge_index(A))
 
 
 # # Test 2

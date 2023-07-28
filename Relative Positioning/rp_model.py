@@ -39,23 +39,23 @@ class GNN_encoder(nn.Module):
         
         self.fc2 = nn.Linear(hidden_dim, final_dim)
 
-    def forward(self, x, edge_index, edge_attr):
+    def forward(self, node_features, edge_index, edge_features):
         """
         Forward pass.
 
         Args:
-            x (torch.Tensor): The node features of the graph. Shape: (num_nodes, num_node_features), where nf_dim[0] == num_node_features.
+            node_features (torch.Tensor): The node features of the graph. Shape: (num_nodes, num_node_features), where nf_dim[0] == num_node_features.
             edge_index (torch.Tensor): Edges indices of the graph for the edge features. Shape: (2, num_edges) where num_edges is the number of edges in the graph. 
                                        The first row contains the source node indices and the second row contains the target node indices. For example, the column [4 2]^T refers to the directed edge from
                                        node 4 to node 2.  
-            edge_attr (torch.Tensor): Edge features of the graph. Shape: (num_edges, ef_dim), where ef_dim is the number of input edge features. Each row in the tensor corresponds to the edge-specific feature,
+            edge_features (torch.Tensor): Edge features of the graph. Shape: (num_edges, ef_dim), where ef_dim is the number of input edge features. Each row in the tensor corresponds to the edge-specific feature,
                                         i.e. the edge feature of the edge specified by the corresponding column in edge_index.
 
         Returns:
             x (torch.Tensor): The graph embedding vector. Shape: (final_dim,).
         """
         # ECC Convolution
-        x = F.relu(self.ECC(x, edge_index, edge_attr))
+        x = F.relu(self.ECC(node_features, edge_index, edge_features))
 
         # GAT Convolution
         x = F.relu(self.GAT(x, edge_index))
