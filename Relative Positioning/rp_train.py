@@ -1,7 +1,7 @@
 import numpy as np
 import torch.nn as nn
 from torch import optim
-from rp_model import GNN_embedder, Contrast, LogisticRegression
+from rp_model import GNN_encoder, Contrast, LogisticRegression
 from rp_preprocess import dataloader
 
 
