@@ -7,26 +7,53 @@ from torch_geometric.nn import NNConv, GATConv
 
 
 # Graph neural network encoder
-class GNN_embedder(nn.Module):
+# Graph neural network encoder
+# Graph neural network encoder
+class GNN_encoder(nn.Module):
     """
     Graph neural network embedder (encoder).
 
     Args:
-        in_channels (int): Number of input features?
+        num_nodes (int): Number of nodes in the graph.
+        nf_dim (list[int]): Node feature dimensions. For i > 0, nf_dim[i-1] is the input dimension of the i-th layer, and nf_dim[i] is the output dimension of the i-th layer.
+        ef_dim (int): Number of input edge features.
+        GAT_dim (int): Number of hidden units in the GAT layer.
+        final_dim (int): Number of output features.
     """
-    def __init__(self, in_channels, out_channels, num_edge_features, num_heads, hidden_dim, final_dim):
-        super(GNN_embedder, self).__init__()
+    def __init__(self, num_nodes, nf_dim, ef_dim, num_heads, GAT_dim, hidden_dim, final_dim):
+        super(GNN_encoder, self).__init__()
 
+        #MLP 1, hidden layer with 32 units
+        mlp1 = nn.Sequential(nn.Linear(ef_dim, 32), 
+                             nn.ReLU(),
+                             nn.Linear(32, nf_dim[0] * nf_dim[1]))
+        
         # ECC layer
-        self.ECC = NNConv(in_channels, out_channels, num_edge_features)
+        self.ECC = NNConv(nf_dim[0], nf_dim[1], mlp1)
 
         # GAT layer
-        self.GAT = GATConv(out_channels, hidden_dim, heads=num_heads)
+        self.GAT = GATConv(nf_dim[1], GAT_dim, heads=num_heads)
 
-        # Fully connected layer
-        self.fc = nn.Linear(hidden_dim * num_heads, final_dim)
+        # Fully connected layers
+        self.fc1 = nn.Linear(num_nodes * GAT_dim * num_heads, hidden_dim)
+        
+        self.fc2 = nn.Linear(hidden_dim, final_dim)
 
     def forward(self, x, edge_index, edge_attr):
+        """
+        Forward pass.
+
+        Args:
+            x (torch.Tensor): The node features of the graph. Shape: (num_nodes, num_node_features), where nf_dim[0] == num_node_features.
+            edge_index (torch.Tensor): Edges indices of the graph for the edge features. Shape: (2, num_edges) where num_edges is the number of edges in the graph. 
+                                       The first row contains the source node indices and the second row contains the target node indices. For example, the column [4 2]^T refers to the directed edge from
+                                       node 4 to node 2.  
+            edge_attr (torch.Tensor): Edge features of the graph. Shape: (num_edges, ef_dim), where ef_dim is the number of input edge features. Each row in the tensor corresponds to the edge-specific feature,
+                                        i.e. the edge feature of the edge specified by the corresponding column in edge_index.
+
+        Returns:
+            x (torch.Tensor): The graph embedding vector. Shape: (final_dim,).
+        """
         # ECC Convolution
         x = F.relu(self.ECC(x, edge_index, edge_attr))
 
@@ -34,11 +61,13 @@ class GNN_embedder(nn.Module):
         x = F.relu(self.GAT(x, edge_index))
 
         # Flatten the features
-        x = x.view(x.size(0), -1)
+        x = x.view(-1)
 
-        # Fully connected layer
-        x = self.fc(x)
-
+        # Fully connected layers
+        x = F.relu(self.fc1(x))
+        
+        x = F.relu(self.fc2(x))
+        
         return x
 
 

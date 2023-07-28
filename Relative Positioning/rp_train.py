@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 import torch.nn as nn
 from torch import optim
 from rp_model import GNN_encoder, Contrast, LogisticRegression
@@ -38,12 +39,34 @@ def train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs
             print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {total_loss / len(data_loader)}")
 
 
+# Hyperparameters for GNN
+num_nodes = 40
+num_node_features = 5
+num_edges = 20
+num_edge_features = 2
+nf_dim = [num_node_features, 64]  # Node feature dimensions for each layer
+ef_dim = num_edge_features  # Edge feature dimension
+num_heads = 1  # Number of GAT heads
+GAT_dim = 27  # Number of hidden units in the GAT layer
+hidden_dim = 450  # Number of hidden units in first fully connected layer
+final_dim = 128  # Number of output features
+
+# Modules
+model_enc = GNN_encoder(num_nodes, nf_dim, ef_dim, num_heads, GAT_dim, hidden_dim, final_dim)
+model_cont = Contrast()
+odel_logreg = LogisticRegression()
 
 
-# Filtered iEEG data
-A = np.random.rand(22, 400)
+# Dummy iEEG graph representations
 
-# Hyperparameters
+
+
+
+x = torch.randn(num_nodes, num_node_features)
+edge_index = torch.randint(0, num_nodes, (2, num_edges), dtype=torch.long)
+edge_attr = torch.randn(num_edges, num_edge_features)
+
+# Hyperparameters for dataloader
 T = 30
 tau_pos = 60
 tau_neg = 120
@@ -66,7 +89,3 @@ criterion = nn.BCELoss()
 
 print("ok")
 
-# Model
-# model_enc = GNN_embedder()
-# model_cont = Contrast()
-# model_logreg = LogisticRegression()

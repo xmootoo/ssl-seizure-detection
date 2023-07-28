@@ -125,32 +125,67 @@ def dataloader(A, T, step_size, tau_pos, tau_neg, batch_size, shuffle = True, te
 
 
 
-# Testing
-# Number of electrodes
-N = 22
-# Number of discrete time points
-M = 101
-# Multivariate timeseries (iEEG data)
-A = np.random.randn(N, M)
-# Window length
-T = 6
-# Window step
-step_size = 10
-# Tau positive and tau negative
-tau_pos = 3
-tau_neg = 41
-batch_size = 32
 
-# Test
+def adjaceny_to_edge_index(A):
+    """ 
+    Converts the binary adjacency matrix to the edge index that pytorch_geometric uses to track edges.
 
-A_x, A_y, dataset, data_loader = dataloader(A, T, step_size, tau_pos, tau_neg, batch_size, shuffle = False, testing = True)
+    Args:
+        A (torch.Tensor): Shape: (num_nodes, num_nodes), the binary adjaceny matrix.
+    
+    Returns:
+        edge_index (torch.Tensor): Shape: (2, num_edges), the edge index matrix, where each column represents a directed edge.
+    """
+    edge_index = []
+    for i in range(A.shape[0]):
+        for j in range(A.shape[1]):
+            if A[i, j] == 1:
+                edge_index.append([i, j])
+    edge_index = torch.tensor(edge_index, dtype=torch.long).T
+    return edge_index
 
-pair_1 = A_x[0][0]
-pair_2 = A_x[0][1]
 
-for inputs, labels in data_loader:
-    X_1, X_2 = inputs[:, 0], inputs[:, 1]
-    for i in range(len(X_1)):
-        print(X_1[i] == pair_1)
-        print(X_2[i] == pair_2)
-        break
+def in_graph_rep():
+    # TODO: Implement input graph representation
+    pass
+    
+
+
+# Test 1
+A = torch.tensor([[0., 1., 1., 0.],
+                  [1., 0., 0., 1.],
+                  [1., 0., 0., 1.],
+                  [0., 1., 1., 0.]])
+
+print(adjaceny_to_edge_index(A))
+
+
+# # Test 2
+# # Number of electrodes
+# N = 22
+# # Number of discrete time points
+# M = 101
+# # Multivariate timeseries (iEEG data)
+# A = np.random.randn(N, M)
+# # Window length
+# T = 6
+# # Window step
+# step_size = 10
+# # Tau positive and tau negative
+# tau_pos = 3
+# tau_neg = 41
+# batch_size = 32
+
+# # Test
+
+# A_x, A_y, dataset, data_loader = dataloader(A, T, step_size, tau_pos, tau_neg, batch_size, shuffle = False, testing = True)
+
+# pair_1 = A_x[0][0]
+# pair_2 = A_x[0][1]
+
+# for inputs, labels in data_loader:
+#     X_1, X_2 = inputs[:, 0], inputs[:, 1]
+#     for i in range(len(X_1)):
+#         print(X_1[i] == pair_1)
+#         print(X_2[i] == pair_2)
+#         break

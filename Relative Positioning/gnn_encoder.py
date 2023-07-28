@@ -60,11 +60,14 @@ class GNN_encoder(nn.Module):
         # Flatten the features
         x = x.view(-1)
 
-        # Fully connected layer
+        # Fully connected layers
         x = F.relu(self.fc1(x))
+        
         x = F.relu(self.fc2(x))
         
         return x
+
+
 
 # Test case for the GNN_encoder
 num_nodes = 40
