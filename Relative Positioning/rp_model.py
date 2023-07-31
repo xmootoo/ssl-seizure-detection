@@ -18,6 +18,7 @@ class GNN_encoder(nn.Module):
         nf_dim (list[int]): Node feature dimensions. For i > 0, nf_dim[i-1] is the input dimension of the i-th layer, and nf_dim[i] is the output dimension of the i-th layer.
         ef_dim (int): Number of input edge features.
         GAT_dim (int): Number of hidden units in the GAT layer.
+        hidden_dim (int): Number of hidden units in the first fully connected layer.
         final_dim (int): Number of output features.
     """
     def __init__(self, num_nodes, nf_dim, ef_dim, num_heads, GAT_dim, hidden_dim, final_dim):
@@ -44,12 +45,12 @@ class GNN_encoder(nn.Module):
         Forward pass.
 
         Args:
-            node_features (torch.Tensor): The node features of the graph. Shape: (num_nodes, num_node_features), where nf_dim[0] == num_node_features.
-            edge_index (torch.Tensor): Edges indices of the graph for the edge features. Shape: (2, num_edges) where num_edges is the number of edges in the graph. 
+            node_features (torch.Tensor): The node features of the graph. Shape: (num_nodes, num_node_features).
+            edge_index (torch.Tensor): Edges indices of the graph. Shape: (2, num_edges) where num_edges is the number of edges in the graph. 
                                        The first row contains the source node indices and the second row contains the target node indices. For example, the column [4 2]^T refers to the directed edge from
                                        node 4 to node 2.  
             edge_features (torch.Tensor): Edge features of the graph. Shape: (num_edges, ef_dim), where ef_dim is the number of input edge features. Each row in the tensor corresponds to the edge-specific feature,
-                                        i.e. the edge feature of the edge specified by the corresponding column in edge_index.
+                                        indexed by the corresponding column in edge_index.
 
         Returns:
             x (torch.Tensor): The graph embedding vector. Shape: (final_dim,).
