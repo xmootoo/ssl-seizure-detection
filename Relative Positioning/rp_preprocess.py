@@ -132,41 +132,41 @@ def rp_data(A, T, step_size, tau_pos, tau_neg):
     
 
 
-def dataloader(A, NF, EF, batch_size, shuffle = True, testing = False):
-    """
-    Function that creates a data loader from the input graph representation.
+# def dataloader(A, NF, EF, batch_size, shuffle = True, testing = False):
+#     """
+#     Function that creates a data loader from the input graph representation.
 
-    Args:
-        A (numpy array): Pairs of adjacency matrices. Shape: (M, 2, N, N) where M is the number of pairs, and N is the number of nodes.
-        NF (numpy array): Pairs of node features. Shape: (M, 2, num_node_features).
-        EF (numpy array): Pairs of edge features. Shape: (M, 2, num_edge_features).
-        Y (numpy array): Pseudolabels. Shape: (M,).
-        batch_size (int): Batch size for DataLoader.
+#     Args:
+#         A (numpy array): Pairs of adjacency matrices. Shape: (M, 2, N, N) where M is the number of pairs, and N is the number of nodes.
+#         NF (numpy array): Pairs of node features. Shape: (M, 2, num_node_features).
+#         EF (numpy array): Pairs of edge features. Shape: (M, 2, num_edge_features).
+#         Y (numpy array): Pseudolabels. Shape: (M,).
+#         batch_size (int): Batch size for DataLoader.
 
-    Returns:
-        data_loader (torch.utils.data.DataLoader): Data loader of samples and pseudolabels.
-    """
+#     Returns:
+#         data_loader (torch.utils.data.DataLoader): Data loader of samples and pseudolabels.
+#     """
     
-    # Shapes
-    M = A.shape[0]
-    N = A.shape[2]
-    num_node_features = NF.shape[2]
-    num_edge_features = EF.shape[2]
+#     # Shapes
+#     M = A.shape[0]
+#     N = A.shape[2]
+#     num_node_features = NF.shape[2]
+#     num_edge_features = EF.shape[2]
     
-    # Convert to torch tensors
-    X = torch.tensor(pairs, dtype=torch.float64)
-    Y = torch.tensor(labels, dtype=torch.uint8)
+#     # Convert to torch tensors
+#     X = torch.tensor(pairs, dtype=torch.float64)
+#     Y = torch.tensor(labels, dtype=torch.uint8)
     
-    # Create dataset
-    dataset = TensorDataset(X, Y)
+#     # Create dataset
+#     dataset = TensorDataset(X, Y)
     
-    # Create data loader
-    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
+#     # Create data loader
+#     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     
-    if testing == True:
-        return X, Y, dataset, data_loader
-    else:
-        return dataset, data_loader
+#     if testing == True:
+#         return X, Y, dataset, data_loader
+#     else:
+#         return dataset, data_loader
 
 
 
