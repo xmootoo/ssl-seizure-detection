@@ -18,10 +18,9 @@ class GNN_encoder(nn.Module):
         nf_dim (list[int]): Node feature dimensions. For i > 0, nf_dim[i-1] is the input dimension of the i-th layer, and nf_dim[i] is the output dimension of the i-th layer.
         ef_dim (int): Number of input edge features.
         GAT_dim (int): Number of hidden units in the GAT layer.
-        hidden_dim (int): Number of hidden units in the first fully connected layer.
         final_dim (int): Number of output features.
     """
-    def __init__(self, num_nodes, nf_dim, ef_dim, num_heads, GAT_dim, hidden_dim, final_dim):
+    def __init__(self, num_nodes, nf_dim, ef_dim, num_heads, GAT_dim, final_dim):
         super(GNN_encoder, self).__init__()
 
         #MLP 1, hidden layer with 32 units
@@ -36,9 +35,7 @@ class GNN_encoder(nn.Module):
         self.GAT = GATConv(nf_dim[1], GAT_dim, heads=num_heads)
 
         # Fully connected layers
-        self.fc1 = nn.Linear(num_nodes * GAT_dim * num_heads, hidden_dim)
-        
-        self.fc2 = nn.Linear(hidden_dim, final_dim)
+        self.fc = nn.Linear(num_nodes * GAT_dim * num_heads, final_dim)
 
     def forward(self, node_features, edge_index, edge_features):
         """
@@ -65,9 +62,7 @@ class GNN_encoder(nn.Module):
         x = x.view(-1)
 
         # Fully connected layers
-        x = F.relu(self.fc1(x))
-        
-        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc(x))
         
         return x
 
