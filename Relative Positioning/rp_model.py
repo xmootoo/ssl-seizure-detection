@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import NNConv, GATConv
+from torch_geometric.nn import NNConv, GATConv, global_mean_pool
 
 
 
@@ -35,9 +35,9 @@ class GNN_encoder(nn.Module):
         self.GAT = GATConv(nf_dim[1], GAT_dim, heads=num_heads)
 
         # Fully connected layers
-        self.fc = nn.Linear(num_nodes * GAT_dim * num_heads, final_dim)
+        self.fc = nn.Linear(GAT_dim, final_dim)
 
-    def forward(self, node_features, edge_index, edge_features):
+    def forward(self, data):
         """
         Forward pass.
 
@@ -52,16 +52,27 @@ class GNN_encoder(nn.Module):
         Returns:
             x (torch.Tensor): The graph embedding vector. Shape: (final_dim,).
         """
+        # Obtain the node features, edge indices, and edge features
+        x, edge_index, edge_attr = data.x.float(), data.edge_index.long(), data.edge_attr.float()
+        
         # ECC Convolution
-        x = F.relu(self.ECC(node_features, edge_index, edge_features))
+        x = F.relu(self.ECC(x, edge_index, edge_attr))
 
         # GAT Convolution
         x = F.relu(self.GAT(x, edge_index))
 
-        # Flatten the features
-        x = x.view(-1)
+        # Global average pooling
+        x = global_mean_pool(x, data.batch)
 
-        # Fully connected layers
+        # Create a new tensor to hold the edge features with the right number of columns
+        print(x.shape)
+
+        # # Flatten the features
+        # x = x.view(-1)
+        
+        print(x.shape)
+
+        # Apply the fully connected layer
         x = F.relu(self.fc(x))
         
         return x
@@ -90,9 +101,10 @@ class Contrast(nn.Module):
 
 
 # Logistic regression
-class LogisticRegression(nn.Module):
+class Regression(nn.Module):
     """
-    Logistic regression module.
+    Linear regression module. We will turn this into a logistic regression by applying a sigmoid function to the output with
+    the BCEWithLogisticLoss function (which applies the sigmoid function before taking the standard BCELoss).
 
     Args:
         in_dim (int): Number of input features.
@@ -103,10 +115,10 @@ class LogisticRegression(nn.Module):
     """
     
     def __init__(self, in_dim):
-        super(LogisticRegression).__init__()
+        super(Regression, self).__init__()
         self.fc = nn.Linear(in_dim, 1)
 
     def forward(self, x):
-        x = torch.sigmoid(self.fc(x))
+        x = self.fc(x.float())
         
         return x

@@ -144,59 +144,59 @@ def rp_dataloader(edge_index, node_features, edge_features, labels, batch_size=3
 
 
 
-# Test case
-num_graphs = 5
-num_node_features = 3
-num_edge_features = 4
+# # Test case
+# num_graphs = 5
+# num_node_features = 3
+# num_edge_features = 4
 
-edge_index = []
-node_features = []
-edge_features = []
-for _ in range(num_graphs):
-    num_nodes1, num_nodes2 = 8, 8
-    num_edges1, num_edges2 = np.random.randint(5, 8, size=2)
-    edge_index.append((np.random.randint(num_nodes1, size=(2, num_edges1)), np.random.randint(num_nodes2, size=(2, num_edges2))))
-    node_features.append((np.random.rand(num_nodes1, num_node_features), np.random.rand(num_nodes2, num_node_features)))
-    edge_features.append((np.random.rand(num_edges1, num_edge_features), np.random.rand(num_edges2, num_edge_features)))
+# edge_index = []
+# node_features = []
+# edge_features = []
+# for _ in range(num_graphs):
+#     num_nodes1, num_nodes2 = 8, 8
+#     num_edges1, num_edges2 = np.random.randint(5, 8, size=2)
+#     edge_index.append((np.random.randint(num_nodes1, size=(2, num_edges1)), np.random.randint(num_nodes2, size=(2, num_edges2))))
+#     node_features.append((np.random.rand(num_nodes1, num_node_features), np.random.rand(num_nodes2, num_node_features)))
+#     edge_features.append((np.random.rand(num_edges1, num_edge_features), np.random.rand(num_edges2, num_edge_features)))
 
-labels = np.random.randint(2, size=num_graphs)
+# labels = np.random.randint(2, size=num_graphs)
 
-# Create the DataLoader
-data_loader = rp_dataloader(edge_index, node_features, edge_features, labels, batch_size=2, shuffle=False)
+# # Create the DataLoader
+# data_loader = rp_dataloader(edge_index, node_features, edge_features, labels, batch_size=2, shuffle=False)
 
 
-# Assume data_loader is your DataLoader object
-for batch_idx, (batch, batch_labels) in enumerate(data_loader):
-    print(f"Processing batch {batch_idx}...")
+# # Assume data_loader is your DataLoader object
+# for batch_idx, (batch, batch_labels) in enumerate(data_loader):
+#     print(f"Processing batch {batch_idx}...")
     
-    # You can access the batch data here
-    for i in range(0, batch.num_graphs, 2):  # Step by 2 because each pair contains 2 graphs
-        # Get the nodes for the first graph in the pair
-        nodes1 = batch.x[batch.batch == i]
-        edge_mask1 = batch.batch[batch.edge_index[0].long()] == i
-        edges1 = batch.edge_index[:, edge_mask1]
-        edge_attr1 = batch.edge_attr[edge_mask1]
+#     # You can access the batch data here
+#     for i in range(0, batch.num_graphs, 2):  # Step by 2 because each pair contains 2 graphs
+#         # Get the nodes for the first graph in the pair
+#         nodes1 = batch.x[batch.batch == i]
+#         edge_mask1 = batch.batch[batch.edge_index[0].long()] == i
+#         edges1 = batch.edge_index[:, edge_mask1]
+#         edge_attr1 = batch.edge_attr[edge_mask1]
 
-        # Get the nodes for the second graph in the pair
-        nodes2 = batch.x[batch.batch == i + 1]
-        edge_mask2 = batch.batch[batch.edge_index[0].long()] == i + 1
-        edges2 = batch.edge_index[:, edge_mask2]
-        edge_attr2 = batch.edge_attr[edge_mask2]
+#         # Get the nodes for the second graph in the pair
+#         nodes2 = batch.x[batch.batch == i + 1]
+#         edge_mask2 = batch.batch[batch.edge_index[0].long()] == i + 1
+#         edges2 = batch.edge_index[:, edge_mask2]
+#         edge_attr2 = batch.edge_attr[edge_mask2]
 
         
-        # edge_mask1 is a boolean mask for the edges of the first graph in a pair. It is used to separate the edges of the 
-        # first graph from the edges of the second graph in the edge_index tensor of the batch. It is created by checking 
-        # which edges (represented by the source nodes in the edge_index tensor) belong to the first graph based on the 
-        # batch assignment of nodes. Similarly for edge_mask2.
+#         # edge_mask1 is a boolean mask for the edges of the first graph in a pair. It is used to separate the edges of the 
+#         # first graph from the edges of the second graph in the edge_index tensor of the batch. It is created by checking 
+#         # which edges (represented by the source nodes in the edge_index tensor) belong to the first graph based on the 
+#         # batch assignment of nodes. Similarly for edge_mask2.
         
-        # Now nodes1, edges1, and edge_attr1 contain the node features, edge indices, and edge features for the first graph in the pair,
-        # and nodes2, edges2, and edge_attr2 contain the node features, edge indices, and edge features for the second graph in the pair
+#         # Now nodes1, edges1, and edge_attr1 contain the node features, edge indices, and edge features for the first graph in the pair,
+#         # and nodes2, edges2, and edge_attr2 contain the node features, edge indices, and edge features for the second graph in the pair
 
-        print(f"Graph pair {i // 2} in batch {batch_idx}:")
-        print(f"First graph nodes: {nodes1}")
-        print(f"First graph edges: {edges1}")
-        print(f"First graph edge attributes: {edge_attr1}")
-        print(f"Second graph nodes: {nodes2}")
-        print(f"Second graph edges: {edges2}")
-        print(f"Second graph edge attributes: {edge_attr2}")
+#         print(f"Graph pair {i // 2} in batch {batch_idx}:")
+#         print(f"First graph nodes: {nodes1}")
+#         print(f"First graph edges: {edges1}")
+#         print(f"First graph edge attributes: {edge_attr1}")
+#         print(f"Second graph nodes: {nodes2}")
+#         print(f"Second graph edges: {edges2}")
+#         print(f"Second graph edge attributes: {edge_attr2}")
 
