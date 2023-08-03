@@ -35,7 +35,7 @@ class GNN_encoder(nn.Module):
         self.GAT = GATConv(nf_dim[1], GAT_dim, heads=num_heads)
 
         # Fully connected layers
-        self.fc = nn.Linear(GAT_dim, final_dim)
+        self.fc = nn.Linear(128, final_dim)
 
     def forward(self, data):
         """
