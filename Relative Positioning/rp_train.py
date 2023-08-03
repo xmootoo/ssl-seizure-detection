@@ -107,11 +107,5 @@ labels = np.random.randint(2, size=num_graphs)
 # Call your data loading function
 data_loader = rp_dataloader(edge_index, node_features, edge_features, labels)
 
-# Print the size of the first batch to verify
-# first_batch = next(iter(data_loader))
-# print(f'First batch size (graph pair and label): {len(first_batch)}')
-# print(f'First batch graph pair size: {first_batch[0].num_graphs}')
-# print(f'First batch labels size: {first_batch[1].size()}')
-
 # Training
 train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs=2)
