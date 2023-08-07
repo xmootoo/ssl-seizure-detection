@@ -87,25 +87,25 @@ def train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs
                     print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {total_loss / len(data_loader)}")
 
 
-# Test case
-num_graphs = 10
+# # Test case
+# num_graphs = 10
 
-# Generate random edge indices, node features, and edge features
-edge_index = []
-edge_index = []
-node_features = []
-edge_features = []
-for _ in range(num_graphs):
-    num_edges1, num_edges2 = np.random.randint(1, num_nodes, size=2)
-    edge_index.append((np.random.randint(num_nodes, size=(2, num_edges1)), np.random.randint(num_nodes, size=(2, num_edges2))))
-    node_features.append((np.random.rand(num_nodes, nf_dim[0]), np.random.rand(num_nodes, nf_dim[0])))
-    edge_features.append((np.random.rand(num_edges1, ef_dim), np.random.rand(num_edges2, ef_dim)))
+# # Generate random edge indices, node features, and edge features
+# edge_index = []
+# edge_index = []
+# node_features = []
+# edge_features = []
+# for _ in range(num_graphs):
+#     num_edges1, num_edges2 = np.random.randint(1, num_nodes, size=2)
+#     edge_index.append((np.random.randint(num_nodes, size=(2, num_edges1)), np.random.randint(num_nodes, size=(2, num_edges2))))
+#     node_features.append((np.random.rand(num_nodes, nf_dim[0]), np.random.rand(num_nodes, nf_dim[0])))
+#     edge_features.append((np.random.rand(num_edges1, ef_dim), np.random.rand(num_edges2, ef_dim)))
 
-# Generate random labels (binary classification)
-labels = np.random.randint(2, size=num_graphs)
+# # Generate random labels (binary classification)
+# labels = np.random.randint(2, size=num_graphs)
 
-# Call your data loading function
-data_loader = rp_dataloader(edge_index, node_features, edge_features, labels)
+# # Call your data loading function
+# data_loader = rp_dataloader(edge_index, node_features, edge_features, labels)
 
-# Training
-train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs=2)
+# # Training
+# train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs=2)

@@ -1,9 +1,5 @@
 # Libraries
 import numpy as np
-import torch
-from torch.utils.data import TensorDataset, DataLoader
-
-
 
 
 def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
@@ -23,43 +19,74 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
     """
 
     n = len(graph_reps)
-
     graph_rep_pairs = []
-
+    done_tasks = set()
+    
     # Get rid of the real labels
     data = [graph_reps[i][0] for i in range(n)]
 
     # Create pairs and pseudolabels
-    # TODO: Make sure we do not create symmetric pairs, we only need one of [[A, NF, EF], [A', NF', EF'], Y] or 
-    # [[A', NF', EF'], [A, NF, EF],  Y] but not both as the they both use the same encoder (redundant)
     for i in range(n):
         for j in range(n):
+            
+            # Time distance between pairs
             diff = np.abs(i-j)
-            if (i != j):
+            
+            # Check if pair entry unique and each pair is unique up to permutation
+            if (i != j) & ((j, i) not in done_tasks):
+                
+                # Check if pair is within the positive or negative context
                 if diff <= tau_pos:
                     graph_rep_pairs.append([data[i], data[j], 1])
                 elif diff > tau_neg:
                     graph_rep_pairs.append([data[i], data[j], 0])
+                done_tasks.add((i, j))
         
     return graph_rep_pairs
 
+
+def adj(A, thres):
+    """Converts functional connectivity matrix to binary adjacency matrix.
+
+    Args:
+        A (numpy array): Functional connectivity matrix.
+        thres (float): Threshold value.
+    """
     
-# Test case
-# Graph representations with labels
-graph_reps = [
-    [["adj1", "nf1", "ef1"], 1],
-    [["adj2", "nf2", "ef2"], 0],
-    [["adj3", "nf3", "ef3"], 1],
-    [["adj4", "nf4", "ef4"], 0]
-]
+    
+    n = A.shape[0]
+    x = np.zeros((n,n))
+    
+    for i in range(n):
+        for j in range(n):
+            if A[i,j] > thres:
+                x[i,j] = 1
+    
+    return x
 
-# Positive and negative context thresholds
-tau_pos = 1
-tau_neg = 2
+    
+# # Test case for adj
+# # Functional connectivity matrix and threshold
+# A = np.array([[0.5, -1], [0.2, 0.4]])
+# thres = 0.3
+# print(adj(A, thres))
 
-# Call the function
-pairs = graph_pairs(graph_reps, tau_pos, tau_neg)
+# # Test case for graph_pairs
+# # Graph representations with labels
+# graph_reps = [
+#     [["adj1", "nf1", "ef1"], 1],
+#     [["adj2", "nf2", "ef2"], 0],
+#     [["adj3", "nf3", "ef3"], 1],
+#     [["adj4", "nf4", "ef4"], 0]
+# ]
 
-# Print the pairs
-for pair in pairs:
-    print(pair)
+# # Positive and negative context thresholds
+# tau_pos = 1
+# tau_neg = 2
+
+# # Call the function
+# pairs = graph_pairs(graph_reps, tau_pos, tau_neg)
+
+# # Print the pairs
+# for pair in pairs:
+#     print(pair)

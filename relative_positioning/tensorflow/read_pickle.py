@@ -1,38 +1,27 @@
 import pickle
-import numpy as np
+from rp_dataloader_tf import adj, graph_pairs
+
 
 # File path (PC)
 path = "C:/Users/xmoot/Desktop/Data/ssl-seizure-detection/pickle/jh101_grs.pickle"
 
 # File path (Macbook)
-
-# Load pickle file
-f = pickle.load(open(path, "rb"))
+# path =
 
 
-
-def adj(A, thres):
-    """Converts functional connectivity matrix to binary adjacency matrix.
-
-    Args:
-        A (numpy array): Functional connectivity matrix.
-        thres (float): Threshold value.
-    """
-    
-    
-    n = A.shape[0]
-    x = np.zeros((n,n))
-    
-    for i in range(n):
-        for j in range(n):
-            if A[i,j] > thres:
-                x[i,j] = 1
-    
-    return x
+# Load graph representations
+data = pickle.load(open(path, "rb"))
 
 
 # Convert FCNs to adjacency matrices
-for i in range(len(f)):
-    f[i][0][0] = adj(f[i][0][0], 0.3)
+for i in range(len(data)):
+    data[i][0][0] = adj(data[i][0][0], 0.3)
+
     
-# Train
+# Create graph pairs
+tau_pos = 6 // 0.12
+tau_neg = 20 // 0.12
+pseudo_data = graph_pairs(data, tau_pos, tau_neg)
+
+
+
