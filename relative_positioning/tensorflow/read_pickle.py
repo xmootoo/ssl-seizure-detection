@@ -23,4 +23,6 @@ tau_pos = 6 // 0.12
 tau_neg = 20 // 0.12
 pseudo_data = graph_pairs(data, tau_pos, tau_neg)
 
-print(pseudo_data[0])
+# Save the pseudolabeled data as a pickle file
+with open('pseudo_data_jh101.pkl', 'wb') as f:
+    pickle.dump(pseudo_data, f)
