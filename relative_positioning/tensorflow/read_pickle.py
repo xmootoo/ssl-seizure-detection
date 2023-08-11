@@ -6,11 +6,16 @@ from rp_preprocess_tf import adj, graph_pairs
 path = "C:/Users/xmoot/Desktop/Data/ssl-seizure-detection/pickle/jh101_grs.pickle"
 
 # File path (Macbook) for subject jh101
-path = "/Users/xaviermootoo/Documents/Data/SSL-seizure-detection/pickle/jh101_grs.pickle"
+# path = "/Users/xaviermootoo/Documents/Data/SSL-seizure-detection/pickle/jh101_grs.pickle"
 
 
-# Load graph representations
+# Load graph representations list of [[A, NF, EF], Y]]
 data = pickle.load(open(path, "rb"))
+
+print(data[0][0][0])
+print(data[0][0][0].shape)
+
+
 
 
 # Convert FCNs to adjacency matrices
