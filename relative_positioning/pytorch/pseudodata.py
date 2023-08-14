@@ -1,6 +1,5 @@
 import pickle
-from preprocess import adj, graph_pairs, convert_to_tf_tensors, pseudo_data
-import pandas as pd
+from preprocess import convert_to_tensor, pseudo_data
 
 
 # File path (PC) for subject jh101
@@ -14,10 +13,10 @@ path = "C:/Users/xmoot/Desktop/Data/ssl-seizure-detection/patient_gr/jh101_grs.p
 data = pickle.load(open(path, "rb"))
 
 # Convert A, NF, EF, Y to TensorFlow tensors
-data = convert_to_tf_tensors(data)
+data = convert_to_tensor(data)
 
 # Create pseudolabeled graph pairs and write file for subject jh101.   
-pdata = pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, mode = "weighted", stats = True, save = True, patientid = "jh101_12s_7min_tensor")
+pdata = pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, mode = "weighted", stats = True, save = True, patientid = "jh101_12s_7min_py_tensor")
 
 
 

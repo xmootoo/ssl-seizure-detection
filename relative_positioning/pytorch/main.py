@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torch import optim
 from rp_model import GNN_encoder, Contrast, Regression
-from rp_dataloader import rp_dataloader
+from dataloader import dataloaders_torch
 
 # Hyperparameters
 num_nodes = 8
@@ -40,6 +40,8 @@ optimizer = optim.Adam(
     lr=0.001,
     weight_decay=l2_reg  # L2 regularization
 )
+
+
 
 def train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs=10):
     """

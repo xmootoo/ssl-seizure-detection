@@ -34,15 +34,7 @@ class gnn_encoder(Model):
         x = self.fc(x)
         
         return x
-
-class contrast(Model):
-    def __init__(self):
-        super(contrast, self).__init__()
-
-    def call(self, inputs):
-        z_1, z_2 = inputs
-        return tf.abs(z_1 - z_2)
-
+    
 
 class regression(Model):
     def __init__(self):
@@ -67,13 +59,20 @@ class relative_positioning(Model):
         super(relative_positioning, self).__init__()
         self.gnn_encoder = gnn_encoder(fltrs_out, l2_reg)
         self.regression = regression()
-
+        
     def call(self, inputs):
+        
+        # Graph pairs
         graph_1, graph_2 = inputs
+        
+        # Encode the graphs
         z_1 = self.gnn_encoder(graph_1)
         z_2 = self.gnn_encoder(graph_2)
-        x = contrast(z_1, z_2)
         
+        # Contrast their encodings
+        x = tf.abs(z_1 - z_2)
+        
+        # Return logistic regression of the contrastive component
         return self.regression(x, "log")
 
 

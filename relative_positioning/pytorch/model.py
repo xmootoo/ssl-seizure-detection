@@ -5,11 +5,7 @@ import torch.nn.functional as F
 from torch_geometric.nn import NNConv, GATConv, global_mean_pool
 
 
-
-# Graph neural network encoder
-# Graph neural network encoder
-# Graph neural network encoder
-class GNN_encoder(nn.Module):
+class gnn_encoder(nn.Module):
     """
     Graph neural network embedder (encoder).
 
@@ -20,11 +16,12 @@ class GNN_encoder(nn.Module):
         GAT_dim (int): Number of hidden units in the GAT layer.
         final_dim (int): Number of output features.
     """
+    
     def __init__(self, num_nodes, nf_dim, ef_dim, num_heads, GAT_dim, final_dim):
-        super(GNN_encoder, self).__init__()
-
+        super(gnn_encoder, self).__init__()
+    
         #MLP 1, hidden layer with 32 units
-        mlp1 = nn.Sequential(nn.Linear(ef_dim, 32), 
+        mlp1 = nn.Sequential(nn.Linear(ef_dim, 32),
                              nn.ReLU(),
                              nn.Linear(32, nf_dim[0] * nf_dim[1]))
         
@@ -43,18 +40,19 @@ class GNN_encoder(nn.Module):
 
         Args:
             node_features (torch.Tensor): The node features of the graph. Shape: (num_nodes, num_node_features).
-            edge_index (torch.Tensor): Edges indices of the graph. Shape: (2, num_edges) where num_edges is the number of edges in the graph. 
+            data.edge_index (torch.Tensor): Edges indices of the graph. Shape: (2, num_edges) where num_edges is the number of edges in the graph. 
                                        The first row contains the source node indices and the second row contains the target node indices. For example, the column [4 2]^T refers to the directed edge from
                                        node 4 to node 2.  
-            edge_features (torch.Tensor): Edge features of the graph. Shape: (num_edges, ef_dim), where ef_dim is the number of input edge features. Each row in the tensor corresponds to the edge-specific feature,
+            data.edge_features (torch.Tensor): Edge features of the graph. Shape: (num_edges, ef_dim), where ef_dim is the number of input edge features. Each row in the tensor corresponds to the edge-specific feature,
                                         indexed by the corresponding column in edge_index.
-
+            data.edge_weight (torch.Tensor): Edge weights of the graph. Shape: (num_edges,).
+            
         Returns:
             x (torch.Tensor): The graph embedding vector. Shape: (final_dim,).
         """
         # Obtain the node features, edge indices, and edge features
-        x, edge_index, edge_attr = data.x.float(), data.edge_index.long(), data.edge_attr.float()
-        
+        x, edge_index, edge_attr, edge_weight = data.x.float(), data.edge_index.long(), data.edge_attr.float(), data.edge_weight.float()
+
         # ECC Convolution
         x = F.relu(self.ECC(x, edge_index, edge_attr))
 
@@ -79,7 +77,7 @@ class GNN_encoder(nn.Module):
 
 
 # Contrastive module
-class Contrast(nn.Module):
+class contrast(nn.Module):
     """
     The contrastive module to measure the difference of embeddings.
 
@@ -92,7 +90,7 @@ class Contrast(nn.Module):
     """
     
     def __init__(self):
-        super(Contrast, self).__init__()
+        super(contrast, self).__init__()
 
     def forward(self, z_1, z_2):
         x = torch.abs(z_1 - z_2)
@@ -101,7 +99,7 @@ class Contrast(nn.Module):
 
 
 # Logistic regression
-class Regression(nn.Module):
+class regression(nn.Module):
     """
     Linear regression module. We will turn this into a logistic regression by applying a sigmoid function to the output with
     the BCEWithLogisticLoss function (which applies the sigmoid function before taking the standard BCELoss).
@@ -115,7 +113,7 @@ class Regression(nn.Module):
     """
     
     def __init__(self, in_dim):
-        super(Regression, self).__init__()
+        super(regression, self).__init__()
         self.fc = nn.Linear(in_dim, 1)
 
     def forward(self, x):

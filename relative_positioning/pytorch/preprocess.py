@@ -1,7 +1,7 @@
 import pickle
 import pandas as pd
 import numpy as np
-import tensorflow as tf
+import torch
 
 
 def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
@@ -121,9 +121,9 @@ def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, mode = "weighte
 
 
 
-def convert_to_tf_tensors(data):
+def convert_to_tensor(data):
     """
-    Converts a list of data entries of the form [[A, X, E], Y] to TensorFlow tensors.
+    Converts a list of data entries of the form [[A, X, E], Y] to PyTorch tensors.
     
     Args:
         data (list): A list of entries where each entry is of the form [[A, X, E], Y].
@@ -140,36 +140,49 @@ def convert_to_tf_tensors(data):
     converted_data = []
     for entry in data:
         graphs, label = entry
-        tf_graphs = [tf.convert_to_tensor(tensor) for tensor in graphs]
-        tf_label = tf.convert_to_tensor(label)
+        tf_graphs = [torch.tensor(tensor) for tensor in graphs]
+        tf_label = torch.tensor(label)
         converted_data.append([tf_graphs, tf_label])
     return converted_data
 
 
+    
+def adj_to_pyg(A, weighted = True):
+    """ 
+    Converts an adjacency matrix to the edge index and edge weight that pytorch_geometric uses to track edges.
+
+    Args:
+        A (torch.Tensor): Shape: (num_nodes, num_nodes), the binary adjaceny matrix.
+    
+    Returns:
+        edge_index (torch.Tensor): Shape: (2, num_edges), the edge index matrix. Each column represents a directed edge.
+        edge_weight (torch.Tensor): Shape: (num_edges,), the edge weight vector. Each entry represents the weight of the corresponding edge in edge_index.
+        weighted (bool): Whether the adjacency matrix is weighted or not.
+    """
+
+    # Find the indices where the adjacency matrix is nonzero
+    # These represent the directed edges
+    i, j = np.where(A != 0)
+
+    # Create the edge_index tensor with shape (2, num_edges)
+    edge_index = torch.tensor([i, j], dtype=torch.long)
+
+    # Create the edge_weight tensor with shape (num_edges,)
+    # Using the values from the adjacency matrix at the corresponding indices
+    if weighted:
+        edge_weight = torch.tensor([A[i[k], j[k]] for k in range(len(i))], dtype=torch.float)
+        return edge_index, edge_weight
+    else:
+        return edge_index
 
     
-# # Test case for adj
-# # Functional connectivity matrix and threshold
-# A = np.array([[0.5, -1], [0.2, 0.4]])
-# thres = 0.3
-# print(adj(A, thres))
 
-# # Test case for graph_pairs
-# # Graph representations with labels
-# graph_reps = [
-#     [["adj1", "nf1", "ef1"], 1],
-#     [["adj2", "nf2", "ef2"], 0],
-#     [["adj3", "nf3", "ef3"], 1],
-#     [["adj4", "nf4", "ef4"], 0]
-# ]
 
-# # Positive and negative context thresholds
-# tau_pos = 1
-# tau_neg = 2
 
-# # Call the function
-# pairs = graph_pairs(graph_reps, tau_pos, tau_neg)
 
-# # Print the pairs
-# for pair in pairs:
-#     print(pair)
+
+# Test case
+adj_matrix = np.array([[0, 2, 0], [2, 0, 1], [0, 1, 0]])
+edge_index, edge_weight = convert_adjacency_matrix(adj_matrix)
+print(edge_index)
+print(edge_weight)
