@@ -76,7 +76,7 @@ def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, se
         train_f1_score.append(metrics["f1_score"])
         
         # Print loss
-        print("Epoch: " + str(epoch) + ". Loss: " + str(metrics["loss"]))
+        print("Epoch: " + str(1 + epoch) + ". Loss: " + str(metrics["loss"]))
     
     
     # ------------------------------ Validation ------------------------------
