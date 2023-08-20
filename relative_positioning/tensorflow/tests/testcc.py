@@ -1,3 +1,4 @@
+# Tensorflow testing
 from spektral.layers import ECCConv, GlobalAvgPool, GATConv
 import tensorflow as tf
 from tensorflow.keras.layers import Dense, Dropout
@@ -101,10 +102,20 @@ model = relative_positioning()
 
 print(model(inputs))
 
+
+# Arguments testing
 import sys
 
-arg1 = sys.argv[1]
-arg2 = sys.argv[2]
+model_logdir = sys.argv[1]
+stats_logdir = sys.argv[2]
 
-print(arg1)
-print(arg2)
+# Pickle saving testing
+import pickle
+A = [1,2,3,4,5]
+B = [6,7,8,9,10]
+
+# Open the file in write-binary mode and use pickle.dump to save the object
+with open(model_logdir, 'wb') as f:
+    pickle.dump(A, f)
+with open(stats_logdir, 'wb') as f:
+    pickle.dump(B, f)
