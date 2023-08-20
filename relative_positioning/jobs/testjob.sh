@@ -1,7 +1,8 @@
 #!/bin/bash
 job_name="test_19_08_2023"
-model_logdir="path to model folder"
-stats_logdir="path to stats folder"
+model_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/models"
+stats_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/stats"
+
 
 sbatch <<EOT
 #!/bin/bash
