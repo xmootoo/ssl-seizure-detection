@@ -1,7 +1,7 @@
 #!/bin/bash
 job_name="test5_20_08_2023"
-# model_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/models/"
-# stats_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/stats/"
+model_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/models/"
+stats_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/stats/"
 
 
 sbatch <<EOT
