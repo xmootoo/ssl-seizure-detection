@@ -1,5 +1,5 @@
 #!/bin/bash
-job_name="test_19_08_2023"
+job_name="test3_20_08_2023"
 model_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/models"
 stats_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/stats"
 
@@ -11,7 +11,7 @@ sbatch <<EOT
 #SBATCH --mem-per-cpu=10G
 #SBATCH --time=00:05:00
 #SBATCH --job-name=$job_name
-#SBATCH --output=$xav/ssl_epilepsy/jobs/$job_name.out
+#SBATCH --output=$xav/ssl_epilepsy/jobs/relative_positioning/tests/$job_name.out
 #SBATCH --mail-user=xmootoo@gmail.com
 #SBATCH --mail-type=ALL
 
