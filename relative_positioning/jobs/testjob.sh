@@ -1,0 +1,18 @@
+sbatch <<EOT
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=3
+#SBATCH --mem-per-cpu=10G
+#SBATCH --time=12:00:00
+#SBATCH --job-name=test_19_08_2023
+#SBATCH --output=$xav/ssl_epilepsy/jobs/%j.out
+#SBATCH --mail-user=xmootoo@gmail.com
+#SBATCH --mail-type=ALL
+
+cd $xav/ssl_epilepsy/ssl-seizure-detection/relative_positioning/tensorflow/tests
+module load python/3.10
+source ~/tf2.12/bin/activate
+
+python testcc.py
+
+EOT
