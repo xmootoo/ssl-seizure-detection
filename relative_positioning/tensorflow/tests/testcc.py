@@ -100,3 +100,11 @@ inputs = [[A_1, X_1, E_1], [A_2, X_2, E_2]]
 model = relative_positioning()
 
 print(model(inputs))
+
+import sys
+
+arg1 = sys.argv[1]
+arg2 = sys.argv[2]
+
+print(arg1)
+print(arg2)

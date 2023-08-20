@@ -1,5 +1,7 @@
 #!/bin/bash
 job_name="test_19_08_2023"
+model_logdir="path to model folder"
+stats_logdir="path to stats folder"
 
 sbatch <<EOT
 #!/bin/bash
@@ -16,6 +18,6 @@ cd $xav/ssl_epilepsy/ssl-seizure-detection/relative_positioning/tensorflow/tests
 module load python/3.10
 source ~/tf2.12/bin/activate
 
-python testcc.py
+python testcc.py $model_logdir $stats_logdir
 
 EOT
