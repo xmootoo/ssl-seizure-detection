@@ -7,7 +7,6 @@ stats_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/stats/"
 sbatch <<EOT
 #!/bin/bash
 #SBATCH --ntasks=1               # Number of cores (CPUs, threads)
-#SBATCH --gres=gpu:1             # Number of GPU(s) per node
 #SBATCH --cpus-per-task=16       # CPU cores/threads
 #SBATCH --mem-per-cpu=10G        # memory per CPU core
 #SBATCH --time=00:05:00     
