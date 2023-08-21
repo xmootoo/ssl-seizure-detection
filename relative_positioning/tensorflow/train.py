@@ -137,7 +137,7 @@ def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, se
     # ------------------------------ Evaluation ------------------------------
     # Plot and save figures for training stats
     training_curves(train_loss, val_loss, train_acc, val_acc, stats_logdir)
-
+    
     # Evaluate on test set
     test_stats = eval(model, test_loader)
     pickle.dump(test_stats, open(os.path.join(stats_logdir, "test_stats.pickle"), "wb"))
