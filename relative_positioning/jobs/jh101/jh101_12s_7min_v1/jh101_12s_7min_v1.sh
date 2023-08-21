@@ -2,7 +2,7 @@
 job_name="jh101_12s_7min_v1"
 model_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/jh101/models"
 stats_logdir="$xav/ssl_epilepsy/jobs/relative_positioning/jh101/stats"
-pseudolabeled_data="$xav/ssl_epilepsy/data/pseudolabeled/jh101/jh101_12s_7min.pkl"
+pseudolabeled_data="$xav/ssl_epilepsy/data/pseudolabeled/jh101/jh101_12s_7min_np.pkl"
 
 sbatch <<EOT
 #!/bin/bash
