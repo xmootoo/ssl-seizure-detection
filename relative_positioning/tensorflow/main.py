@@ -17,7 +17,7 @@ lr=1e-3
 epochs=100
 batch_size=32
 val_size=0.2
-test_size=0,
+test_size=0
 seed=0
 es_patience=20
 
