@@ -6,10 +6,10 @@ pseudolabeled_data="$xav/ssl_epilepsy/data/pseudolabeled/jh101/jh101_12s_7min.pk
 
 sbatch <<EOT
 #!/bin/bash
-#SBATCH --ntasks=3               # Number of tasks
-#SBATCH --cpus-per-task=3        # CPU cores/threads
+#SBATCH --ntasks=1               # Number of tasks
+#SBATCH --cpus-per-task=16        # CPU cores/threads
 #SBATCH --mem-per-cpu=10G        # memory per CPU core
-#SBATCH --time=24:00:00     
+#SBATCH --time=12:00:00     
 #SBATCH --job-name=$job_name
 #SBATCH --output=$xav/ssl_epilepsy/jobs/relative_positioning/tests/$job_name.out
 #SBATCH --mail-user=xmootoo@gmail.com
