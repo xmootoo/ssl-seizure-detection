@@ -68,7 +68,7 @@ def adj(A, thres):
 
 
 
-def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, mode = "weighted", stats = True, save = True, patientid = "patient"):
+def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, mode = "weighted", stats = True, save = True, patientid = "patient", logdir = None):
     """
     Creates a pseudolabeled dataset of graph pairs.
     
@@ -113,8 +113,7 @@ def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, mode = "weighte
     
     # Save as a pickle file
     if save == True:
-        folder_path = "C:/Users/xmoot/Desktop/Data/ssl-seizure-detection/patient_pseudolabeled/"
-        with open(folder_path + patientid + ".pkl", "wb") as f:
+        with open(logdir + patientid + ".pkl", "wb") as f:
             pickle.dump(x, f)
     
     return x

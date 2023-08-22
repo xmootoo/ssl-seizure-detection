@@ -37,16 +37,16 @@ def graph_triplets(graph_reps, tau_pos = 50, tau_neg = 170):
                 diff_third = np.abs(M-k)
                 
                 # Check if pair is positive context
-                if diff_pos <= tau_pos:
+                if (diff_pos <= tau_pos) and (i != j) and (j != k) and (i != k):
                     
                     # Positive triplet context
                     if ((j < k < i) or (i < k < j)):
                         graph_rep_triplets.append([[data[i], data[j], data[k]], 1])
                     
                     # Negative triplet context
-                    elif (diff_third > tau_neg):
+                    if (diff_third > tau_neg):
                         graph_rep_triplets.append([[data[i], data[j], data[k]], 0])
-                    done_tasks.add((i, j, k))
+                    # done_tasks.add((i, j, k))
             
     return graph_rep_triplets
 
@@ -72,7 +72,7 @@ def adj(A, thres):
 
 
 
-def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, mode = "weighted", stats = True, save = True, patientid = "patient"):
+def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, mode = "weighted", stats = True, save = True, patientid = "patient", logdir = None):
     """
     Creates a pseudolabeled dataset of graph pairs.
     
@@ -87,7 +87,7 @@ def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, mode = "weighte
         patientid (str): Patient identification code. Defaults to "patient".
 
     Returns:
-        x (list): List of the form [[[A,NF,EF], [A',NF',EF']], Y]
+        x (list): List of the form [[[A,NF,EF], [A',NF',EF'], [A'', NF'', EF'']], Y]
     """
     
     
@@ -117,8 +117,7 @@ def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, mode = "weighte
     
     # Save as a pickle file
     if save == True:
-        folder_path = "C:/Users/xmoot/Desktop/Data/ssl-seizure-detection/patient_pseudolabeled/"
-        with open(folder_path + patientid + ".pkl", "wb") as f:
+        with open(logdir + patientid + ".pkl", "wb") as f:
             pickle.dump(x, f)
     
     return x
@@ -152,28 +151,29 @@ def convert_to_tf_tensors(data):
 
 
     
-# Test case for adj
-# Functional connectivity matrix and threshold
-A = np.array([[0.5, -1], [0.2, 0.4]])
-thres = 0.3
-print(adj(A, thres))
+# # Test case for adj
+# # Functional connectivity matrix and threshold
+# A = np.array([[0.5, -1], [0.2, 0.4]])
+# thres = 0.3
+# print(adj(A, thres))
 
-# Test case for graph_triplets
-# Graph representations with labels
-graph_reps = [
-    [["adj1", "nf1", "ef1"], 1],
-    [["adj2", "nf2", "ef2"], 0],
-    [["adj3", "nf3", "ef3"], 1],
-    [["adj4", "nf4", "ef4"], 0]
-]
+# # Test case for graph_triplets
+# # Graph representations with labels
+# graph_reps = [
+#     ["a", 1],
+#     ["b", 0],
+#     ["c", 1],
+#     ["d", 0]    
+# ]
 
-# Positive and negative context thresholds
-tau_pos = 1
-tau_neg = 2
 
-# Call the function
-triplets = graph_triplets(graph_reps, tau_pos, tau_neg)
+# # Positive and negative context thresholds
+# tau_pos = 2
+# tau_neg = 2
 
-# Print the pairs
-for triplet in triplets:
-    print(triplet)
+# # Call the function
+# triplets = graph_triplets(graph_reps, tau_pos, tau_neg)
+
+# # Print the pairs
+# for triplet in triplets:
+#     print(triplet)

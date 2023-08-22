@@ -1,14 +1,14 @@
 import pickle
-from preprocess import adj, graph_pairs, convert_to_tf_tensors, pseudo_data
-import pandas as pd
+from preprocess import convert_to_tf_tensors, pseudo_data
 
 
 # File path (PC) for subject jh101
 path = "C:/Users/xmoot/Desktop/Data/ssl-seizure-detection/patient_gr/jh101_grs.pickle"
-
 # File path (Macbook) for subject jh101
 # path = "/Users/xaviermootoo/Documents/Data/SSL-seizure-detection/pickle/jh101_grs.pickle"
 
+# Directory for dumping pseudolabeled data
+logdir = "C:/Users/xmoot/Desktop/Data/ssl-seizure-detection/patient_pseudolabeled/temporal_shuffling"
 
 # Load graph representations list of [[A, NF, EF], Y]]
 data = pickle.load(open(path, "rb"))
@@ -17,7 +17,7 @@ data = pickle.load(open(path, "rb"))
 data = convert_to_tf_tensors(data)
 
 # Create pseudolabeled graph pairs and write file for subject jh101.   
-pdata = pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, mode = "weighted", stats = True, save = True, patientid = "jh101_12s_7min_tensor")
+pdata = pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, mode = "weighted", stats = True, save = True, patientid = "jh101_12s_7min_tensor", logdir=logdir)
 
 
 

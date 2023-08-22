@@ -54,20 +54,21 @@ class regression(Model):
             return x
 
 
-class relative_positioning(Model):
+class temporal_shuffling(Model):
     def __init__(self, fltrs_out=64, l2_reg=1e-3):
-        super(relative_positioning, self).__init__()
+        super(temporal_shuffling, self).__init__()
         self.gnn_encoder = gnn_encoder(fltrs_out, l2_reg)
         self.regression = regression()
         
     def call(self, inputs):
         
         # Graph pairs
-        graph_1, graph_2 = inputs
+        graph_1, graph_2, graph_3 = inputs
         
         # Encode the graphs
         z_1 = self.gnn_encoder(graph_1)
         z_2 = self.gnn_encoder(graph_2)
+        z_3 = self.gnn_encoder(graph_3)
         
         # Contrast their encodings
         x = tf.abs(z_1 - z_2)
