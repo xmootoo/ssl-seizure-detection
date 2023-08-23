@@ -1,14 +1,23 @@
-# Pickle saving testing
-import pickle
-A = [1,2,3,4,5]
-B = [6,7,8,9,10]
+import tensorflow as tf
+import numpy as np
 
-model_logdir = "/Users/xaviermootoo/Desktop/School Docs/"
-stats_logdir = "/Users/xaviermootoo/Desktop/School Docs/"
+# Sample data
+data = [
+    [[np.array([1, 2]), np.array([3, 4]), np.array([5, 6])],
+     [np.array([7, 8]), np.array([9, 10]), np.array([11, 12])], 0],
+    [[np.array([13, 14]), np.array([15, 16]), np.array([17, 18])],
+     [np.array([19, 20]), np.array([21, 22]), np.array([23, 24])], 1]
+]
 
+# Convert to suitable structure
+inputs = [tf.constant([gr_1, gr_2]) for gr_1, gr_2, y in data]
+labels = [y for _, _, y in data]
 
-# Open the file in write-binary mode and use pickle.dump to save the object
-with open(model_logdir + "model_test.pickle", 'wb') as f:
-    pickle.dump(A, f)
-with open(stats_logdir + "stats_test.pickle", 'wb') as f:
-    pickle.dump(B, f)
+# Create a dataset
+dataset = tf.data.Dataset.from_tensor_slices((inputs, labels))
+
+# Iterate through the dataset
+for item in dataset:
+    input_data, label = item
+    print('Input:', input_data.numpy())
+    print('Label:', label.numpy())

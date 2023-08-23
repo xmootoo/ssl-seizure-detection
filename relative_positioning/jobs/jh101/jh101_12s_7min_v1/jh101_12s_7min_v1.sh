@@ -9,7 +9,7 @@ sbatch <<EOT
 #SBATCH --ntasks=3                # Number of tasks
 #SBATCH --cpus-per-task=3        # CPU cores/threads
 #SBATCH --mem-per-cpu=10G        # memory per CPU core
-#SBATCH --time=1:00:00     
+#SBATCH --time=12:00:00     
 #SBATCH --job-name=$job_name
 #SBATCH --output=$xav/ssl_epilepsy/jobs/relative_positioning/jh101/out/$job_name.out
 #SBATCH --mail-user=xmootoo@gmail.com
