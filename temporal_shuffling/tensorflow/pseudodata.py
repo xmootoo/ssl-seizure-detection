@@ -17,11 +17,7 @@ data = pickle.load(open(path, "rb"))
 data = convert_to_tf_tensors(data)
 
 # Create pseudolabeled graph pairs and write file for subject jh101.   
-pdata = pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, mode = "weighted", stats = True, save = True, patientid = "jh101_12s_7min_tensor", logdir=logdir)
-
-
-
-
+pdata = pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, mode = "weighted", stats = True, save = False, patientid = "jh101_12s_7min_tensor", logdir=logdir)
 
 
 
@@ -29,8 +25,6 @@ pdata = pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, mode
 # # Test case
 # path_pc = "C:/Users/xmoot/Desktop/Data/ssl-seizure-detection/patient_pseudolabeled/jh101_12s_7min.pkl"
 # data = pickle.load(open(path_pc, "rb"))
-
-
 
 # # Print within [[[A, NF, EF], [A', NF', EF']] Y] format
 # print(len(data[0]) == 2)

@@ -7,38 +7,10 @@ from torch.utils.data import SubsetRandomSampler, DataLoader
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
-def dataloaders_tf(data, batch_size=32, val_size=0.1, test_size=0.1, seed=0):
-    """
-    Creates TensorFlow data loaders for training, validation, and test sets from a given data list.
-    
-    Args:
-        data (list): A list of entries where each entry is of the form [[graph_1, graph_2], label].
-                     graph_1 and graph_2 are lists representing graphs, each of the form [A, X, E].
-                     A, X, E are TensorFlow tensors, and label is a tensor.
-        batch_size (int, optional): The batch size for the data loaders. Defaults to 32.
-        val_size (float, optional): The proportion of the data to include in the validation set. Defaults to 0.1.
-        test_size (float, optional): The proportion of the data to include in the test set. Defaults to 0.1.
-        seed (int, optional): Random seed for data splitting. Defaults to 0.
-    
-    Returns:
-        tuple: A tuple containing three TensorFlow data loaders for the training, validation, and test sets.
-               Each data loader yields batches of data in the form of ([graph_1, graph_2], label) tuples.
-    """
-    # Separate the inputs and labels
-    inputs = [([graph_1, graph_2], label) for [graph_1, graph_2], label in data]
-    
-    # Split into training and temporary sets
-    train_data, temp_data = train_test_split(inputs, test_size=val_size + test_size, random_state=seed)
 
-    # Further split the temporary set into validation and test sets
-    val_data, test_data = train_test_split(temp_data, test_size=test_size / (val_size + test_size), random_state=seed)
 
-    # Convert to TensorFlow datasets
-    train_loader = tf.data.Dataset.from_generator(lambda: iter(train_data), output_signature=([tf.TensorSpec(shape=(None, None), dtype=tf.float32)]*4, tf.TensorSpec(shape=(), dtype=tf.float32))).batch(batch_size)
-    val_loader = tf.data.Dataset.from_generator(lambda: iter(val_data), output_signature=([tf.TensorSpec(shape=(None, None), dtype=tf.float32)]*4, tf.TensorSpec(shape=(), dtype=tf.float32))).batch(batch_size)
-    test_loader = tf.data.Dataset.from_generator(lambda: iter(test_data), output_signature=([tf.TensorSpec(shape=(None, None), dtype=tf.float32)]*4, tf.TensorSpec(shape=(), dtype=tf.float32))).batch(batch_size)
 
-    return train_loader, val_loader, test_loader
+
 
 
 

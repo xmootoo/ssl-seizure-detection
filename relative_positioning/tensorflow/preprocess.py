@@ -16,7 +16,7 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
         tau_neg: Negative context threshold.
 
     Returns:
-        graph_rep_pairs (numpy array): List of graph representation pairs [[[A, NF, EF], [A', NF', EF']], Y], where Y corresponds to
+        graph_rep_pairs (numpy array): List of graph representation pairs [[A, NF, EF], [A', NF', EF'], Y], where Y corresponds to
         the pseudolabel of the pair.
     """
 
@@ -39,9 +39,9 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
                 
                 # Check if pair is within the positive or negative context
                 if diff <= tau_pos:
-                    graph_rep_pairs.append([[data[i], data[j]], 1])
+                    graph_rep_pairs.append([data[i], data[j], 1])
                 elif diff > tau_neg:
-                    graph_rep_pairs.append([[data[i], data[j]], 0])
+                    graph_rep_pairs.append([data[i], data[j], 0])
                 done_tasks.add((i, j))
         
     return graph_rep_pairs
@@ -83,7 +83,7 @@ def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, mode = "weighte
         patientid (str): Patient identification code. Defaults to "patient".
 
     Returns:
-        x (list): List of the form [[[A,NF,EF], [A',NF',EF']], Y]
+        x (list): List of the form [[A,NF,EF], [A',NF',EF'], Y]
     """
     
     

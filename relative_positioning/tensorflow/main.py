@@ -1,11 +1,19 @@
 import pickle
 import sys
-from train import run
+from train_tf import run
 
 # Model, stats, and pseudolabeled data directories from command line
-model_logdir = sys.argv[1]
-stats_logdir = sys.argv[2]
-pseudodata_path = sys.argv[3]
+# model_logdir = sys.argv[1]
+# stats_logdir = sys.argv[2]
+# pseudodata_path = sys.argv[3]
+
+
+# PC Local paths
+model_logdir = r"C:\Users\xmoot\Desktop\Models\TensorFlow\ssl-seizure-detection\models"
+stats_logdir = r"C:\Users\xmoot\Desktop\Models\TensorFlow\ssl-seizure-detection\stats"
+pseudodata_path = r"C:\Users\xmoot\Desktop\Data\ssl-seizure-detection\patient_pseudolabeled\relative_positioning\jh101_12s_7min_np.pkl"
+
+
 
 # Load data
 data = pickle.load(open(pseudodata_path, "rb"))
