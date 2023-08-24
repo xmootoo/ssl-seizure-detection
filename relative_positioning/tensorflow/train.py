@@ -62,13 +62,15 @@ def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, se
         metrics = None
         
         # Adam optimization on batch
+        t=0
         for batch in train_loader:
             inputs, labels = batch
-            
+            print(t)
+            t+=1
             # e.g., input[0] = [[A, NF, EF], [A', NF', EF']]
             outs = model.train_on_batch(inputs, labels)
          
-         # Training stats   
+        # Training stats   
             for i, k in enumerate(model.metrics_names):
                 if metrics is None:
                     metrics = {k: 0 for k in model.metrics_names}
