@@ -53,3 +53,10 @@ def dataloaders_torch(data, batch_size=32, val_size=0.1, test_size=0.1, seed=0):
     test_loader = DataLoader(data, batch_size=batch_size, sampler=test_sampler)
     
     return train_loader, val_loader, test_loader
+
+
+# 4600^2 = 21,160,000. approx 900,000 examples
+
+
+# Test case
+# Test if test_loader has 0 entries (empty)

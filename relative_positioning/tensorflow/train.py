@@ -62,8 +62,10 @@ def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, se
         metrics = None
         
         # Adam optimization on batch
-        for inputs, labels in train_loader:
+        for batch in train_loader:
+            inputs, labels = batch
             
+            # e.g., input[0] = [[A, NF, EF], [A', NF', EF']]
             outs = model.train_on_batch(inputs, labels)
          
          # Training stats   
@@ -82,7 +84,8 @@ def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, se
     
     # ------------------------------ Validation ------------------------------
         metrics_val = None
-        for inputs, labels in val_loader:
+        for batch in val_loader:
+            inputs, labels = batch
             
             # Convert to NumPy arrays
             inputs = [[inp.numpy() for inp in inputs[0]], [inp.numpy() for inp in inputs[1]]]         
@@ -137,8 +140,26 @@ def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, se
     # ------------------------------ Evaluation ------------------------------
     # Plot and save figures for training stats
     training_curves(train_loss, val_loss, train_acc, val_acc, stats_logdir)
-    
-    # Evaluate on test set
-    test_stats = eval(model, test_loader)
-    pickle.dump(test_stats, open(os.path.join(stats_logdir, "test_stats.pickle"), "wb"))
 
+
+# PC Local paths
+model_logdir = r"C:\Users\xmoot\Desktop\Models\TensorFlow\ssl-seizure-detection\models"
+stats_logdir = r"C:\Users\xmoot\Desktop\Models\TensorFlow\ssl-seizure-detection\stats"
+pseudodata_path = r"C:\Users\xmoot\Desktop\Data\ssl-seizure-detection\patient_pseudolabeled\relative_positioning\jh101_12s_7min_np.pkl"
+
+# Load data
+data = pickle.load(open(pseudodata_path, "rb"))
+
+# Hyperparameters
+fltrs_out=64
+l2_reg=1e-3
+lr=1e-3
+epochs=10
+batch_size=32
+val_size=0.2
+test_size=0
+seed=0
+es_patience=20
+
+run(data=data, fltrs_out=fltrs_out, l2_reg=l2_reg, lr=lr, epochs=epochs, batch_size=batch_size, val_size=val_size, test_size=test_size,
+    seed=seed, es_patience=es_patience, stats_logdir=stats_logdir, model_logdir=model_logdir)

@@ -9,7 +9,7 @@ from evaluation import f1_score, training_curves, eval
 
 
 
-def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, seed=0, es_patience=20, stats_logdir=None, 
+def run(dataset, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, seed=0, es_patience=20, stats_logdir=None, 
         model_logdir=None):
     """
     Runnning the self-supervised model 'Relative Positioning' using a GNN encoder.

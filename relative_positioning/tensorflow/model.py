@@ -61,6 +61,7 @@ class relative_positioning(Model):
         self.regression = regression()
         
     def call(self, inputs):
+        # Inputs of the form [[A, NF, EF], [A', NF', EF']]
         
         # Graph pairs
         graph_1, graph_2 = inputs
@@ -94,18 +95,24 @@ class relative_positioning(Model):
 # E_1, E_2 = (np.random.rand(N * N, S), np.random.rand(N * N, S))  # Edge features for all possible edges
 
 
-# # Instantiate the different modules
-# encoder = gnn_encoder()
-# contrast_layer = contrast()
-# regression_layer = regression()
+# # Create the model
+# model = relative_positioning(fltrs_out=64, l2_reg=1e-3)
+# graph_1 = [A_1, X_1, E_1]
+# graph_2 = [A_2, X_2, E_2]
+# inputs = [graph_1, graph_2]
+# print(model(inputs))
 
+
+# # Gnn encoder
+# encoder = gnn_encoder(fltrs_out=64, l2_reg=1e-3)
 # # Encode the graph
 # z_1 = encoder.call([A_1, X_1, E_1])
 # z_2 = encoder.call([A_2, X_2, E_2])
 
-# # Compute contrastive embedding
-# x = contrast_layer([z_1, z_2])
 
+# x = tf.abs(z_1 - z_2) 
+
+# regression_layer = regression()
 # # Perform regression on the contrasted result
 # regression_output = regression_layer(x, version="log")
 

@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import pickle
 
-def generator():
+def generator(data):
     """Generates data for the dataset."""
     for (gr_1, gr_2, y) in data:
         yield (
@@ -11,31 +11,26 @@ def generator():
             y
         )
 
-
-
-def dataset_tf(data, generator):
-
-    """Creates a TensorFlow dataset from the data.
-
-    Returns:
-        dataset : _description_
-    """
+def dataset_tf(data):
+    """Creates a TensorFlow dataset from the data."""
     # Define the output types and shapes
     output_signature = (
         (tf.TensorSpec(shape=None, dtype=tf.float32),
-        tf.TensorSpec(shape=None, dtype=tf.float32),
-        tf.TensorSpec(shape=None, dtype=tf.float32)),
+         tf.TensorSpec(shape=None, dtype=tf.float32),
+         tf.TensorSpec(shape=None, dtype=tf.float32)),
         (tf.TensorSpec(shape=None, dtype=tf.float32),
-        tf.TensorSpec(shape=None, dtype=tf.float32),
-        tf.TensorSpec(shape=None, dtype=tf.float32)),
+         tf.TensorSpec(shape=None, dtype=tf.float32),
+         tf.TensorSpec(shape=None, dtype=tf.float32)),
         tf.TensorSpec(shape=(), dtype=tf.int32)
     )
 
     # Create a dataset
-    dataset = tf.data.Dataset.from_generator(generator, output_signature=(output_signature[0], output_signature[1], output_signature[2]))
+    dataset = tf.data.Dataset.from_generator(
+        lambda: generator(data), # Using a lambda function to call generator with data
+        output_signature=(output_signature[0], output_signature[1], output_signature[2])
+    )
 
     return dataset
-
 
 
     
@@ -74,43 +69,59 @@ train_loader, val_loader, test_loader = dataloader_tf(dataset, batch_size=32, va
 
 
 # Print examples to check the loaders
-i = 0
+print("Start of train_loader:")
 print(train_loader)
-for batch in train_loader:
+
+if not train_loader:
+    print("train_loader is empty or None")
+
+for i, batch in enumerate(train_loader):
+    print(f"Batch {i}:")
+    print(batch)
+
+    if batch is None or len(batch) == 0:
+        print("Empty or None batch")
+        continue
+
     inputs, label = batch[:-1], batch[-1]
-    for i in range(len(inputs)):
-        print('Training Input:', inputs[i])
-        print('Training Label:', label.numpy()[i])
-        if i == 4:
+
+    if not inputs or not label:
+        print("Missing inputs or label")
+        continue
+
+    for j in range(len(inputs[0])): # Adjust this line based on the actual structure of inputs
+        print('Training Input:', [input[j] for input in inputs])
+        print('Training Label:', label.numpy()[j])
+        if j == 4:
             break
 
 
 
 
-# Tests
-# # Test data 
-# data = [
-#     [[np.array([[0.5645, 0.2412], [0.9563, 0.1425]]), np.array([0.8741, 0.3524, 0.4567]), np.array([[0.6324, 0.8632], [0.7841, 0.5124]])],
-#      [np.array([[0.7234, 0.4234], [0.7432, 0.9876]]), np.array([0.1234, 0.5310, 0.9865]), np.array([[0.6345, 0.2354], [0.7865, 0.5432]])], 0],
-#     [[np.array([[0.4523, 0.9876], [0.2413, 0.1532]]), np.array([0.3423, 0.6543, 0.7654]), np.array([[0.5432, 0.7654], [0.8675, 0.2134]])],
-#      [np.array([[0.1234, 0.9765], [0.7654, 0.2345]]), np.array([0.8765, 0.2345, 0.5432]), np.array([[0.1234, 0.4567], [0.7654, 0.9876]])], 0],
-#     [[np.array([[0.7654, 0.1234], [0.4567, 0.6543]]), np.array([0.9765, 0.1234, 0.8765]), np.array([[0.2345, 0.5678], [0.1234, 0.7654]])],
-#      [np.array([[0.5432, 0.7654], [0.8765, 0.4321]]), np.array([0.1234, 0.5678, 0.4321]), np.array([[0.7654, 0.1234], [0.2345, 0.6543]])], 0],
-#     [[np.array([[0.2345, 0.6789], [0.1234, 0.2345]]), np.array([0.8765, 0.1234, 0.4321]), np.array([[0.5432, 0.2345], [0.7654, 0.1234]])],
-#      [np.array([[0.9876, 0.1234], [0.4321, 0.5678]]), np.array([0.6543, 0.1234, 0.7654]), np.array([[0.8765, 0.2345], [0.1234, 0.4321]])], 0],
-#     [[np.array([0.5432, 0.8765, 0.1234]), np.array([0.7654, 0.2345]), np.array([0.4321, 0.5678, 0.8765])],
-#      [np.array([0.1234, 0.6789]), np.array([0.7654, 0.1234, 0.4567]), np.array([0.2345, 0.5678, 0.1234])], 1]
-# ]
+Tests
+# Test data 
+data = [
+    [[np.array([[0.5645, 0.2412], [0.9563, 0.1425]]), np.array([0.8741, 0.3524, 0.4567]), np.array([[0.6324, 0.8632], [0.7841, 0.5124]])],
+     [np.array([[0.7234, 0.4234], [0.7432, 0.9876]]), np.array([0.1234, 0.5310, 0.9865]), np.array([[0.6345, 0.2354], [0.7865, 0.5432]])], 0],
+    [[np.array([[0.4523, 0.9876], [0.2413, 0.1532]]), np.array([0.3423, 0.6543, 0.7654]), np.array([[0.5432, 0.7654], [0.8675, 0.2134]])],
+     [np.array([[0.1234, 0.9765], [0.7654, 0.2345]]), np.array([0.8765, 0.2345, 0.5432]), np.array([[0.1234, 0.4567], [0.7654, 0.9876]])], 0],
+    [[np.array([[0.7654, 0.1234], [0.4567, 0.6543]]), np.array([0.9765, 0.1234, 0.8765]), np.array([[0.2345, 0.5678], [0.1234, 0.7654]])],
+     [np.array([[0.5432, 0.7654], [0.8765, 0.4321]]), np.array([0.1234, 0.5678, 0.4321]), np.array([[0.7654, 0.1234], [0.2345, 0.6543]])], 0],
+    [[np.array([[0.2345, 0.6789], [0.1234, 0.2345]]), np.array([0.8765, 0.1234, 0.4321]), np.array([[0.5432, 0.2345], [0.7654, 0.1234]])],
+     [np.array([[0.9876, 0.1234], [0.4321, 0.5678]]), np.array([0.6543, 0.1234, 0.7654]), np.array([[0.8765, 0.2345], [0.1234, 0.4321]])], 0],
+    [[np.array([0.5432, 0.8765, 0.1234]), np.array([0.7654, 0.2345]), np.array([0.4321, 0.5678, 0.8765])],
+     [np.array([0.1234, 0.6789]), np.array([0.7654, 0.1234, 0.4567]), np.array([0.2345, 0.5678, 0.1234])], 1]
+]
 
-# # Test for generator() and dataset_tf()
-# dataset = dataset_tf(data, generator)
+# Test for generator() and dataset_tf()
+dataset = dataset_tf(data, generator)
 
-# # Iterate through the dataset
-# for item in dataset:
-#     graph1, graph2, label = item
-#     print('Graph 1:', graph1)
-#     print('Graph 2:', graph2)
-#     print('Label:', label.numpy())
+# Iterate through the dataset
+for item in dataset:
+    graph1, graph2, label = item
+    print('Graph 1:', graph1)
+    print('Graph 2:', graph2)
+    print('Label:', label.numpy())
     
 
 
@@ -126,3 +137,4 @@ for batch in train_loader:
 
 
 
+#<------------------------------------------------------------------------------------------->#
