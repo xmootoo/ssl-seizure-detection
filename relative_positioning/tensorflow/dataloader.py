@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 
 
 
-def dataloaders_torch(data, batch_size=32, val_size=0.1, test_size=0.1, seed=0):
+def dataloaders_torch(data, batch_size=32, val_size=0.1, test_size=0.1, seed=0, num_examples=50000):
     """
         Splits the data into PyTorch dataloaders for training, validation, and testing.
     
@@ -30,6 +30,10 @@ def dataloaders_torch(data, batch_size=32, val_size=0.1, test_size=0.1, seed=0):
     Returns:
         train_loader, val_loader, test_loader (torch.utils.data.DataLoader)
     """
+    # Data
+    random.shuffle(data)
+    data = data[0:num_examples]
+    print("Number of examples is:", len(data))
     
     # Train, test, val split with seed
     indices = [i for i in range(len(data) // 2)]

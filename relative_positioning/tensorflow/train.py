@@ -1,16 +1,18 @@
 import os
 import pickle
+import time
+
 
 from tensorflow.keras.optimizers import Adam
 from model import relative_positioning
 from dataloader import dataloaders_torch
 from evaluation import f1_score, training_curves, eval
 
-
+start_time = time.time()
 
 
 def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, seed=0, es_patience=20, stats_logdir=None, 
-        model_logdir=None):
+        model_logdir=None, num_examples=50000):
     """
     Runnning the self-supervised model 'Relative Positioning' using a GNN encoder.
 
@@ -31,7 +33,7 @@ def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, se
     
     
     # Get data loaders
-    train_loader, val_loader, test_loader = dataloaders_torch(data, batch_size, val_size, test_size, seed)
+    train_loader, val_loader, test_loader = dataloaders_torch(data, batch_size, val_size, test_size, seed, num_examples)
     
     # Model
     model = relative_positioning(fltrs_out, l2_reg)
@@ -156,12 +158,16 @@ data = pickle.load(open(pseudodata_path, "rb"))
 fltrs_out=64
 l2_reg=1e-3
 lr=1e-3
-epochs=10
+epochs=100
 batch_size=32
 val_size=0.2
 test_size=0
 seed=0
 es_patience=20
+num_examples=50000
 
 run(data=data, fltrs_out=fltrs_out, l2_reg=l2_reg, lr=lr, epochs=epochs, batch_size=batch_size, val_size=val_size, test_size=test_size,
-    seed=seed, es_patience=es_patience, stats_logdir=stats_logdir, model_logdir=model_logdir)
+    seed=seed, es_patience=es_patience, stats_logdir=stats_logdir, model_logdir=model_logdir, num_examples=num_examples)
+
+# Takes approximately 1.5min to run 1000 examples
+print("Process finished --- %s seconds ---" % (time.time() - start_time))
