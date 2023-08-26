@@ -12,7 +12,7 @@ start_time = time.time()
 
 
 def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, seed=0, es_patience=20, stats_logdir=None, 
-        model_logdir=None, num_examples=50000):
+        model_logdir=None, num_examples=50000, model_name=None):
     """
     Runnning the self-supervised model 'Relative Positioning' using a GNN encoder.
 
@@ -64,11 +64,9 @@ def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, se
         metrics = None
         
         # Adam optimization on batch
-        t=0
         for batch in train_loader:
             inputs, labels = batch
-            print(t)
-            t+=1
+            
             # e.g., input[0] = [[A, NF, EF], [A', NF', EF']]
             outs = model.train_on_batch(inputs, labels)
          
@@ -113,18 +111,18 @@ def run(data, fltrs_out, l2_reg, lr, epochs, batch_size, val_size, test_size, se
     if metrics_val["loss"] < best_val_loss:
         best_val_loss = metrics_val["loss"]
         patience = es_patience
-        model.save_weights(os.path.join(model_logdir, "best_model.h5"))
+        model.save_weights(os.path.join(model_logdir, model_name + ".h5"))
         saved_model = True
     else:
         patience -= 1
         if patience == 0:
             print("Early stopping (best val_loss: {})".format(best_val_loss))
     if not saved_model:
-        model.save_weights(os.path.join(model_logdir, "best_model.h5"))
+        model.save_weights(os.path.join(model_logdir, model_name + ".h5"))
    
     
     # ------------------------------ Save best model ------------------------------
-    model.load_weights(os.path.join(model_logdir, "best_model.h5"))
+    model.load_weights(os.path.join(model_logdir, model_name + ".h5"))
 
 
     # ------------------------------ Save statistical measurements ------------------------------
@@ -158,16 +156,17 @@ data = pickle.load(open(pseudodata_path, "rb"))
 fltrs_out=64
 l2_reg=1e-3
 lr=1e-3
-epochs=100
+epochs=200
 batch_size=32
 val_size=0.2
 test_size=0
 seed=0
 es_patience=20
-num_examples=50000
+num_examples=12000
+model_name = "jh101_12s_7min_200epochs_12000examples"
 
 run(data=data, fltrs_out=fltrs_out, l2_reg=l2_reg, lr=lr, epochs=epochs, batch_size=batch_size, val_size=val_size, test_size=test_size,
-    seed=seed, es_patience=es_patience, stats_logdir=stats_logdir, model_logdir=model_logdir, num_examples=num_examples)
+    seed=seed, es_patience=es_patience, stats_logdir=stats_logdir, model_logdir=model_logdir, num_examples=num_examples, model_name=model_name)
 
 # Takes approximately 1.5min to run 1000 examples
 print("Process finished --- %s seconds ---" % (time.time() - start_time))
