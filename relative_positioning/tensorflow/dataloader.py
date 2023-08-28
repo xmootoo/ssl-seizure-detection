@@ -32,7 +32,11 @@ def dataloaders_torch(data, batch_size=32, val_size=0.1, test_size=0.1, seed=0, 
     """
     # Data
     random.shuffle(data)
-    data = data[0:num_examples]
+    
+    if num_examples > len(data):
+        num_examples = len(data)
+    else:
+        data = data[0:num_examples]
     print("Number of examples is:", len(data))
     
     # Train, test, val split with seed
