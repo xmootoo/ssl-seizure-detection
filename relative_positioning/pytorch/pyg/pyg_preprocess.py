@@ -2,6 +2,139 @@ import pickle
 import pandas as pd
 import numpy as np
 import torch
+from torch_geometric.data import Data
+
+
+def build_K_n(num_nodes):
+    """
+    Builds the edge_index for a complete graph K_n for num_nodes = n. 
+    Credit: https://github.com/pyg-team/pytorch_geometric/issues/964
+    
+    """
+    # Initialize edge index matrix
+    E = np.zeros((2, num_nodes * (num_nodes - 1)), dtype=np.int64)
+
+    # Populate 1st row
+    for node in range(num_nodes):
+        for neighbor in range(num_nodes - 1):
+            E[0, node * (num_nodes - 1) + neighbor] = node
+
+    # Populate 2nd row
+    neighbors = []
+    for node in range(num_nodes):
+        neighbors.append(list(np.arange(node)) + list(np.arange(node + 1, num_nodes)))
+    E[1, :] = [item for sublist in neighbors for item in sublist]
+    
+    return E
+
+
+
+def adj_to_edge_attr(A, edge_index, edge_attr=None):
+    """
+    Stacks the weights of the adjacency matrix A as edge attributes to the edge_attr of a the graph.
+
+    Args:
+        A (numpy array): Adjacency matrix.
+        edge_index (numpy array): Edge indices of shape (2, num_edges).
+        edge_attr (numpy array): Existing edge features of shape (num_edges, num_edge_features).
+
+    Returns:
+        edge_attr (numpy array): New edge features of shape (num_edges, num_edge_features + 1).
+    """
+    
+    num_edges = edge_index.shape[1]
+    edge_attr_new = np.zeros((num_edges, 1))
+    
+    # Filling up the new attribute with values from the adjacency matrix
+    for k, edge in enumerate(edge_index.T):
+        i, j = edge
+        edge_attr_new[k] = A[i,j]
+        
+    # If edge_attr is None, the new attribute becomes the edge_attr
+    if edge_attr is None:
+        edge_attr = edge_attr_new
+    else:
+        # If edge_attr exists, concatenate the new attribute to the existing edge attributes
+        edge_attr = np.hstack((edge_attr, edge_attr_new))
+
+    return edge_attr
+
+
+
+def create_tensordata(num_nodes, data_list, complete = True):
+    """
+    Converts the graph data from the pickle file containing the list of graph representations of with entries of the form [[A, NF, EF], Y]
+    for numpy arrays A, NF, EF and float Y, to list of graph representations [[edge_index, x, edge_attr], y] for PyG format in torch tensors.
+    
+    args:
+        num_nodes (int): Number of nodes in the graph.
+        data_list (list): List of graph representations of the form [[A, NF, EF], Y] for numpy arrays A, NF, EF and float Y.
+        complete (bool): Whether the graph is complete or not. Defaults to True.
+    
+    returns:
+        pyg_data (list): List of graph representations of the form [[edge_index, x, edge_attr], y] for PyG format, where edge_index is a torch.long tensor of shape
+                        (2, num_edges), x is a torch.float32 tensor of shape (num_nodes, num_node_features), edge_attr is a torch.float32 tensor of shape 
+                        (num_edges, num_edge_features). 
+    
+    """
+    pyg_data = []
+    
+    if complete:
+        edge_index = build_K_n(num_nodes)
+        edge_index = torch.from_numpy(edge_index).to(torch.long)
+        
+
+        for i, example in enumerate(data_list):
+            
+            # Parse data
+            graph, y = example
+            A, x, _ = graph
+            
+            # Add adjacency matrix weights to edge attributes
+            edge_attr = adj_to_edge_attr(A, edge_index)
+            
+            # Convert to tensors
+            x = torch.from_numpy(x).to(torch.float32)
+            y = torch.tensor(y, dtype=torch.float32)
+            edge_attr = torch.from_numpy(edge_attr).to(torch.float32)
+            
+            pyg_data.append([[edge_index, x, edge_attr], y])
+
+    return pyg_data
+
+
+
+class PairData(Data):
+    def __inc__(self, key, value, *args, **kwargs):
+        if key == 'edge_index1':
+            return self.x1.size(0)
+        if key == 'edge_index2':
+            return self.x2.size(0)
+        return super().__inc__(key, value, *args, **kwargs)
+
+
+
+def convert_to_PairData(data_list, save = True, file_name = "patient", logdir = None):
+    """Converts a list of data entries of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y] to PyG Data objects.
+
+    Args:
+        data_list (list): A list of entries where each entry is of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y]. 
+                            edge_index1, x1, edge_attr1, edge_index2, x2, edge_attr2 are tensors representing graph components and y is a 1 dim tensor (label).
+    """
+    converted_data = []
+    for entry in data_list:
+        graph1, graph2, label = entry
+        edge_index1, x1, edge_attr1 = graph1
+        edge_index2, x2, edge_attr2 = graph2
+        converted_data.append(PairData(x1=x1, edge_index1=edge_index1, edge_attr1=edge_attr1, 
+                                       x2=x2, edge_index2=edge_index2, edge_attr2=edge_attr2, 
+                                       y=label))
+    
+    if save:
+        torch.save(converted_data, logdir + file_name + ".pt")
+
+    return converted_data
+
 
 
 def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
@@ -47,27 +180,6 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
     return graph_rep_pairs
 
 
-def adj(A, thres):
-    """Converts functional connectivity matrix to binary adjacency matrix.
-
-    Args:
-        A (numpy array): Functional connectivity matrix.
-        thres (float): Threshold value.
-    """
-    
-    
-    n = A.shape[0]
-    x = np.zeros((n,n))
-    
-    for i in range(n):
-        for j in range(n):
-            if A[i,j] > thres:
-                x[i,j] = 1
-    
-    return x
-
-
-
 def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, stats = True, save = True, patientid = "patient", logdir = None):
     """
     Creates a pseudolabeled dataset of graph pairs.
@@ -99,47 +211,30 @@ def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, stats = True, s
     
     # Save as a pickle file
     if save == True:
-        with open(logdir + patientid + ".pkl", "wb") as f:
-            pickle.dump(pairs, f)
+        torch.save(pairs, logdir + patientid + ".pt")
     
     return pairs
 
 
+def adj(A, thres):
+    """Converts functional connectivity matrix to binary adjacency matrix.
 
-def convert_to_tensors(data, pairs = False):
-    """
-    Converts a list of data entries of the form [[edge_index, x, edge_attr], y] to PyTorch tensors.
-    
     Args:
-        data (list): A list of entries where each entry is of the form [[edge_index, x, edge_attr], y].
-                     edge_index, x, edge_attr, are NumPy arrays representing graph components and y is a float (label).
-        pairs (bool): Whether the data is in the form of graph pairs or not. Defaults to False.
-    
-    Returns:
-        list: A list of entries with the same structure as the input data, but with each
-              NumPy array replaced by an equivalent PyTorch tensor.
+        A (numpy array): Functional connectivity matrix.
+        thres (float): Threshold value.
     """
-    if pairs == False:
-        converted_data = []
-        for entry in data:
-            graph, label = entry
-            tensor_graph = [torch.from_numpy(g) for g in graph]
-            tensor_label = torch.tensor(label)
-            converted_data.append([tensor_graph, tensor_label])
-    else:
-        converted_data = []
-        for entry in data:
-            graph1, graph_2, label = entry
-            tensor_graph1 = [torch.from_numpy(g) for g in graph1]
-            tensor_graph2 = [torch.from_numpy(g) for g in graph2]
-            tensor_label = torch.tensor(label)
-            converted_data.append([tensor_graph1, tensor_graph2, tensor_label])
-
-    return converted_data
-
-
-
     
+    
+    n = A.shape[0]
+    x = np.zeros((n,n))
+    
+    for i in range(n):
+        for j in range(n):
+            if A[i,j] > thres:
+                x[i,j] = 1
+    
+    return x
+
 # # Test case for adj
 # # Functional connectivity matrix and threshold
 # A = np.array([[0.5, -1], [0.2, 0.4]])
