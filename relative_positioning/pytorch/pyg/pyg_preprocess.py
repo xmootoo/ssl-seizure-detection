@@ -61,7 +61,7 @@ def adj_to_edge_attr(A, edge_index, edge_attr=None):
 
 
 
-def create_tensordata(num_nodes, data_list, complete = True):
+def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=None):
     """
     Converts the graph data from the pickle file containing the list of graph representations of with entries of the form [[A, NF, EF], Y]
     for numpy arrays A, NF, EF and float Y, to list of graph representations [[edge_index, x, edge_attr], y] for PyG format in torch tensors.
@@ -100,40 +100,10 @@ def create_tensordata(num_nodes, data_list, complete = True):
             
             pyg_data.append([[edge_index, x, edge_attr], y])
 
-    return pyg_data
-
-
-
-class PairData(Data):
-    def __inc__(self, key, value, *args, **kwargs):
-        if key == 'edge_index1':
-            return self.x1.size(0)
-        if key == 'edge_index2':
-            return self.x2.size(0)
-        return super().__inc__(key, value, *args, **kwargs)
-
-
-
-def convert_to_PairData(data_list, save = True, file_name = "patient", logdir = None):
-    """Converts a list of data entries of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y] to PyG Data objects.
-
-    Args:
-        data_list (list): A list of entries where each entry is of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y]. 
-                            edge_index1, x1, edge_attr1, edge_index2, x2, edge_attr2 are tensors representing graph components and y is a 1 dim tensor (label).
-    """
-    converted_data = []
-    for entry in data_list:
-        graph1, graph2, label = entry
-        edge_index1, x1, edge_attr1 = graph1
-        edge_index2, x2, edge_attr2 = graph2
-        converted_data.append(PairData(x1=x1, edge_index1=edge_index1, edge_attr1=edge_attr1, 
-                                       x2=x2, edge_index2=edge_index2, edge_attr2=edge_attr2, 
-                                       y=label))
-    
     if save:
-        torch.save(converted_data, logdir + file_name + ".pt")
-
-    return converted_data
+        torch.save(pyg_data, logdir)
+        
+    return pyg_data
 
 
 
@@ -180,7 +150,7 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
     return graph_rep_pairs
 
 
-def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, stats = True, save = True, patientid = "patient", logdir = None):
+def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = True, save = True, patientid = "patient", logdir = None):
     """
     Creates a pseudolabeled dataset of graph pairs.
     
@@ -214,6 +184,62 @@ def pseudo_data(data, tau_pos = 6 // 0.12, tau_neg = 50 // 0.12, stats = True, s
         torch.save(pairs, logdir + patientid + ".pt")
     
     return pairs
+
+class PairData(Data):
+    def __inc__(self, key, value, *args, **kwargs):
+        if key == 'edge_index1':
+            return self.x1.size(0)
+        if key == 'edge_index2':
+            return self.x2.size(0)
+        return super().__inc__(key, value, *args, **kwargs)
+
+
+def convert_to_PairData(data_list, save = True, logdir = None):
+    """Converts a list of data entries of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y] to PyG Data objects.
+
+    Args:
+        data_list (list): A list of entries where each entry is of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y]. 
+                            edge_index1, x1, edge_attr1, edge_index2, x2, edge_attr2 are tensors representing graph components and y is a 1 dim tensor (label).
+    """
+    converted_data = []
+    for entry in data_list:
+        graph1, graph2, label = entry
+        edge_index1, x1, edge_attr1 = graph1
+        edge_index2, x2, edge_attr2 = graph2
+        converted_data.append(PairData(x1=x1, edge_index1=edge_index1, edge_attr1=edge_attr1, 
+                                       x2=x2, edge_index2=edge_index2, edge_attr2=edge_attr2, 
+                                       y=label))
+    
+    if save:
+        torch.save(converted_data, logdir)
+
+    return converted_data
+
+
+def convert_to_Data(data_list, save = True, logdir = None):
+    """Converts a list of data entries of the form [[edge_index, x, edge_attr], y] to list of PyG Data objects.
+    
+    Args:
+        data_list (list): A list of entries where each entry is of the form [[edge_index, x, edge_attr], y]. edge_index, x, edge_attr are 
+        tensors representing graph components and y is a 1 dim tensor (label).
+    
+    Returns:
+        Data_list (list): A list of PyG Data objects.
+    
+    """
+    
+    Data_list = []
+
+    for entry in data_list:
+        graph, y = entry
+        edge_index, x, edge_attr = graph
+        data = Data(x = x, edge_index = edge_index, edge_attr = edge_attr, y = y)
+        Data_list.append(data)
+
+    if save:
+        torch.save(Data_list, logdir)
+    
+    return Data_list
 
 
 def adj(A, thres):
