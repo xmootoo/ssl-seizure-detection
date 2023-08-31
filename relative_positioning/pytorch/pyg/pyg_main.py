@@ -1,114 +1,126 @@
-import numpy as np
 import torch
-import torch.nn as nn
-from torch import optim
-from rp_model import GNN_encoder, Contrast, Regression
-from dataloader import dataloaders_torch
+import time
+import json
+from pyg_preprocess import create_data_loaders
+from pyg_model import relative_positioning
+from torch.cuda.amp import autocast, GradScaler
+
+
+# def train( epochs, patience, load_path, save_path)
+
+# Load data
+path = r"C:\Users\xmoot\Desktop\Data\ssl-seizure-detection\patient_pseudolabeled\relative_positioning\PyG\jh101_12s_7min_PairData.pt"
+data = torch.load(path)
+
+# Assign GPU if available
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
 
 # Hyperparameters
-num_nodes = 8
-nf_dim = (4, 12)
-ef_dim = 32
-GAT_dim = 128
-num_heads = 1
-final_dim = 64
+num_node_features = 1
+num_edge_features = 1
+hidden_channels = 64
+out_channels = 32
+epochs = 1
+patience = 20  # Number of epochs to wait before early stop
 
-# Learning rate
-lr = 0.001
+if __name__ == '__main__':
 
-# L2 regularization strength
-l2_reg = 0.01
+    # Dataloaders
+    train_loader, val_loader = create_data_loaders(data, data_size = 0.05)
 
-# Number of epochs
-num_epochs = 100
+    # Initialization
+    scaler = GradScaler()
+    model = relative_positioning(num_node_features, num_edge_features, hidden_channels, out_channels).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    criterion = torch.nn.BCEWithLogitsLoss()
 
-# Batch size
-batch_size = 32
+    best_val_loss = float('inf')
+    counter = 0  # Counter for early stopping
 
-# Initialize the models
-model_enc = GNN_encoder(num_nodes, nf_dim, ef_dim, GAT_dim, num_heads, final_dim)
-model_cont = Contrast()
-model_logreg = Regression(final_dim)
+    # Initialize lists to store loss and accuracy data as tuples
+    train_loss_data = []
+    val_loss_data = []
+    train_acc_data = []
+    val_acc_data = []
 
-# Loss BCE (with logits) for numerical stability
-criterion = nn.BCEWithLogitsLoss()
+    for epoch in range(epochs):  # 100 is just an example, set your own number of epochs
+        model.train()
+        start_time = time.time()
+        epoch_train_loss = 0
+        correct_train = 0
+        total_train = 0
 
-
-# Optimizer with L2 regularization
-optimizer = optim.Adam(
-    list(model_enc.parameters()) + list(model_cont.parameters()) + list(model_logreg.parameters()),
-    lr=0.001,
-    weight_decay=l2_reg  # L2 regularization
-)
-
-
-
-def train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs=10):
-    """
-    Train a graph neural network version of the relative positioning model.
-
-    Args:
-        model_enc (GNN_encoder): The graph neural network encoder module.
-        model_cont (Contrast): The contrastive module.
-        model_logreg (Regression): The linear regression module.
-        data_loader (DataLoader): The data loader that loads the graph pairs.
-        lr (float, optional): The learning rate for the optimizer. Defaults to 0.001.
-        num_epochs (int, optional): The number of training epochs. Defaults to 10.
-    """
-    for epoch in range(num_epochs):
-        total_loss = 0.0
-        
-        for batch_idx, (batch, labels) in enumerate(data_loader):
+        #<---------------------------------------Training--------------------------------------->
+        for batch_idx, batch in enumerate(train_loader):
             optimizer.zero_grad()
+            batch.to(device)
+            with autocast():
+                out = model(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch,
+                            batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
+                loss = criterion(out.squeeze(), batch.y.float().to(device))
+            
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+            epoch_train_loss += loss.item()
+            # Calculate training accuracy
+            pred = torch.sigmoid(out)
+            pred = (pred > 0.5).float()
+            correct_train += (pred.squeeze() == batch.y.float().to(device)).sum().item()
+            total_train += len(batch.y)
+            print(batch_idx)
+        epoch_train_loss /= len(train_loader)
+        train_accuracy = 100. * correct_train / total_train
+        train_loss_data.append((epoch, epoch_train_loss))
+        train_acc_data.append((epoch, train_accuracy))
 
-            # Convert Batch back into list of Data objects
-            data_list = batch.to_data_list()
-
-            # Separate list into two lists for the two graphs in each pair
-            graph1_list = data_list[::2]  # Elements at even indices
-            graph2_list = data_list[1::2]  # Elements at odd indices
-
-            # Process each pair of graphs
-            for graph1, graph2 in zip(graph1_list, graph2_list):
+        #<---------------------------------------Validation--------------------------------------->
+        model.eval()
+        epoch_val_loss = 0
+        correct_val = 0
+        total_val = 0
+        with torch.no_grad():
+            for batch_idx, batch in enumerate(val_loader):
+                batch.to(device)
+                with autocast():
+                    out = model(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch,
+                                batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
+                    loss = criterion(out.squeeze(), batch.y.float().to(device))
+                epoch_val_loss += loss.item()
                 
-                # Forward pass
-                z_1, z_2 = model_enc(graph1), model_enc(graph2)
-                x = model_cont(z_1, z_2)
-                logits = model_logreg(x)
+                # Calculate validation accuracy
+                pred = torch.sigmoid(out)
+                pred = (pred > 0.5).float()
+                correct_val += (pred.squeeze() == batch.y.float().to(device)).sum().item()
+                total_val += len(batch.y)
+                print(batch_idx)
                 
-                # Loss
-                loss = criterion(logits.view(-1), labels.float())
-                total_loss += loss.item()
-                
-                # Backward pass and optimization
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+        epoch_val_loss /= len(val_loader)
+        val_accuracy = 100. * correct_val / total_val
+        val_loss_data.append((epoch, epoch_val_loss))
+        val_acc_data.append((epoch, val_accuracy))
 
-                # Print the loss every 5 epochs
-                if epoch % 5 == 0:
-                    print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {total_loss / len(data_loader)}")
+        # Print epoch results
+        print(f'Epoch: {epoch}, Train Loss: {epoch_train_loss}, Train Accuracy: {train_accuracy}, Validation Loss: {epoch_val_loss}, Validation Accuracy: {val_accuracy}')
 
+        # <--------------------------------------Early Stopping-------------------------------------->
+        if epoch_val_loss < best_val_loss:
+            best_val_loss = epoch_val_loss
+            counter = 0
+        else:
+            counter += 1
+            if counter >= patience:
+                print("Early stopping triggered.")
+                break
 
-# # Test case
-# num_graphs = 10
+    #<------------------------Save stats to JSON------------------------>
+    with open('train_loss_data.json', 'w') as f:
+        json.dump(train_loss_data, f)
+    with open('val_loss_data.json', 'w') as f:
+        json.dump(val_loss_data, f)
+    with open('train_acc_data.json', 'w') as f:
+        json.dump(train_acc_data, f)
+    with open('val_acc_data.json', 'w') as f:
+        json.dump(val_acc_data, f)
 
-# # Generate random edge indices, node features, and edge features
-# edge_index = []
-# edge_index = []
-# node_features = []
-# edge_features = []
-# for _ in range(num_graphs):
-#     num_edges1, num_edges2 = np.random.randint(1, num_nodes, size=2)
-#     edge_index.append((np.random.randint(num_nodes, size=(2, num_edges1)), np.random.randint(num_nodes, size=(2, num_edges2))))
-#     node_features.append((np.random.rand(num_nodes, nf_dim[0]), np.random.rand(num_nodes, nf_dim[0])))
-#     edge_features.append((np.random.rand(num_edges1, ef_dim), np.random.rand(num_edges2, ef_dim)))
-
-# # Generate random labels (binary classification)
-# labels = np.random.randint(2, size=num_graphs)
-
-# # Call your data loading function
-# data_loader = rp_dataloader(edge_index, node_features, edge_features, labels)
-
-# # Training
-# train(model_enc, model_cont, model_logreg, data_loader, lr=0.001, num_epochs=2)

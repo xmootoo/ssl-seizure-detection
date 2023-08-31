@@ -2,8 +2,10 @@ import pickle
 import pandas as pd
 import numpy as np
 import torch
+import random
 from torch_geometric.data import Data
-
+from torch.utils.data import random_split
+from torch_geometric.loader import DataLoader
 
 def build_K_n(num_nodes):
     """
@@ -241,6 +243,42 @@ def convert_to_Data(data_list, save = True, logdir = None):
     
     return Data_list
 
+
+def create_data_loaders(data, data_size=1.0, train_ratio=0.8, batch_size=32, num_workers=4):
+    # Shuffle data
+    """
+    Create train and validation data loaders.
+
+    Parameters:
+    - data (list): The dataset
+    - val_split (float): Fraction of data to go into validation set
+    - batch_size (int): Size of mini-batches
+    - num_workers (int): Number of worker threads to use with DataLoader
+
+    Returns:
+    - train_loader, val_loader: DataLoader instances for training and validation data
+    """
+    
+    # Shuffle data
+    random.shuffle(data)
+    
+    # Take the subset of the data
+    n = len(data)
+    n_subset = int(n * data_size)
+    data_subset = data[:n_subset]
+
+    # Calculate the size of the training and validation sets
+    train_size = int(len(data_subset) * train_ratio)
+    val_size = len(data_subset) - train_size
+
+    # Split the data
+    train_data, val_data = random_split(data_subset, [train_size, val_size])
+
+    # Create data loaders
+    train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+    val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+
+    return train_loader, val_loader
 
 def adj(A, thres):
     """Converts functional connectivity matrix to binary adjacency matrix.
