@@ -109,7 +109,7 @@ def save_to_json(data, save_path, file_name):
 
 
 
-def train(data_path, save_path, model_name, epochs, data_size=1.0, train_ratio=0.8, batch_size=32, num_workers=4,
+def train(data_path, model_path, stats_path, model_name, epochs, data_size=1.0, train_ratio=0.8, batch_size=32, num_workers=4,
           lr=1e-3, timing=True):
     """Trains a the Relative Positioning SSL model.
 
@@ -180,7 +180,7 @@ def train(data_path, save_path, model_name, epochs, data_size=1.0, train_ratio=0
         if epoch_val_loss < best_val_loss:
             best_val_loss = epoch_val_loss
             counter = 0
-            save_model(model, save_path, model_name)
+            save_model(model, model_path, model_name)
         else:
             counter += 1
             if counter >= patience:
@@ -188,7 +188,7 @@ def train(data_path, save_path, model_name, epochs, data_size=1.0, train_ratio=0
                 break
             
     #<----------Save Statistics---------->
-    save_to_json(train_loss_data, save_path, "train_loss_data.json")
-    save_to_json(val_loss_data, save_path, "val_loss_data.json")
-    save_to_json(train_acc_data, save_path, "train_acc_data.json")
-    save_to_json(val_acc_data, save_path, "val_acc_data.json")
+    save_to_json(train_loss_data, stats_path, "train_loss_data.json")
+    save_to_json(val_loss_data, stats_path, "val_loss_data.json")
+    save_to_json(train_acc_data, stats_path, "train_acc_data.json")
+    save_to_json(val_acc_data, stats_path, "val_acc_data.json")
