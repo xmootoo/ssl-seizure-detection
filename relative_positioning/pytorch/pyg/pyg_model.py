@@ -39,7 +39,7 @@ class relative_positioning(nn.Module):
         self.fc2 = nn.Linear(out_channels, 1)
     
         
-    def embedder(self, x, edge_index, edge_attr, batch):
+    def encoder(self, x, edge_index, edge_attr, batch):
         # NNConv layer
         x = self.conv1(x, edge_index, edge_attr)
         x = F.relu(x)
@@ -59,10 +59,10 @@ class relative_positioning(nn.Module):
     
     def forward(self, x1, edge_index1, edge_attr1, batch1, x2, edge_index2, edge_attr2, batch2, mode="sigmoid"):
         # First graph's embeddings
-        z1 = self.embedder(x1, edge_index1, edge_attr1, batch1)
+        z1 = self.encoder(x1, edge_index1, edge_attr1, batch1)
         
         # Second graph's embeddings
-        z2 = self.embedder(x2, edge_index2, edge_attr2, batch2)
+        z2 = self.encoder(x2, edge_index2, edge_attr2, batch2)
         
         # Contrast the embeddings
         z = torch.abs(z1 - z2)
