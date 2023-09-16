@@ -113,14 +113,14 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
     Creates unique sample pairs from a list of samples and their corresponding time indexes.
 
     Args:
-        graph_reps (list of [[A, NF, EF], Y]): Ordered list of graph representations each element is a list [[A, NF, EF], Y] where
-        A is the adj matrix, NF are the node features, EF are the edge features, and Y is its label (ictal or nonictal). The index
-        of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point is approx 0.12s.
+        graph_reps (list of [graph_representation, Y]): Ordered list of graph representations each element is a list [graph_representaiton, Y] where
+        Y is its label (ictal or nonictal). The index of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point 
+        is approx 0.12s.
         tau_pos: Positive context threshold.
         tau_neg: Negative context threshold.
 
     Returns:
-        graph_rep_pairs (numpy array): List of graph representation pairs [[A, NF, EF], [A', NF', EF'], Y], where Y corresponds to
+        graph_rep_pairs (list): List of graph representation pairs [gr_1, gr_2, Y], where Y corresponds to
         the pseudolabel of the pair.
     """
 
@@ -151,7 +151,92 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
     return graph_rep_pairs
 
 
-def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = True, save = True, patientid = "patient", logdir = None):
+
+def graph_triplets(graph_reps, tau_pos=50, tau_neg=170):
+    n = len(graph_reps)
+    data = [graph_reps[i][0] for i in range(n)]
+    
+    graph_rep_triplets = []
+    seen_triplets = set()
+    
+    for t1 in range(n):
+        for t3 in range(t1 + 1, n):  # Ensuring t1 < t3 to leverage symmetry
+            diff_pos = np.abs(t1 - t3)
+            
+            if diff_pos <= tau_pos:
+                for t2 in range(n):
+                    if t2 != t1 and t2 != t3:
+                        if (t1, t2, t3) not in seen_triplets:
+                            if (t1 < t2 < t3) or (t3 < t2 < t1):
+                                graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
+                                seen_triplets.add((t1, t2, t3))
+                                
+                            M = diff_pos / 2
+                            diff_third = np.abs(M - t2)
+                            
+                            if diff_third > tau_neg // 2:
+                                graph_rep_triplets.append([data[t1], data[t2], data[t3], 0])
+                                graph_rep_triplets.append([data[t3], data[t2], data[t1], 0])  # Adding the mirrored triplet
+                                seen_triplets.add((t1, t2, t3))
+                                seen_triplets.add((t3, t2, t1))
+                            
+    return graph_rep_triplets
+
+
+
+
+
+
+
+
+# def graph_triplets(graph_reps, tau_pos = 50, tau_neg = 170):
+#     """ 
+#     Creates unique sample pairs from a list of samples and their corresponding time indexes.
+
+#     Args:
+#         graph_reps (list of [graph, Y]): Ordered list of graph representations each element is a list [graph_rep, Y] where Y is its label (ictal or nonictal). 
+#         The index of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point is approx 0.12s.
+#         tau_pos: Positive context threshold.
+#         tau_neg: Negative context threshold.
+
+#     Returns:
+#         graph_rep_triplets (list): List of graph representation pairs [gr_1, gr_2, gr_3, Y], where Y is the pseudolabel, each gr_ is a graph representation.
+#     """
+
+#     n = len(graph_reps)
+#     graph_rep_triplets = []
+    
+#     # Get rid of the real labels
+#     data = [graph_reps[i][0] for i in range(n)]
+
+#     # Create pairs and pseudolabels
+#     for t1 in range(n):
+#         for t2 in range(n):
+#             for t3 in range(n):
+#                 if (t1 != t2) and (t2 != t3) and (t1 != t3):
+        
+#                     # Time distance between pairs
+#                     diff_pos = np.abs(t1 - t3)
+                    
+#                     # Check if t1 and t3 are in positive context
+#                     if (diff_pos <= tau_pos):
+                        
+#                         # Check if temporally ordered. Also do the mirror.
+#                         if ((t1 < t2 < t3) or (t3 < t2 < t1)):
+#                             graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
+                        
+#                         M = diff_pos / 2
+#                         diff_third = np.abs(M-t2)
+                        
+#                         # Check if shuffled
+#                         if (diff_third > tau_neg // 2):
+#                             graph_rep_triplets.append([data[t1], data[t2], data[t3], 0])
+            
+#     return graph_rep_triplets
+
+
+
+def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = True, save = True, patientid = "patient", logdir = None, model = "relative_positioning"):
     """
     Creates a pseudolabeled dataset of graph pairs.
     
@@ -168,55 +253,47 @@ def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = 
         pairs (list): List of the form [[edge_index, x, edge_attr], [edge_index', x', edge_attr'], Y], where Y is the pseudolabel.
     """
     
-    pairs = graph_pairs(data, tau_pos, tau_neg)
+    if logdir is None:
+        logdir = ""
     
-    # Descriptive statistics    
-    if stats == True:
-        # Number of examples
-        print("Number of examples: "  + str(len(pairs)))
+    if model == "relative_positioning":
+        pairs = graph_pairs(data, tau_pos, tau_neg)
         
-        # Number of positive and negative examples
-        df = pd.DataFrame(pairs, columns=['col1', 'col1', 'y'])
-        counts = df['y'].value_counts()
-        print(counts)
+        # Descriptive statistics    
+        if stats:
+            # Number of examples
+            print("Number of examples: "  + str(len(pairs)))
+            
+            # Number of positive and negative examples
+            df = pd.DataFrame(pairs, columns=['col1', 'col1', 'y'])
+            counts = df['y'].value_counts()
+            print(counts)
+        
+        # Save as a pickle file
+        if save:
+            torch.save(pairs, logdir + patientid + ".pt")
+        
+        return pairs
     
-    # Save as a pickle file
-    if save == True:
-        torch.save(pairs, logdir + patientid + ".pt")
-    
-    return pairs
-
-class PairData(Data):
-    def __inc__(self, key, value, *args, **kwargs):
-        if key == 'edge_index1':
-            return self.x1.size(0)
-        if key == 'edge_index2':
-            return self.x2.size(0)
-        return super().__inc__(key, value, *args, **kwargs)
-
-
-def convert_to_PairData(data_list, save = True, logdir = None):
-    """Converts a list of data entries of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y] to PyG Data objects.
-
-    Args:
-        data_list (list): A list of entries where each entry is of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y]. 
-                            edge_index1, x1, edge_attr1, edge_index2, x2, edge_attr2 are tensors representing graph components and y is a 1 dim tensor (label).
-    """
-    converted_data = []
-    for entry in data_list:
-        graph1, graph2, label = entry
-        edge_index1, x1, edge_attr1 = graph1
-        edge_index2, x2, edge_attr2 = graph2
-        converted_data.append(PairData(x1=x1, edge_index1=edge_index1, edge_attr1=edge_attr1, 
-                                       x2=x2, edge_index2=edge_index2, edge_attr2=edge_attr2, 
-                                       y=label))
-    
-    if save:
-        torch.save(converted_data, logdir)
-
-    return converted_data
-
-
+    if model == "temporal_shuffling":
+        triplets = graph_triplets(data, tau_pos, tau_neg)
+        
+        # Descriptive statistics    
+        if stats:
+            # Number of examples
+            print("Number of examples: "  + str(len(triplets)))
+            
+            # Number of positive and negative examples
+            df = pd.DataFrame(triplets, columns=['col1', 'col2', 'col3', 'y'])
+            counts = df['y'].value_counts()
+            print(counts)
+        
+        if save:
+            torch.save(triplets, logdir + patientid + ".pt")
+        
+        return triplets
+        
+        
 def convert_to_Data(data_list, save = True, logdir = None):
     """Converts a list of data entries of the form [[edge_index, x, edge_attr], y] to list of PyG Data objects.
     
@@ -241,6 +318,82 @@ def convert_to_Data(data_list, save = True, logdir = None):
         torch.save(Data_list, logdir)
     
     return Data_list
+
+
+class PairData(Data):
+    """
+    Creates the torch_geometric data object for a pair of graphs.
+    
+    """
+    def __inc__(self, key, value, *args, **kwargs):
+        if key == 'edge_index1':
+            return self.x1.size(0)
+        if key == 'edge_index2':
+            return self.x2.size(0)
+        return super().__inc__(key, value, *args, **kwargs)
+
+
+class TripletData(Data):
+    """
+    Creates the torch_geometric data object for a triplets of graphs.
+    
+    """
+    def __inc__(self, key, value, *args, **kwargs):
+        if key == 'edge_index1':
+            return self.x1.size(0)
+        if key == 'edge_index2':
+            return self.x2.size(0)
+        if key == 'edge_index3':
+            return self.x3.size(0)
+        return super().__inc__(key, value, *args, **kwargs)
+
+
+
+def convert_to_PairData(data_list, save = True, logdir = None):
+    """Converts a list of data entries of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y] to PyG Data objects.
+
+    Args:
+        data_list (list): A list of entries where each entry is of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y]. 
+                            edge_index1, x1, edge_attr1, edge_index2, x2, edge_attr2 are tensors representing graph components and y is a 1 dim tensor (label).
+    """
+    converted_data = []
+    for entry in data_list:
+        graph1, graph2, label = entry
+        edge_index1, x1, edge_attr1 = graph1
+        edge_index2, x2, edge_attr2 = graph2
+        converted_data.append(PairData(x1=x1, edge_index1=edge_index1, edge_attr1=edge_attr1, 
+                                       x2=x2, edge_index2=edge_index2, edge_attr2=edge_attr2, 
+                                       y=label))
+    
+    if save:
+        torch.save(converted_data, logdir)
+
+    return converted_data
+
+
+def convert_to_TripletData(data_list, save = True, logdir = None):
+    """Converts a list of data entries of the form [graph1, graph2, graph3, y] to PyG Data objects.
+
+    Args:
+        data_list (list): A list of entries where each entry is of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], [edge_index3, x3, edge_attr3], y]. 
+                            edge_index_, x_, edge_attr_, are tensors representing graph components and y is a 1 dim tensor (label).
+    """
+    converted_data = []
+    for entry in data_list:
+        graph1, graph2, graph3, label = entry
+        edge_index1, x1, edge_attr1 = graph1
+        edge_index2, x2, edge_attr2 = graph2
+        edge_index3, x3, edge_attr3 = graph3
+        converted_data.append(TripletData(x1=x1, edge_index1=edge_index1, edge_attr1=edge_attr1, 
+                                       x2=x2, edge_index2=edge_index2, edge_attr2=edge_attr2,
+                                       x3=x3, edge_index3=edge_index3, edge_attr3=edge_attr3, 
+                                       y=label))
+    
+    if save:
+        torch.save(converted_data, logdir)
+
+    return converted_data
+
 
 
 def create_data_loaders(data, data_size=1.0, train_ratio=0.8, batch_size=32, num_workers=4):
