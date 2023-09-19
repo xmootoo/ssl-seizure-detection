@@ -19,6 +19,44 @@ class EdgeMLP(nn.Module):
     def forward(self, edge_attr):
         return self.mlp(edge_attr)
 
+#TODO: Implement this into the relative_positioning class along with a projector.
+class gnn_encoder(nn.Module):
+    def __init__(self, num_node_features, num_edge_features, hidden_channels, out_channels):
+        super(gnn_encoder, self).__init__()
+        
+        #MLP for NNConv (e.g., dynamic filter-generating network)
+        self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels)
+        
+        # NNConv layer
+        self.conv1 = NNConv(num_node_features, hidden_channels, self.edge_mlp)
+        
+        # GATConv layer
+        self.conv2 = GATConv(hidden_channels, hidden_channels, heads=1, concat=False)
+
+        # Fully connected layer
+        self.fc1 = nn.Linear(hidden_channels, out_channels)
+        self.fc2 = nn.Linear(out_channels, 1)
+        
+    def forward(self, x, edge_index, edge_attr, batch):
+        # NNConv layer
+        x = self.conv1(x, edge_index, edge_attr)
+        x = F.relu(x)
+        
+        # GATConv layer
+        x = self.conv2(x, edge_index)
+        x = F.relu(x)
+
+        # NON-global average pooling
+
+        # Fully connected layers
+        x = self.fc1(x)
+        x = F.relu(x)
+        
+        return x
+        
+        
+
+
 
 # Adapted Graph Neural Network using NNConv and GATConv
 class relative_positioning(nn.Module):
