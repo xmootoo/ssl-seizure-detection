@@ -2,7 +2,7 @@ import pickle
 import os
 from preprocess import create_tensordata, convert_to_Data, pseudo_data, convert_to_PairData, convert_to_TripletData
 
-def patch(graphrep_dir=None, logdir=None, file_name=None, num_electrodes=107, tau_pos=12//0.1, tau_neg=(7 * 60) // 0.12, model="supervised", stats=True):
+def patch(graphrep_dir=None, logdir=None, file_name=None, num_electrodes=107, tau_pos=12//0.1, tau_neg=(7 * 60)//0.12, model="supervised", stats=True):
   
   # Create the save directory with .pt extension
   logdir = os.join(logdir, file_name + ".pt")
@@ -11,7 +11,7 @@ def patch(graphrep_dir=None, logdir=None, file_name=None, num_electrodes=107, ta
   pickle_data = pickle.load(open(graphrep_dir, "rb"))
 
   # Convert standard graph representations to Pytorch Geometric data
-  pyg_grs = create_tensordata(num_nodes=num_electrodes, data_list=pickle_data, complete=True, save=False, logdir=None, mode="binary")
+  pyg_grs = create_tensordata(num_nodes=num_electrodes, data_list=pickle_data, complete=True, save=False, logdir=None)
   
   # Select which model to use
   if model == "supervised":
