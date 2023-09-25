@@ -28,7 +28,7 @@ Clone the repository: `git clone https://github.com/yourusername/seizure-detecti
 
 ## Usage
 
-To run the main program, use the following command optimized for the Graham cluster in Digital Alliance of Canada (Canada Compute) GPU resources:
+To run the main program, use the following command (which we optimized for GPU usage on the Graham cluster in Digital Research Alliance of Canada (Canada Compute).
 
 ```bash
 python main.py
