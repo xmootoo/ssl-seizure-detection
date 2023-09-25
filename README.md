@@ -12,9 +12,8 @@ This project aims to leverage the power of Graph Neural Networks (GNNs) for seiz
 1. [Installation](#installation)
 2. [Usage](#usage)
 3. [File Descriptions](#file-descriptions)
-4. [Contributing](#contributing)
-5. [License](#license)
-6. [Contact](#contact)
+4. [License](#license)
+5. [Contact](#contact)
 
 ## Installation
 
@@ -52,6 +51,4 @@ This project is licensed under the MIT License.
 
 ## Contact
 
-For any queries, please contact [your_email@example.com](mailto:your_email@example.com).
-
-> Note: Due to limitations in my browsing capability, I wasn't able to provide citations for ECC, GAT, and other self-supervised methods. Please add them where needed.
+For any queries, please contact [xmotoo at gmail dot com](mailto:xmootoo@gmail.com).
