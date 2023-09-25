@@ -3,11 +3,14 @@
 
 ## Introduction
 
-This project aims to leverage the power of Graph Neural Networks (GNNs) for seizure detection. Specifically, it employs various self-supervised learning methods such as Relative Positioning, Temporal Shuffling, Contrastive Predictive Coding (CPC), and Variance-Invariance-Covariance Regularization (VICReg). The architecture involves the use of a single Edge-Conditioned Convolution (ECC) layer and a Graph Attention Layer (GAT).
+This project utilizes self-supervised learning (SSL) Graph Neural Network (GNN) models for the downstream task of seizure detection including methods such as: Relative Positioning, Temporal Shuffling, Contrastive Predictive Coding (CPC), and Variance-Invariance-Covariance Regularization (VICReg). The architecture involves the use of a single Edge-Conditioned Convolution (ECC) layer and a Graph Attention Layer (GAT).
 
-> Note: For the ECC and GAT layers, please refer to their respective papers:
+> Please refer to the relevant papers:
 > - Edge-Conditioned Convolution (ECC): [(Simonovsky & Komodakis, 2017)](https://arxiv.org/abs/1704.02901)
 > - Graph Attention Layer (GAT): [(Veličković et al., 2018)](https://arxiv.org/abs/1710.10903)
+> - Relative Positioning and Temporal Shuffling [(Banvile et al., 2021)](https://arxiv.org/abs/2007.16104)
+> - Contrastive Predictive Coding (CPC) [(Oord et al., 2018)](https://arxiv.org/abs/1807.03748)
+> - Variance-Invariance-Covariance Regularization (VICreg) [(Bardes et al., 2022)](https://arxiv.org/abs/2105.04906)
 
 ## Table of Contents
 1. [Installation](#installation)
