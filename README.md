@@ -1,5 +1,6 @@
 # Seizure Detection using Graph Neural Networks and Self-Supervised Learning
 <img src="https://iiif.elifesciences.org/journal-cms/subjects%2F2021-11%2Felife-sciences-neuroscience-illustration.jpg/0,1,7016,2081/2000,/0/default.jpg" alt="Project Image" width="1000" height="300">
+
 ## Introduction
 
 This project aims to leverage the power of Graph Neural Networks (GNNs) for seizure detection. Specifically, it employs various self-supervised learning methods such as Relative Positioning, Temporal Shuffling, Contrastive Predictive Coding (CPC), and Variance-Invariance-Covariance Regularization (VICReg). The architecture involves the use of a single Edge-Conditioned Convolution (ECC) layer and a Graph Attention Layer (GAT).
