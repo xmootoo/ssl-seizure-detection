@@ -46,10 +46,6 @@ For a detailed tutorial, refer to `tutorial.ipynb`.
 - **preprocess.ipynb**: A guided notebook that demonstrates how to use preprocessing functions for both supervised and self-supervised learning.
 - **transfer.ipynb**: A notebook illustrating how to apply transfer learning from self-supervised to supervised models and fine-tuning them.
 
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to this project.
-
 ## License
 
 This project is licensed under the MIT License.
