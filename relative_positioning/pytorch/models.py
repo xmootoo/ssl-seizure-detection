@@ -17,7 +17,8 @@ class EdgeMLP(nn.Module):
         )
         
     def forward(self, edge_attr):
-        return self.mlp(edge_attr)
+        x = self.mlp(edge_attr)
+        return x
 
 #TODO: Implement this into the relative_positioning class along with a projector.
 class gnn_encoder(nn.Module):
@@ -181,7 +182,62 @@ class temporal_shuffling(nn.Module):
         return z.squeeze(1)
     
 
+
+
+
 class supervised_model(nn.Module):
-    def __init__(self, ):
+    def __init__(self, num_node_features, num_edge_features, hidden_channels=64, out_channels=32, dropout=0.5):
         super(supervised_model, self).__init__()
+        
+        # Initialize the MLP for NNConv
+        self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels)
+        
+        # NNConv layer
+        self.conv1 = NNConv(num_node_features, hidden_channels, self.edge_mlp)
+        
+        # GATConv layer
+        self.conv2 = GATConv(hidden_channels, hidden_channels, heads=1, concat=False)
+
+        # First fully connected layer
+        self.fc1 = nn.Linear(hidden_channels, out_channels)
+
+        # Dropout
+        self.dropout = nn.Dropout(p=dropout)
+
+        # Last fully connected layer
+        self.fc2 = nn.Linear(out_channels, 1)
+        self.fc3 = nn.Linear(out_channels, 3)
+    
+    def forward(self, x, edge_index, edge_attr, batch, classify="binary", dropout=True):
+
+        # ECC
+        x = self.conv1(x, edge_index, edge_attr)
+        x = F.relu(x)
+
+        # GAT
+        x = self.conv2(x, edge_index)
+        x = F.relu(x)
+
+        # Global average pooling
+        x = global_mean_pool(x, batch)
+
+
+        # Fully connected layers
+        x = self.fc1(x)
+        x = F.relu(x)
+
+        if dropout:
+            self.dropout(x)
+
+        if classify == "binary":
+            x = self.fc2(x)
+            x = torch.sigmoid(x)
+            return x.squeeze(1)
+        
+        if classify == "multi":
+            x = self.fc3(x)
+            x = torch.softmax(x, dim=1)
+            return x
+        
+            
         
