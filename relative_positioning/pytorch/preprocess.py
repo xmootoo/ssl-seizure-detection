@@ -151,13 +151,58 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
     return graph_rep_pairs
 
 
+#TODO: Fix this function, it's giving triplets with duplicate entries.
+def graph_triplets_new(graph_reps, tau_pos=50, tau_neg=170, data_size=1.0):
+    n = len(graph_reps)
+    
+    # Create a list containing the graph representation and the index
+    data = [[graph_reps[i][0], i] for i in range(n)]
+    
+    # Shuffle the data
+    random.shuffle(data)
+    
+    # Trim the data based on data_size
+    trim_size = int(n * data_size)
+    data = data[:trim_size]
+    
+    graph_rep_triplets = []
+    seen_triplets = set()
+    
+    for t1_index in range(len(data)):
+        for t2_index in range(len(data)):
+            for t3_index in range(len(data)):
+                t1 = data[t1_index][1]
+                t2 = data[t2_index][1]
+                t3 = data[t3_index][1]
+                diff_pos = np.abs(t1 - t3)
+                
+                if diff_pos <= tau_pos and t2 != t1 and t2 != t3 and ((t1, t2, t3) not in seen_triplets):
+                        if (t1 < t2 < t3) or (t3 < t2 < t1):
+                            graph_rep_triplets.append([data[t1_index][0], data[t2_index][0], data[t3_index][0], 1])
+                            seen_triplets.add((t1, t2, t3))
+                            
+                        M = diff_pos / 2
+                        diff_third = np.abs(M - t2)
+                        
+                        if diff_third > tau_neg // 2:
+                            graph_rep_triplets.append([data[t1_index][0], data[t2_index][0], data[t3_index][0], 0])
+                            graph_rep_triplets.append([data[t3_index][0], data[t2_index][0], data[t1_index][0], 0])
+                            seen_triplets.add((t1, t2, t3))
+                            seen_triplets.add((t3, t2, t1))
+                            
+    return graph_rep_triplets
 
-def graph_triplets(graph_reps, tau_pos=50, tau_neg=170):
+
+
+
+
+def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, data_size=1.0):
     n = len(graph_reps)
     data = [graph_reps[i][0] for i in range(n)]
     
     graph_rep_triplets = []
     seen_triplets = set()
+    
     
     for t1 in range(n):
         for t3 in range(t1 + 1, n):  # Ensuring t1 < t3 to leverage symmetry
@@ -236,7 +281,8 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170):
 
 
 
-def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = True, save = True, patientid = "patient", logdir = None, model = "relative_positioning"):
+def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = True, save = True, patientid = "patient", 
+                logdir = None, model = "relative_positioning", data_size = 1.0):
     """
     Creates a pseudolabeled dataset of graph pairs.
     
