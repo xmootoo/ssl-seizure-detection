@@ -87,38 +87,19 @@ def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=Non
 
         for i, example in enumerate(data_list):
 
-            if mode == "binary":    
-                # Parse data
-                graph, y = example
-                A, x, _ = graph
-                
-                # Add adjacency matrix weights to edge attributes
-                edge_attr = adj_to_edge_attr(A, edge_index)
-                
-                # Convert to tensors
-                x = torch.from_numpy(x).to(torch.float32)
-                y = torch.tensor(y, dtype=torch.float32)
-                edge_attr = torch.from_numpy(edge_attr).to(torch.float32)
-                
-                pyg_data.append([[edge_index, x, edge_attr], y])
+            # Parse data
+            graph, y = example
+            A, x, _ = graph
             
-            if mode == "multi":
-                # Parse data
-                graph, y_ind = example
-                A, x, _ = graph
-                
-                # Convert multi-class label to one-hot vector
-                y = torch.zeros(3, dtype=torch.float32)
-                y[y_ind] = 1.0
-                
-                # Add adjacency matrix weights to edge attributes
-                edge_attr = adj_to_edge_attr(A, edge_index)
-                
-                # Convert to tensors
-                x = torch.from_numpy(x).to(torch.float32)
-                edge_attr = torch.from_numpy(edge_attr).to(torch.float32)
-                
-                pyg_data.append([[edge_index, x, edge_attr], y])
+            # Add adjacency matrix weights to edge attributes
+            edge_attr = adj_to_edge_attr(A, edge_index)
+            
+            # Convert to tensors
+            x = torch.from_numpy(x).to(torch.float32)
+            y = torch.tensor(y, dtype=torch.long)
+            edge_attr = torch.from_numpy(edge_attr).to(torch.float32)
+            
+            pyg_data.append([[edge_index, x, edge_attr], y])
 
     if save:
         torch.save(pyg_data, logdir)
