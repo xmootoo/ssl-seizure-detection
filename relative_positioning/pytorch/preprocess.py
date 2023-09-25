@@ -62,7 +62,7 @@ def adj_to_edge_attr(A, edge_index, edge_attr=None):
 
 
 
-def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=None):
+def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=None, mode="binary"):
     """
     Converts the graph data from the pickle file containing the list of graph representations of with entries of the form [[A, NF, EF], Y]
     for numpy arrays A, NF, EF and float Y, to list of graph representations [[edge_index, x, edge_attr], y] for PyG format in torch tensors.
@@ -86,20 +86,39 @@ def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=Non
         
 
         for i, example in enumerate(data_list):
+
+            if mode == "binary":    
+                # Parse data
+                graph, y = example
+                A, x, _ = graph
+                
+                # Add adjacency matrix weights to edge attributes
+                edge_attr = adj_to_edge_attr(A, edge_index)
+                
+                # Convert to tensors
+                x = torch.from_numpy(x).to(torch.float32)
+                y = torch.tensor(y, dtype=torch.float32)
+                edge_attr = torch.from_numpy(edge_attr).to(torch.float32)
+                
+                pyg_data.append([[edge_index, x, edge_attr], y])
             
-            # Parse data
-            graph, y = example
-            A, x, _ = graph
-            
-            # Add adjacency matrix weights to edge attributes
-            edge_attr = adj_to_edge_attr(A, edge_index)
-            
-            # Convert to tensors
-            x = torch.from_numpy(x).to(torch.float32)
-            y = torch.tensor(y, dtype=torch.float32)
-            edge_attr = torch.from_numpy(edge_attr).to(torch.float32)
-            
-            pyg_data.append([[edge_index, x, edge_attr], y])
+            if mode == "multi":
+                # Parse data
+                graph, y_ind = example
+                A, x, _ = graph
+                
+                # Convert multi-class label to one-hot vector
+                y = torch.zeros(3, dtype=torch.float32)
+                y[y_ind] = 1.0
+                
+                # Add adjacency matrix weights to edge attributes
+                edge_attr = adj_to_edge_attr(A, edge_index)
+                
+                # Convert to tensors
+                x = torch.from_numpy(x).to(torch.float32)
+                edge_attr = torch.from_numpy(edge_attr).to(torch.float32)
+                
+                pyg_data.append([[edge_index, x, edge_attr], y])
 
     if save:
         torch.save(pyg_data, logdir)
@@ -228,56 +247,6 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, data_size=1.0):
     return graph_rep_triplets
 
 
-
-
-
-
-
-
-# def graph_triplets(graph_reps, tau_pos = 50, tau_neg = 170):
-#     """ 
-#     Creates unique sample pairs from a list of samples and their corresponding time indexes.
-
-#     Args:
-#         graph_reps (list of [graph, Y]): Ordered list of graph representations each element is a list [graph_rep, Y] where Y is its label (ictal or nonictal). 
-#         The index of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point is approx 0.12s.
-#         tau_pos: Positive context threshold.
-#         tau_neg: Negative context threshold.
-
-#     Returns:
-#         graph_rep_triplets (list): List of graph representation pairs [gr_1, gr_2, gr_3, Y], where Y is the pseudolabel, each gr_ is a graph representation.
-#     """
-
-#     n = len(graph_reps)
-#     graph_rep_triplets = []
-    
-#     # Get rid of the real labels
-#     data = [graph_reps[i][0] for i in range(n)]
-
-#     # Create pairs and pseudolabels
-#     for t1 in range(n):
-#         for t2 in range(n):
-#             for t3 in range(n):
-#                 if (t1 != t2) and (t2 != t3) and (t1 != t3):
-        
-#                     # Time distance between pairs
-#                     diff_pos = np.abs(t1 - t3)
-                    
-#                     # Check if t1 and t3 are in positive context
-#                     if (diff_pos <= tau_pos):
-                        
-#                         # Check if temporally ordered. Also do the mirror.
-#                         if ((t1 < t2 < t3) or (t3 < t2 < t1)):
-#                             graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
-                        
-#                         M = diff_pos / 2
-#                         diff_third = np.abs(M-t2)
-                        
-#                         # Check if shuffled
-#                         if (diff_third > tau_neg // 2):
-#                             graph_rep_triplets.append([data[t1], data[t2], data[t3], 0])
-            
-#     return graph_rep_triplets
 
 
 

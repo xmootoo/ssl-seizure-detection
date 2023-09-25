@@ -1,9 +1,16 @@
 import sys
-sys.path.append(r'C:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\relative_positioning\pytorch\pyg')
+import os
+
+
+# PC Path
+# sys.path.append(r'C:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\relative_positioning\pytorch\pyg')
+
+# Mac Path
+sys.path.append("/Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/relative_positioning/pytorch/")
 
 import numpy as np
 import torch
-from pyg_preprocess import graph_triplets, pseudo_data, convert_to_TripletData
+from preprocess import graph_triplets, pseudo_data, convert_to_TripletData, create_tensordata
 from torch_geometric.data import Data
 
 
@@ -27,8 +34,6 @@ def test_graph_triplets():
         print(f"Graph 2: {triplet[1]}")
         print(f"Graph 3: {triplet[2]}")
         print(f"Pseudo Label: {triplet[3]}\n")
-
-
 
 
 
@@ -110,7 +115,6 @@ def test_convert_to_TripletData():
     # Step 2: Call the function with the sample data
     output = convert_to_TripletData(data_list, save=False)
     
-   
     
     if torch.equal(output[0].x1,data_list[0][0][1]) and torch.equal(output[2].edge_index3, data_list[2][2][0]) and torch.equal(output[0].y, data_list[0][3]):
         print(output[0].x1)
@@ -122,5 +126,27 @@ def test_convert_to_TripletData():
         print("Test passed")
     
     
-test_graph_triplets()
-test_convert_to_TripletData()
+def test_create_tensordata(mode = "binary"):
+
+    num_nodes = 4
+    num_edges = int(num_nodes * (num_nodes - 1) / 2)
+    num_node_features = 3
+    num_edge_features = 2
+
+    # Create data_list with the 3 examples
+    if mode == "multi":
+        data_list = [[[np.random.rand(num_nodes, num_nodes), np.random.rand(num_nodes, num_node_features), np.random.rand(num_edges, num_edge_features)], np.random.randint(3)] for i in range(6)]
+
+    if mode == "binary":
+        data_list = [[[np.random.rand(num_nodes, num_nodes), np.random.rand(num_nodes, num_node_features), np.random.rand(num_edges, num_edge_features)], np.random.randint(2)] for i in range(6)]
+    
+    return create_tensordata(num_nodes, data_list, complete=True, save=False, logdir=None, mode="multi")
+
+
+test = test_create_tensordata(mode="multi")
+
+print(f"Edge index of graph 1: {test[0][0][0]}")
+print(f"Node features of graph 2: {test[1][0][1]}")
+print(f"Edge features of graph 3: {test[2][0][2]}")
+print(f"Label of graph 5: {test[4][1]}")
+

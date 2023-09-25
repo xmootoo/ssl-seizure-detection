@@ -179,3 +179,9 @@ class temporal_shuffling(nn.Module):
             pass
         
         return z.squeeze(1)
+    
+
+class supervised_model(nn.Module):
+    def __init__(self, ):
+        super(supervised_model, self).__init__()
+        
