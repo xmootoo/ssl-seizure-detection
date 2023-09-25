@@ -3,7 +3,7 @@
 
 ## Introduction
 
-This project utilizes self-supervised learning (SSL) Graph Neural Network (GNN) models for the downstream task of seizure detection including methods such as: Relative Positioning, Temporal Shuffling, Contrastive Predictive Coding (CPC), and Variance-Invariance-Covariance Regularization (VICReg). The architecture involves the use of a single Edge-Conditioned Convolution (ECC) layer and a Graph Attention Layer (GAT).
+This project utilizes self-supervised learning (SSL) Graph Neural Network (GNN) models for the downstream task of seizure detection. Our project uses a specialized GNN encoder adapted to SSL methods including Relative Positioning, Temporal Shuffling, Contrastive Predictive Coding (CPC), and Variance-Invariance-Covariance Regularization (VICReg). The GNN architecture mainly Edge-Conditioned Convolution (ECC) and Graph Attention Network (GAT) layers. We mainly use PyTorch and PyTorch Geometric libraries for standard deep learning and GNN implementation.
 
 > Please refer to the relevant papers:
 > - Edge-Conditioned Convolution (ECC): [(Simonovsky & Komodakis, 2017)](https://arxiv.org/abs/1704.02901)
