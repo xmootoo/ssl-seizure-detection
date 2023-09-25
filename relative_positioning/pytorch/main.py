@@ -22,12 +22,23 @@ if __name__ == '__main__':
     # num_workers = 4
 
     # Bash command line parameters
+    
+    # The path to .pt file of PairData objects list
     data_path = sys.argv[1]
+    
+    # The path to save the model
     model_path = sys.argv[2]
+    
+    # The path to save the training statistics
     stats_path = sys.argv[3]
+    
+    # The name of the model
     model_name = sys.argv[4]
+    
+    # The number of workers for training
     num_workers = int(sys.argv[5])
 
+    # Train the model
     train(data_path, model_path, stats_path, model_name, epochs, data_size, train_ratio, batch_size, num_workers,
           lr, timing)
 
