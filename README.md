@@ -36,7 +36,6 @@ To run the main program, use the following command (which we optimized for GPU u
 ```bash
 python $data_path $model_path $stats_path $model_name $num_workers main.py
 ```
-where `data_path` is the path for the PairData list or Data list (for self-supervised and supervised respectively), `model_path` is the path to save the model, `stats_path` is the path to save model training and evaluation statistics, `model_name` is the named for the saved model, and `num_workers` is the number of workers assigned.
 
 For a detailed tutorial, refer to `tutorial.ipynb`.
 
