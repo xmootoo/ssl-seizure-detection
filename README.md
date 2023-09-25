@@ -5,8 +5,8 @@
 This project aims to leverage the power of Graph Neural Networks (GNNs) for seizure detection. Specifically, it employs various self-supervised learning methods such as Relative Positioning, Temporal Shuffling, Contrastive Predictive Coding (CPC), and Variance-Invariance-Covariance Regularization (VICReg). The architecture involves the use of a single Edge-Conditioned Convolution (ECC) layer and a Graph Attention Layer (GAT).
 
 > Note: For the ECC and GAT layers, please refer to their respective papers:
-> - Edge-Conditioned Convolution (ECC): [citation needed]
-> - Graph Attention Layer (GAT): [citation needed]
+> - Edge-Conditioned Convolution (ECC): [(Simonovsky & Komodakis, 2017)](https://arxiv.org/abs/1704.02901)
+> - Graph Attention Layer (GAT): [(Veličković et al., 2018)](https://arxiv.org/abs/1710.10903)
 
 ## Table of Contents
 1. [Installation](#installation)
@@ -19,13 +19,12 @@ This project aims to leverage the power of Graph Neural Networks (GNNs) for seiz
 ## Installation
 
 ### Prerequisites
-- Python 3.8+
-- PyTorch 1.9.0
+- Python 3.8-3.11
+- PyTorch 2.0.1+
 - PyTorch Geometric (PyG)
 
 ### Steps
-1. Clone the repository: `git clone https://github.com/yourusername/seizure-detection-gnn.git`
-2. Install dependencies: `pip install -r requirements.txt`
+Clone the repository: `git clone https://github.com/yourusername/seizure-detection-gnn.git`
 
 ## Usage
 
