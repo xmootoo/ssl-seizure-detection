@@ -37,11 +37,9 @@ To run the main program, use the following command (which we optimized for GPU u
 python $data_path $model_path $stats_path $model_name $num_workers main.py
 ```
 
-**A)**  
+- For information on preprocessing, please see: `preprocess.ipynb`.
 
-**B)** For information on preprocessing, please see: `preprocess.ipynb`.
-
-**C)** For an introductory tutorial to graph pair classification with PyG, please see `tutorial.ipynb`.
+- For an introductory tutorial to graph pair classification with PyG, please see `tutorial.ipynb`.
 
 ## File Descriptions
 
