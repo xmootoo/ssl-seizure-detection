@@ -183,8 +183,6 @@ class temporal_shuffling(nn.Module):
     
 
 
-
-
 class supervised_model(nn.Module):
     def __init__(self, num_node_features, num_edge_features, hidden_channels=64, out_channels=32, dropout=0.5):
         super(supervised_model, self).__init__()
@@ -239,5 +237,13 @@ class supervised_model(nn.Module):
             x = torch.softmax(x, dim=1)
             return x
         
-            
+
         
+class CPC(nn.Module):
+    def __init__(self):
+        super(CPC, self).__init__()
+    
+
+class VICReg(nn.Module):
+    def __init__(self):
+        super(VICReg, self).__init__()
