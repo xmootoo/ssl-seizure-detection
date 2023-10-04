@@ -37,7 +37,11 @@ To run the main program, use the following command (which we optimized for GPU u
 python $data_path $model_path $stats_path $model_name $num_workers main.py
 ```
 
-For a detailed tutorial, refer to `tutorial.ipynb`.
+**A)**  For a detailed guide on the self-supervised models and model architecture, please see: https://www.xaviermootoo.com/projects/ssl-seizure-detection
+
+**B)** For information on preprocessing, please see: `preprocess.ipynb`.
+
+**C)** For an introductory tutorial to graph pair classification with PyG, please see `tutorial.ipynb`.
 
 ## File Descriptions
 
