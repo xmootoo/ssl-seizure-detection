@@ -3,14 +3,18 @@ import os
 
 
 # PC Path
-# sys.path.append(r'C:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\relative_positioning\pytorch\pyg')
 
 # Mac Path
-sys.path.append("/Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/relative_positioning/pytorch/")
+# sys.path.append("/Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/pytorch/")
+# os.chdir("/Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/pytorch/")
+# print(f"Working directory: {os.getcwd()}")
+# print(f"Path:{sys.path}")
+
 
 import numpy as np
 import torch
-from preprocess import graph_triplets, pseudo_data, convert_to_TripletData, create_tensordata
+# OR to import specific functions:
+from pytorch.preprocess import graph_triplets, pseudo_data, convert_to_TripletData, create_tensordata, graph_triplets_sampled
 from torch_geometric.data import Data
 
 
@@ -18,15 +22,15 @@ def test_graph_triplets():
     # Create a synthetic dataset with 10 graph representations
     # Note that the graph representations won't be in this format, but it doesn't matter as it only needs to work for general lists with entries [a,b,c,d].
     data = [
-        [["gr1", "gr1", "gr1"], np.random.randint(2)],
-        [["gr2", "gr2", "gr2"], np.random.randint(2)],
-        [["gr3", "gr3", "gr3"], np.random.randint(2)],
-        [["gr4", "gr4", "gr4"], np.random.randint(2)],
-        [["gr5", "gr5", "gr5"], np.random.randint(2)],
-        [["gr6", "gr6", "gr6"], np.random.randint(2)]
+        [["1"], np.random.randint(2)],
+        [["2"], np.random.randint(2)],
+        [["3"], np.random.randint(2)],
+        [["4"], np.random.randint(2)],
+        [["5"], np.random.randint(2)],
+        [["6"], np.random.randint(2)]
         ]
     # Call the function with the synthetic dataset
-    result = graph_triplets(data, tau_pos=2, tau_neg=5)
+    result = graph_triplets(data, tau_pos=3, tau_neg=5, sample_ratio=0.9)
 
     # Print the result to see what the function returns
     for triplet in result:
@@ -34,6 +38,7 @@ def test_graph_triplets():
         print(f"Graph 2: {triplet[1]}")
         print(f"Graph 3: {triplet[2]}")
         print(f"Pseudo Label: {triplet[3]}\n")
+
 
 
 
@@ -143,10 +148,5 @@ def test_create_tensordata(mode = "binary"):
     return create_tensordata(num_nodes, data_list, complete=True, save=False, logdir=None, mode="multi")
 
 
-test = test_create_tensordata(mode="multi")
 
-print(f"Edge index of graph 1: {test[0][0][0]}")
-print(f"Node features of graph 2: {test[1][0][1]}")
-print(f"Edge features of graph 3: {test[2][0][2]}")
-print(f"Label of graph 5: {test[4][1]}")
-
+print(test_graph_triplets_sampled())

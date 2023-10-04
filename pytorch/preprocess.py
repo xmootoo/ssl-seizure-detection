@@ -151,88 +151,42 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
     return graph_rep_pairs
 
 
-#TODO: Fix this function, it's giving triplets with duplicate entries.
-def graph_triplets_new(graph_reps, tau_pos=50, tau_neg=170, data_size=1.0):
-    n = len(graph_reps)
-    
-    # Create a list containing the graph representation and the index
-    data = [[graph_reps[i][0], i] for i in range(n)]
-    
-    # Shuffle the data
-    random.shuffle(data)
-    
-    # Trim the data based on data_size
-    trim_size = int(n * data_size)
-    data = data[:trim_size]
-    
-    graph_rep_triplets = []
-    seen_triplets = set()
-    
-    for t1_index in range(len(data)):
-        for t2_index in range(len(data)):
-            for t3_index in range(len(data)):
-                t1 = data[t1_index][1]
-                t2 = data[t2_index][1]
-                t3 = data[t3_index][1]
-                diff_pos = np.abs(t1 - t3)
-                
-                if diff_pos <= tau_pos and t2 != t1 and t2 != t3 and ((t1, t2, t3) not in seen_triplets):
-                        if (t1 < t2 < t3) or (t3 < t2 < t1):
-                            graph_rep_triplets.append([data[t1_index][0], data[t2_index][0], data[t3_index][0], 1])
-                            seen_triplets.add((t1, t2, t3))
-                            
-                        M = diff_pos / 2
-                        diff_third = np.abs(M - t2)
-                        
-                        if diff_third > tau_neg // 2:
-                            graph_rep_triplets.append([data[t1_index][0], data[t2_index][0], data[t3_index][0], 0])
-                            graph_rep_triplets.append([data[t3_index][0], data[t2_index][0], data[t1_index][0], 0])
-                            seen_triplets.add((t1, t2, t3))
-                            seen_triplets.add((t3, t2, t1))
-                            
-    return graph_rep_triplets
-
-
-
-
-
-def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, data_size=1.0):
+def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     n = len(graph_reps)
     data = [graph_reps[i][0] for i in range(n)]
     
     graph_rep_triplets = []
     seen_triplets = set()
-    
-    
+
     for t1 in range(n):
-        for t3 in range(t1 + 1, n):  # Ensuring t1 < t3 to leverage symmetry
+        for t3 in random.sample(range(t1 + 1, n), min(int((n - t1 - 1) * sample_ratio), n - t1 - 1)):
             diff_pos = np.abs(t1 - t3)
             
             if diff_pos <= tau_pos:
-                for t2 in range(n):
-                    if t2 != t1 and t2 != t3:
-                        if (t1, t2, t3) not in seen_triplets:
-                            if (t1 < t2 < t3) or (t3 < t2 < t1):
-                                graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
-                                seen_triplets.add((t1, t2, t3))
-                                
-                            M = diff_pos / 2
-                            diff_third = np.abs(M - t2)
-                            
-                            if diff_third > tau_neg // 2:
+                available_t2 = [x for x in range(n) if x != t1 and x != t3]
+                for t2 in random.sample(available_t2, min(int(n * sample_ratio), len(available_t2))):
+                    if (t1, t2, t3) not in seen_triplets:
+                        
+                        M = diff_pos / 2
+                        diff_third = np.abs(M - t2)
+
+                        # Checking the condition for label=1
+                        if (t1 < t2 < t3) or (t3 < t2 < t1):
+                            graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
+                            seen_triplets.add((t1, t2, t3))
+                        
+                        # Checking the condition for label=0
+                        if diff_third > tau_neg // 2:
+                            if not ((t1 < t2 < t3) or (t3 < t2 < t1)):
                                 graph_rep_triplets.append([data[t1], data[t2], data[t3], 0])
-                                graph_rep_triplets.append([data[t3], data[t2], data[t1], 0])  # Adding the mirrored triplet
                                 seen_triplets.add((t1, t2, t3))
-                                seen_triplets.add((t3, t2, t1))
                             
     return graph_rep_triplets
 
 
 
-
-
 def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = True, save = True, patientid = "patient", 
-                logdir = None, model = "relative_positioning", data_size = 1.0):
+                logdir = None, model = "relative_positioning", sample_ratio = 1.0):
     """
     Creates a pseudolabeled dataset of graph pairs.
     
@@ -272,7 +226,7 @@ def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = 
         return pairs
     
     if model == "temporal_shuffling":
-        triplets = graph_triplets(data, tau_pos, tau_neg)
+        triplets = graph_triplets(data, tau_pos, tau_neg, sample_ratio)
         
         # Descriptive statistics    
         if stats:
@@ -447,28 +401,37 @@ def adj(A, thres):
     
     return x
 
-# # Test case for adj
-# # Functional connectivity matrix and threshold
-# A = np.array([[0.5, -1], [0.2, 0.4]])
-# thres = 0.3
-# print(adj(A, thres))
 
-# # Test case for graph_pairs
-# # Graph representations with labels
-# graph_reps = [
-#     [["adj1", "nf1", "ef1"], 1],
-#     [["adj2", "nf2", "ef2"], 0],
-#     [["adj3", "nf3", "ef3"], 1],
-#     [["adj4", "nf4", "ef4"], 0]
-# ]
 
-# # Positive and negative context thresholds
-# tau_pos = 1
-# tau_neg = 2
 
-# # Call the function
-# pairs = graph_pairs(graph_reps, tau_pos, tau_neg)
-
-# # Print the pairs
-# for pair in pairs:
-#     print(pair)
+# # Old version of graph triplets
+# def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, data_size=1.0):
+#     n = len(graph_reps)
+#     data = [graph_reps[i][0] for i in range(n)]
+    
+#     graph_rep_triplets = []
+#     seen_triplets = set()
+    
+    
+#     for t1 in range(n):
+#         for t3 in range(t1 + 1, n):  # Ensuring t1 < t3 to leverage symmetry
+#             diff_pos = np.abs(t1 - t3)
+            
+#             if diff_pos <= tau_pos:
+#                 for t2 in range(n):
+#                     if t2 != t1 and t2 != t3:
+#                         if (t1, t2, t3) not in seen_triplets:
+#                             if (t1 < t2 < t3) or (t3 < t2 < t1):
+#                                 graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
+#                                 seen_triplets.add((t1, t2, t3))
+                                
+#                             M = diff_pos / 2
+#                             diff_third = np.abs(M - t2)
+                            
+#                             if diff_third > tau_neg // 2:
+#                                 graph_rep_triplets.append([data[t1], data[t2], data[t3], 0])
+#                                 graph_rep_triplets.append([data[t3], data[t2], data[t1], 0])  # Adding the mirrored triplet
+#                                 seen_triplets.add((t1, t2, t3))
+#                                 seen_triplets.add((t3, t2, t1))
+                            
+#     return graph_rep_triplets
