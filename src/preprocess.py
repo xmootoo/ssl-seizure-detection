@@ -38,6 +38,76 @@ def build_K_n(num_nodes):
 
 
 
+def new_grs(data, type="preictal", mode="binary"):
+    
+    # Encode labels
+    # Binary encoding
+    if mode == "binary":
+        if type == "ictal":
+            Y = 1
+        if type == "preictal":
+            Y = 0
+        if type == "postical":
+            Y = 0
+
+    # Multiclass encoding
+    if mode == "multiclass":
+        if type == "ictal":
+            Y = 0
+        if type == "preictal":
+            Y = 1
+        if type == "postical":
+            Y = 2
+
+    new_grs = []
+    for i in range(len(data)):
+        # Node features
+        NF_avg = data[i][1][1]
+        NF_band = data[i][1][2]
+
+        NF = np.concatenate((NF_avg, NF_band), axis=1)
+
+        # Edge features
+        EF_corr = data[i][2][1]
+        EF_coh = data[i][2][2]
+        EF_phase = data[i][2][3]
+
+        EF = np.concatenate((EF_corr, EF_coh, EF_phase), axis=2)
+
+        new_grs.append(([[NF, EF], Y]))
+    
+    return new_grs
+
+
+
+def ef_to_edge_attr(edge_index, ef=None):
+    """
+    Stacks the weights of the adjacency matrix A as edge attributes to the edge_attr of a the graph.
+    Note this ONLY works for complete graphs K_n as of now.
+
+    Args:
+        A (numpy array): Weighted adjacency matrix of shape (num_nodes, num_nodes).
+        edge_index (numpy array): Edge indices array of shape (2, num_edges) in PyG format.
+        edge_attr (numpy array): Existing edge features (if any), either of shape (num_nodes, num_nodes, num_edge_features) if given
+                                 in functional connectivity matrix format. 
+
+    Returns:
+        edge_attr (numpy array): New edge features of shape (num_edges, num_edge_features) that follows the edge_index.
+    """
+
+    num_edges = edge_index.shape[1]
+    num_nodes = ef.shape[1]
+    num_edge_features = ef.shape[2]
+
+    # Case 2: Edge features exist in FCN format. Convert adj matrix weights and edge features to edge_attr.
+    edge_attr = np.zeros((num_edges, num_edge_features))
+    for k, edge in enumerate(edge_index.T):
+        i, j = edge
+        edge_attr[k] = ef[i, j, :]
+
+    return edge_attr
+
+
 def adj_to_edge_attr(A, edge_index, edge_attr=None, mode=None):
     """
     Stacks the weights of the adjacency matrix A as edge attributes to the edge_attr of a the graph.
@@ -83,6 +153,52 @@ def adj_to_edge_attr(A, edge_index, edge_attr=None, mode=None):
         return "Error: Mode not specified, must be either None, FCN, or PyG."
 
     return edge_attr_new
+
+
+# Version of create_tensordata() but only for lists with entries [[NF, EF], Y] (no Adjacency matrix)
+def create_tensordata_new(num_nodes, data_list, complete=True, save=True, logdir=None):
+    """
+    Converts the graph data from the pickle file containing the list of graph representations of with entries of the form [[NF, EF], Y]
+    for numpy arrays NF, EF and float Y, to list of graph representations [[edge_index, x, edge_attr], y] for PyG format in torch tensors.
+    
+    args:
+        num_nodes (int): Number of nodes in the graph.
+        data_list (list): List of graph representations of the form [[A, NF, EF], Y] for numpy arrays A, NF, EF and float Y.
+        complete (bool): Whether the graph is complete or not. Defaults to True.
+    
+    returns:
+        pyg_data (list): List of graph representations of the form [[edge_index, x, edge_attr], y] for PyG format, where edge_index is a torch.long tensor of shape
+                        (2, num_edges), x is a torch.float32 tensor of shape (num_nodes, num_node_features), edge_attr is a torch.float32 tensor of shape 
+                        (num_edges, num_edge_features). 
+    
+    """
+    pyg_data = []
+    
+    if complete:
+        edge_index = build_K_n(num_nodes)
+        edge_index = torch.from_numpy(edge_index).to(torch.long)
+
+        for i, example in enumerate(data_list):
+
+            # Parse data
+            graph, y = example
+            x, ef = graph
+            
+            # Conver to ef to edge_attr
+            edge_attr = ef_to_edge_attr(edge_index, ef=ef)
+
+            # Convert to tensors
+            x = torch.from_numpy(x).to(torch.float32)
+            y = torch.tensor(y, dtype=torch.long)
+            edge_attr = torch.from_numpy(edge_attr).to(torch.float32)
+            
+            pyg_data.append([[edge_index, x, edge_attr], y])
+
+    if save:
+        torch.save(pyg_data, logdir)
+        
+    return pyg_data
+
 
 
 
