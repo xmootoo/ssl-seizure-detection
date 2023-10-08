@@ -79,7 +79,7 @@ def adj_to_edge_attr(A, edge_index, edge_attr=None, mode=None):
 
 
 
-def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=None):
+def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=None, mode=None):
     """
     Converts the graph data from the pickle file containing the list of graph representations of with entries of the form [[A, NF, EF], Y]
     for numpy arrays A, NF, EF and float Y, to list of graph representations [[edge_index, x, edge_attr], y] for PyG format in torch tensors.
@@ -109,7 +109,7 @@ def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=Non
             A, x, _ = graph
             
             # Add adjacency matrix weights to edge attributes
-            edge_attr = adj_to_edge_attr(A, edge_index)
+            edge_attr = adj_to_edge_attr(A, edge_index, edge_attr=None, mode=mode)
             
             # Convert to tensors
             x = torch.from_numpy(x).to(torch.float32)
