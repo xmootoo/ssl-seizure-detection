@@ -6,6 +6,8 @@ from torch_geometric.data import Data
 from torch.utils.data import random_split
 from torch_geometric.loader import DataLoader
 
+
+
 def build_K_n(num_nodes):
     """
     Builds the edge_index for a complete graph K_n for num_nodes = n. 
@@ -75,7 +77,6 @@ def adj_to_edge_attr(A, edge_index, edge_attr=None, mode=None):
         return "Error: Mode not specified, must be either None, FCN, or PyG."
 
     return edge_attr_new
-
 
 
 
@@ -168,7 +169,25 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
     return graph_rep_pairs
 
 
+
 def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
+    """
+    Creates unique sample triplets from a list of samples and their corresponding time indexes.
+    
+    Args:
+        graph_reps (list of [graph_representation, Y]): Ordered list of graph representations each element is a list [graph_representaiton, Y] where
+        Y is its label (ictal or nonictal). The index of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point 
+        is approx 0.12s.
+        tau_pos: Positive context threshold.
+        tau_neg: Negative context threshold.
+        sample_ratio: Proportion of the psuedodata to be sampled from the entire dataset. Defaults to 1.0.
+
+    Returns:
+        graph_rep_triplets (list): List of graph representation triplets [gr_1, gr_2, gr_3, Y], where Y corresponds to
+        the pseudolabel of the triplet.
+
+    
+    """
     n = len(graph_reps)
     data = [graph_reps[i][0] for i in range(n)]
     
@@ -259,10 +278,12 @@ def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = 
             torch.save(triplets, logdir + patientid + ".pt")
         
         return triplets
-        
+
+
         
 def convert_to_Data(data_list, save = True, logdir = None):
-    """Converts a list of data entries of the form [[edge_index, x, edge_attr], y] to list of PyG Data objects.
+    """
+    Converts a list of data entries of the form [[edge_index, x, edge_attr], y] to list of PyG Data objects.
     
     Args:
         data_list (list): A list of entries where each entry is of the form [[edge_index, x, edge_attr], y]. edge_index, x, edge_attr are 
@@ -287,6 +308,7 @@ def convert_to_Data(data_list, save = True, logdir = None):
     return Data_list
 
 
+
 class PairData(Data):
     """
     Creates the torch_geometric data object for a pair of graphs.
@@ -298,6 +320,7 @@ class PairData(Data):
         if key == 'edge_index2':
             return self.x2.size(0)
         return super().__inc__(key, value, *args, **kwargs)
+
 
 
 class TripletData(Data):
@@ -317,11 +340,15 @@ class TripletData(Data):
 
 
 def convert_to_PairData(data_list, save = True, logdir = None):
-    """Converts a list of data entries of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y] to PyG Data objects.
+    """
+    Converts a list of data entries of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y] to PyG Data objects.
 
     Args:
         data_list (list): A list of entries where each entry is of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], y]. 
                             edge_index1, x1, edge_attr1, edge_index2, x2, edge_attr2 are tensors representing graph components and y is a 1 dim tensor (label).
+    
+    Returns:
+        converted_data (list): A list of PyG PairData objects.
     """
     converted_data = []
     for entry in data_list:
@@ -339,11 +366,15 @@ def convert_to_PairData(data_list, save = True, logdir = None):
 
 
 def convert_to_TripletData(data_list, save = True, logdir = None):
-    """Converts a list of data entries of the form [graph1, graph2, graph3, y] to PyG Data objects.
+    """
+    Converts a list of data entries of the form [graph1, graph2, graph3, y] to PyG Data objects.
 
     Args:
         data_list (list): A list of entries where each entry is of the form [[edge_index1, x1, edge_attr1] [edge_index2, x2, edge_attr2], [edge_index3, x3, edge_attr3], y]. 
                             edge_index_, x_, edge_attr_, are tensors representing graph components and y is a 1 dim tensor (label).
+    
+    Returns:
+        converted_data (list): A list of PyG TripletData objects.
     """
     converted_data = []
     for entry in data_list:
@@ -398,6 +429,8 @@ def create_data_loaders(data, data_size=1.0, train_ratio=0.8, batch_size=32, num
     val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
 
     return train_loader, val_loader
+
+
 
 def adj(A, thres):
     """Converts functional connectivity matrix to binary adjacency matrix.
