@@ -12,6 +12,12 @@ def build_K_n(num_nodes):
     """
     Builds the edge_index for a complete graph K_n for num_nodes = n. 
     Credit: https://github.com/pyg-team/pytorch_geometric/issues/964
+
+    Args:
+        num_nodes (int): Number of nodes in the graph.
+    
+    Returns:
+        E (numpy array): Edge index matrix of shape (2, num_edges) in PyG format.
     
     """
     # Initialize edge index matrix
