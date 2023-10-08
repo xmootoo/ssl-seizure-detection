@@ -30,35 +30,52 @@ def build_K_n(num_nodes):
 
 
 
-def adj_to_edge_attr(A, edge_index, edge_attr=None):
+def adj_to_edge_attr(A, edge_index, edge_attr=None, mode=None):
     """
     Stacks the weights of the adjacency matrix A as edge attributes to the edge_attr of a the graph.
+    Note this ONLY works for complete graphs K_n as of now.
 
     Args:
-        A (numpy array): Adjacency matrix.
-        edge_index (numpy array): Edge indices of shape (2, num_edges).
-        edge_attr (numpy array): Existing edge features of shape (num_edges, num_edge_features).
+        A (numpy array): Weighted adjacency matrix of shape (num_nodes, num_nodes).
+        edge_index (numpy array): Edge indices array of shape (2, num_edges) in PyG format.
+        edge_attr (numpy array): Existing edge features (if any), either of shape (num_nodes, num_nodes, num_edge_features) if given
+                                 in functional connectivity matrix format. Or of shape (num_edges, num_edge_features) if given in 
+                                 PyG format. Defaults to None.
+        mode (str): Format of edge_attr. Either "FCN" or "PyG". Defaults to None.
 
     Returns:
         edge_attr (numpy array): New edge features of shape (num_edges, num_edge_features + 1).
     """
     
     num_edges = edge_index.shape[1]
-    edge_attr_new = np.zeros((num_edges, 1))
+    num_nodes = A.shape[0]
     
-    # Filling up the new attribute with values from the adjacency matrix
-    for k, edge in enumerate(edge_index.T):
-        i, j = edge
-        edge_attr_new[k] = A[i,j]
-        
-    # If edge_attr is None, the new attribute becomes the edge_attr
-    if edge_attr is None:
-        edge_attr = edge_attr_new
-    else:
-        # If edge_attr exists, concatenate the new attribute to the existing edge attributes
-        edge_attr = np.hstack((edge_attr, edge_attr_new))
+    # Case 1: No edge features. Convert adjacency matrix weights to edge_attr.
+    if mode is None:
+        edge_attr_new = np.zeros((num_edges, 1))
+        for k, edge in enumerate(edge_index.T):
+            i, j = edge
+            edge_attr_new[k] = A[i,j]
 
-    return edge_attr
+    # Case 2: Edge features exist in FCN format. Convert adj matrix weights and edge features to edge_attr.
+    elif mode == "FCN":
+        edge_attr_new = np.zeros((num_edges, 1 + edge_attr.shape[2]))
+        for k, edge in enumerate(edge_index.T):
+            i, j = edge
+            edge_attr_new[k] = np.hstack((np.array([A[i, j]]), edge_attr[i, j, :]))
+    
+    # Case 3: Edge features exist in PyG format. Stack adj matrix weights on top of existing edge_attr.
+    elif mode == "PyG":
+        edge_attr_new = np.zeros((num_edges, 1))
+        for k, edge in enumerate(edge_index.T):
+            i, j = edge
+            edge_attr_new[k] = A[i,j]
+        edge_attr_new = np.hstack((edge_attr_new, edge_attr))
+    else:
+        return "Error: Mode not specified, must be either None, FCN, or PyG."
+
+    return edge_attr_new
+
 
 
 
@@ -400,6 +417,11 @@ def adj(A, thres):
                 x[i,j] = 1
     
     return x
+
+
+
+
+
 
 
 

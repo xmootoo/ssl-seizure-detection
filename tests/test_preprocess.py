@@ -1,20 +1,12 @@
 import sys
 import os
-
-
-# PC Path
-
-# Mac Path
-# sys.path.append("/Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/pytorch/")
-# os.chdir("/Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/pytorch/")
-# print(f"Working directory: {os.getcwd()}")
-# print(f"Path:{sys.path}")
+sys.path.append("../src")
 
 
 import numpy as np
 import torch
 # OR to import specific functions:
-from pytorch.preprocess import graph_triplets, pseudo_data, convert_to_TripletData, create_tensordata, graph_triplets_sampled
+from preprocess import graph_triplets, pseudo_data, convert_to_TripletData, create_tensordata, graph_triplets_sampled, adj_to_edge_attr, build_K_n
 from torch_geometric.data import Data
 
 
@@ -148,5 +140,50 @@ def test_create_tensordata(mode = "binary"):
     return create_tensordata(num_nodes, data_list, complete=True, save=False, logdir=None, mode="multi")
 
 
+def test_adj_to_edge_attr():
 
-print(test_graph_triplets_sampled())
+    # Adjacency matrix A (same for all cases)
+    A = np.array([[0, 1, 0, 0],
+                [1, 0, 1, 0],
+                [0, 1, 0, 1],
+                [0, 0, 1, 0]])
+
+    # Edge index (same for all cases). Complete graph K_4.
+    edge_index = build_K_n(4)
+
+    # Test Case 1: No edge features
+    case1_edge_attr = None
+
+    # Test Case 2: Edge features in FCN format (shape = (num_nodes, num_nodes))
+    case2_edge_attr = np.random.rand(4, 4, 2)
+
+    # Test Case 3: Edge features in PyG format (shape = (num_edges, 1))
+    case3_edge_attr = np.random.rand(12, 2)
+
+    test_cases = {
+        "Case 1": (A, edge_index, case1_edge_attr),
+        "Case 2": (A, edge_index, case2_edge_attr),
+        "Case 3": (A, edge_index, case3_edge_attr),
+    }
+
+    # Case 1: No edge features.
+    print("Case 1: No edge features.")
+    print(adj_to_edge_attr(A, edge_index))
+
+    # Case 2: Edge features in FCN format shape = (num_nodes, num_nodes, num_edge_features).
+    print("\nCase 2: Edge features in FCN format shape = (num_nodes, num_nodes, num_edge_features).")
+    edge_attr_new = adj_to_edge_attr(A, edge_index, case2_edge_attr, "FCN")
+    for i in range(4):
+        for j in range(4):
+            if i != j:
+                print(f"A[{i}, {j}]: {A[i, j]}")
+                print(f"Old edge_attr[{i}, {j}]: {case2_edge_attr[i, j]}")
+    for k in range(6):
+        print(f"New edge_attr[{k}]: {edge_attr_new[k]}")
+
+    # Case 3: Edge features in PyG format shape = (num_edges, num_edge_features).
+    print("\nCase 3: Edge features in PyG format shape = (num_edges, num_edge_features).")
+    edge_attr_new = adj_to_edge_attr(A, edge_index, case3_edge_attr, "PyG")
+    for k in range(12):
+        print(f"New edge_attr[{k}]: {edge_attr_new[k]}")
+        print(f"Old edge_attr[{k}]: {case3_edge_attr[k]}")
