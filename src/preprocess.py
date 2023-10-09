@@ -47,7 +47,7 @@ def new_grs(data, type="preictal", mode="binary"):
             Y = 1
         if type == "preictal":
             Y = 0
-        if type == "postical":
+        if type == "postictal":
             Y = 0
 
     # Multiclass encoding
@@ -56,7 +56,7 @@ def new_grs(data, type="preictal", mode="binary"):
             Y = 0
         if type == "preictal":
             Y = 1
-        if type == "postical":
+        if type == "postictal":
             Y = 2
 
     new_grs = []
@@ -248,7 +248,7 @@ def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=Non
 
 
 
-def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
+def graph_pairs(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     """ 
     Creates unique sample pairs from a list of samples and their corresponding time indexes.
 
@@ -267,29 +267,45 @@ def graph_pairs(graph_reps, tau_pos = 50, tau_neg = 170):
     n = len(graph_reps)
     graph_rep_pairs = []
     done_tasks = set()
-    
-    # Get rid of the real labels
+
+    # Get rid of original labels
     data = [graph_reps[i][0] for i in range(n)]
 
-    # Create pairs and pseudolabels
+    pos_pairs = []
+    neg_pairs = []
+
     for i in range(n):
         for j in range(n):
-            
-            # Time distance between pairs
             diff = np.abs(i-j)
-            
-            # Check if pair entry unique and each pair is unique up to permutation
-            if (i != j) & ((j, i) not in done_tasks):
-                
-                # Check if pair is within the positive or negative context
-                if diff <= tau_pos:
-                    graph_rep_pairs.append([data[i], data[j], 1])
-                elif diff > tau_neg:
-                    graph_rep_pairs.append([data[i], data[j], 0])
-                done_tasks.add((i, j))
-        
-    return graph_rep_pairs
 
+            if (i != j) & ((j, i) not in done_tasks):
+                if diff <= tau_pos:
+                    pos_pairs.append([data[i], data[j], 1])
+                elif diff > tau_neg:
+                    neg_pairs.append([data[i], data[j], 0])
+                done_tasks.add((i, j))
+
+    # Randomly shuffle both lists to ensure randomness
+    random.shuffle(pos_pairs)
+    random.shuffle(neg_pairs)
+
+    # Balance the dataset by using the minimum of the two class sizes
+    min_size = min(len(pos_pairs), len(neg_pairs))
+
+    # Apply the sample_ratio to scale down
+    sample_size = int(min_size * sample_ratio)
+    
+    # Trim down to the sample size
+    pos_pairs = pos_pairs[:sample_size]
+    neg_pairs = neg_pairs[:sample_size]
+
+    # Concatenate the balanced data
+    graph_rep_pairs = pos_pairs + neg_pairs
+
+    # Shuffle the final dataset to ensure randomness
+    random.shuffle(graph_rep_pairs)
+
+    return graph_rep_pairs
 
 
 def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
@@ -307,38 +323,55 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     Returns:
         graph_rep_triplets (list): List of graph representation triplets [gr_1, gr_2, gr_3, Y], where Y corresponds to
         the pseudolabel of the triplet.
-
-    
     """
+    
     n = len(graph_reps)
     data = [graph_reps[i][0] for i in range(n)]
-    
-    graph_rep_triplets = []
+
+    pos_triplets = []
+    neg_triplets = []
     seen_triplets = set()
 
     for t1 in range(n):
         for t3 in random.sample(range(t1 + 1, n), min(int((n - t1 - 1) * sample_ratio), n - t1 - 1)):
             diff_pos = np.abs(t1 - t3)
-            
-            if diff_pos <= tau_pos:
-                available_t2 = [x for x in range(n) if x != t1 and x != t3]
-                for t2 in random.sample(available_t2, min(int(n * sample_ratio), len(available_t2))):
-                    if (t1, t2, t3) not in seen_triplets:
-                        
-                        M = diff_pos / 2
-                        diff_third = np.abs(M - t2)
 
-                        # Checking the condition for label=1
-                        if (t1 < t2 < t3) or (t3 < t2 < t1):
-                            graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
+            available_t2 = [x for x in range(n) if x != t1 and x != t3]
+            for t2 in random.sample(available_t2, min(int(n * sample_ratio), len(available_t2))):
+                if (t1, t2, t3) not in seen_triplets:
+
+                    M = diff_pos / 2
+                    diff_third = np.abs(M - t2)
+
+                    if (t1 < t2 < t3) or (t3 < t2 < t1):
+                        pos_triplets.append([data[t1], data[t2], data[t3], 1])
+                        seen_triplets.add((t1, t2, t3))
+
+                    if diff_third > tau_neg // 2:
+                        if not ((t1 < t2 < t3) or (t3 < t2 < t1)):
+                            neg_triplets.append([data[t1], data[t2], data[t3], 0])
                             seen_triplets.add((t1, t2, t3))
-                        
-                        # Checking the condition for label=0
-                        if diff_third > tau_neg // 2:
-                            if not ((t1 < t2 < t3) or (t3 < t2 < t1)):
-                                graph_rep_triplets.append([data[t1], data[t2], data[t3], 0])
-                                seen_triplets.add((t1, t2, t3))
-                            
+
+    # Randomly shuffle lists
+    random.shuffle(pos_triplets)
+    random.shuffle(neg_triplets)
+
+    # Balance the dataset by using the minimum of the two class sizes
+    min_size = min(len(pos_triplets), len(neg_triplets))
+
+    # Apply the sample_ratio to scale down
+    sample_size = int(min_size * sample_ratio)
+
+    # Trim down to the sample size
+    pos_triplets = pos_triplets[:sample_size]
+    neg_triplets = neg_triplets[:sample_size]
+
+    # Concatenate the balanced dataset
+    graph_rep_triplets = pos_triplets + neg_triplets
+
+    # Shuffle the final dataset to ensure randomness
+    random.shuffle(graph_rep_triplets)
+
     return graph_rep_triplets
 
 
@@ -365,7 +398,7 @@ def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = 
         logdir = ""
     
     if model == "relative_positioning":
-        pairs = graph_pairs(data, tau_pos, tau_neg)
+        pairs = graph_pairs(data, tau_pos, tau_neg, sample_ratio)
         
         # Descriptive statistics    
         if stats:
@@ -582,33 +615,51 @@ def adj(A, thres):
 
 
 # # Old version of graph triplets
-# def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, data_size=1.0):
+# def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
+#     """
+#     Creates unique sample triplets from a list of samples and their corresponding time indexes.
+    
+#     Args:
+#         graph_reps (list of [graph_representation, Y]): Ordered list of graph representations each element is a list [graph_representaiton, Y] where
+#         Y is its label (ictal or nonictal). The index of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point 
+#         is approx 0.12s.
+#         tau_pos: Positive context threshold.
+#         tau_neg: Negative context threshold.
+#         sample_ratio: Proportion of the psuedodata to be sampled from the entire dataset. Defaults to 1.0.
+
+#     Returns:
+#         graph_rep_triplets (list): List of graph representation triplets [gr_1, gr_2, gr_3, Y], where Y corresponds to
+#         the pseudolabel of the triplet.
+
+    
+#     """
 #     n = len(graph_reps)
 #     data = [graph_reps[i][0] for i in range(n)]
     
 #     graph_rep_triplets = []
 #     seen_triplets = set()
-    
-    
+
 #     for t1 in range(n):
-#         for t3 in range(t1 + 1, n):  # Ensuring t1 < t3 to leverage symmetry
+#         for t3 in random.sample(range(t1 + 1, n), min(int((n - t1 - 1) * sample_ratio), n - t1 - 1)):
 #             diff_pos = np.abs(t1 - t3)
             
 #             if diff_pos <= tau_pos:
-#                 for t2 in range(n):
-#                     if t2 != t1 and t2 != t3:
-#                         if (t1, t2, t3) not in seen_triplets:
-#                             if (t1 < t2 < t3) or (t3 < t2 < t1):
-#                                 graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
-#                                 seen_triplets.add((t1, t2, t3))
-                                
-#                             M = diff_pos / 2
-#                             diff_third = np.abs(M - t2)
-                            
-#                             if diff_third > tau_neg // 2:
+#                 available_t2 = [x for x in range(n) if x != t1 and x != t3]
+#                 for t2 in random.sample(available_t2, min(int(n * sample_ratio), len(available_t2))):
+#                     if (t1, t2, t3) not in seen_triplets:
+                        
+#                         M = diff_pos / 2
+#                         diff_third = np.abs(M - t2)
+
+#                         # Checking the condition for label=1
+#                         if (t1 < t2 < t3) or (t3 < t2 < t1):
+#                             graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
+#                             seen_triplets.add((t1, t2, t3))
+                        
+#                         # Checking the condition for label=0
+#                         if diff_third > tau_neg // 2:
+#                             if not ((t1 < t2 < t3) or (t3 < t2 < t1)):
 #                                 graph_rep_triplets.append([data[t1], data[t2], data[t3], 0])
-#                                 graph_rep_triplets.append([data[t3], data[t2], data[t1], 0])  # Adding the mirrored triplet
 #                                 seen_triplets.add((t1, t2, t3))
-#                                 seen_triplets.add((t3, t2, t1))
                             
 #     return graph_rep_triplets
