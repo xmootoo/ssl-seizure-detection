@@ -8,14 +8,14 @@ def patch(graphrep_dir=None,  logdir=None, file_name=None, num_electrodes=107, t
     # Create the save directory with .pt extension
     logdir = os.path.join(logdir, file_name + ".pt")
 
-    # Load pickle data of standard graph representations
+    # Load pickle data of standard graph representations (GRs) corresponding to Alan's dictionary
     path_preictal, path_ictal, path_postictal = graphrep_dir
 
     data_preictal = pickle.load(open(path_preictal, 'rb'))
     data_ictal = pickle.load(open(path_ictal, 'rb'))
     data_postictal = pickle.load(open(path_postictal, 'rb'))
 
-    # Select new data for each class
+    # Select graph representation (GR) type from Alan's dictionary of GRs
     new_data_preictal = new_grs(data_preictal, type="preictal", mode="binary")
     new_data_ictal = new_grs(data_ictal, type="ictal", mode="binary")
     new_data_postictal = new_grs(data_postictal, type="postictal", mode="binary")
@@ -29,7 +29,7 @@ def patch(graphrep_dir=None,  logdir=None, file_name=None, num_electrodes=107, t
     if model == "supervised":
         Data_list = convert_to_Data(pyg_grs, save=True, logdir=logdir)
         return Data_list
-
+    
     if model == "relative_positioning":
         pdata = pseudo_data(pyg_grs, tau_pos=tau_pos, tau_neg=tau_neg, stats=stats, save=False, patientid="", 
                             logdir=None, model="relative_positioning", sample_ratio=sample_ratio)
