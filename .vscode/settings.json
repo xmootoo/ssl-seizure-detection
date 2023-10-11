@@ -1,5 +1,0 @@
-{
-    "python.autoComplete.extraPaths": ["./Packages", "./tests", "./scripts", "./notebooks"],
-    "python.analysis.extraPaths": ["./Packages", "./tests", "./scripts", "./notebooks"]
-  }
-  
