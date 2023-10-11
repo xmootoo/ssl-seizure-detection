@@ -4,7 +4,7 @@ data_path="$xav/ssl_epilepsy/data/pseudolabeled/jh101/jh101_12s_7min_PairData.pt
 model_path="$xav/ssl_epilepsy/jobs/relative_positioning/jh101/models"
 stats_path="$xav/ssl_epilepsy/jobs/relative_positioning/jh101/stats"
 model_name="jh101_12s_7min_pyg1"
-num_workers="8"
+num_workers="8" 
 
 sbatch <<EOT
 #!/bin/bash
