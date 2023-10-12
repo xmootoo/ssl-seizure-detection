@@ -20,81 +20,56 @@ class EdgeMLP(nn.Module):
         x = self.mlp(edge_attr)
         return x
 
-#TODO: Implement this into the relative_positioning class along with a projector.
+
 class gnn_encoder(nn.Module):
     def __init__(self, num_node_features, num_edge_features, hidden_channels, out_channels):
         super(gnn_encoder, self).__init__()
         
-        #MLP for NNConv (e.g., dynamic filter-generating network)
-        self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels)
+        # Initialize the MLP for NNConv
+        self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels[0])
         
         # NNConv layer
-        self.conv1 = NNConv(num_node_features, hidden_channels, self.edge_mlp)
+        self.conv1 = NNConv(num_node_features, hidden_channels[0], self.edge_mlp)
         
         # GATConv layer
-        self.conv2 = GATConv(hidden_channels, hidden_channels, heads=1, concat=False)
+        self.conv2 = GATConv(hidden_channels[0], hidden_channels[0], heads=1, concat=False)
 
         # Fully connected layer
-        self.fc1 = nn.Linear(hidden_channels, out_channels)
-        self.fc2 = nn.Linear(out_channels, 1)
+        self.fc1 = nn.Linear(hidden_channels[0], hidden_channels[1])
+        self.fc2 = nn.Linear(hidden_channels[1], out_channels)
         
     def forward(self, x, edge_index, edge_attr, batch):
         # NNConv layer
-        x = self.conv1(x, edge_index, edge_attr)
-        x = F.relu(x)
+        x = F.relu(self.conv1(x, edge_index, edge_attr))
         
         # GATConv layer
-        x = self.conv2(x, edge_index)
-        x = F.relu(x)
+        x = F.relu(self.conv2(x, edge_index))
+        
+        #TODO: Implement a projector (e.g., 2 graph layers that expand the node representations)
 
-        # NON-global average pooling
-
-        # Fully connected layers
-        x = self.fc1(x)
-        x = F.relu(x)
-        
-        return x
-        
-        
-
-
-
-# Adapted Graph Neural Network using NNConv and GATConv
-class relative_positioning(nn.Module):
-    def __init__(self, num_node_features, num_edge_features, hidden_channels, out_channels):
-        super(relative_positioning, self).__init__()
-        
-        # Initialize the MLP for NNConv
-        self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels)
-        
-        # NNConv layer
-        self.conv1 = NNConv(num_node_features, hidden_channels, self.edge_mlp)
-        
-        # GATConv layer
-        self.conv2 = GATConv(hidden_channels, hidden_channels, heads=1, concat=False)
-
-        # Fully connected layer
-        self.fc1 = nn.Linear(hidden_channels, out_channels)
-        self.fc2 = nn.Linear(out_channels, 1)
-    
-        
-    def encoder(self, x, edge_index, edge_attr, batch):
-        # NNConv layer
-        x = self.conv1(x, edge_index, edge_attr)
-        x = F.relu(x)
-        
-        # GATConv layer
-        x = self.conv2(x, edge_index)
-        x = F.relu(x)
-        
         # Global average pooling
         x = global_mean_pool(x, batch) #<-- batch vector to keep track of graphs
 
         # Fully connected layers
-        x = self.fc1(x)
-        x = F.relu(x)
+        x = F.relu(self.fc1(x))
+
+        # Final layer with a linear head
+        x = self.fc2(x)
         
         return x
+        
+
+
+class relative_positioning(nn.Module):
+    def __init__(self, num_node_features, num_edge_features, hidden_channels, out_channels):
+        super(relative_positioning, self).__init__()
+        
+        # GNN encoder
+        self.encoder = gnn_encoder(num_node_features, num_edge_features, hidden_channels, out_channels)
+
+        # Fully connected layer
+        self.fc = nn.Linear(out_channels, 1)
+    
     
     def forward(self, x1, edge_index1, edge_attr1, batch1, x2, edge_index2, edge_attr2, batch2, mode="sigmoid"):
         # First graph's embeddings
@@ -106,8 +81,8 @@ class relative_positioning(nn.Module):
         # Contrast the embeddings
         z = torch.abs(z1 - z2)
         
-        # Logistic regression
-        z = self.fc2(z)
+        # Linear or Logistic regression
+        z = self.fc(z)
         
         if mode == "sigmoid":
             z = torch.sigmoid(z)
@@ -116,62 +91,34 @@ class relative_positioning(nn.Module):
             pass
         
         return z.squeeze(1)
+
+
     
 
 class temporal_shuffling(nn.Module):
     def __init__(self, num_node_features, num_edge_features, hidden_channels, out_channels):
         super(temporal_shuffling, self).__init__()
         
-        # Initialize the MLP for NNConv
-        self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels)
+        # GNN Encoder
+        self.encoder = gnn_encoder(num_node_features, num_edge_features, hidden_channels, out_channels)
         
-        # NNConv layer
-        self.conv1 = NNConv(num_node_features, hidden_channels, self.edge_mlp)
-        
-        # GATConv layer
-        self.conv2 = GATConv(hidden_channels, hidden_channels, heads=1, concat=False)
-
         # Fully connected layer
-        self.fc1 = nn.Linear(hidden_channels, out_channels)
-        self.fc2 = nn.Linear(2 * out_channels, 1)
-    
-        
-    def embedder(self, x, edge_index, edge_attr, batch):
-        # NNConv layer
-        x = self.conv1(x, edge_index, edge_attr)
-        x = F.relu(x)
-        
-        # GATConv layer
-        x = self.conv2(x, edge_index)
-        x = F.relu(x)
-        
-        # Global average pooling
-        x = global_mean_pool(x, batch) #<-- batch vector to keep track of graphs
+        self.fc = nn.Linear(2 * out_channels, 1)
 
-        # Fully connected layers
-        x = self.fc1(x)
-        x = F.relu(x)
-        
-        return x
-    
+
     def forward(self, x1, edge_index1, edge_attr1, batch1, x2, edge_index2, edge_attr2, batch2, x3, edge_index3, edge_attr3, batch3, mode="sigmoid"):
-        # First graph's embeddings
-        z1 = self.embedder(x1, edge_index1, edge_attr1, batch1)
-        
-        # Second graph's embeddings
-        z2 = self.embedder(x2, edge_index2, edge_attr2, batch2)
-        
-        # Third graph's embeddings
-        z3 = self.embedder(x3, edge_index3, edge_attr3, batch3)
+        # Encoding for each graph
+        z1 = self.encoder(x1, edge_index1, edge_attr1, batch1)
+        z2 = self.encoder(x2, edge_index2, edge_attr2, batch2)
+        z3 = self.encoder(x3, edge_index3, edge_attr3, batch3)
         
         # Contrast the embeddings
         diff1 = torch.abs(z1 - z2)
         diff2 = torch.abs(z2 - z3)
         z = torch.cat((diff1, diff2), dim=1)
 
-        
         # Logistic regression
-        z = self.fc2(z)
+        z = self.fc(z)
         
         if mode == "sigmoid":
             z = torch.sigmoid(z)
@@ -232,7 +179,7 @@ class supervised_model(nn.Module):
             x = torch.sigmoid(x)
             return x.squeeze(1)
         
-        if classify == "multi":
+        if classify == "multiclass":
             x = self.fc3(x)
             x = torch.softmax(x, dim=1)
             return x
