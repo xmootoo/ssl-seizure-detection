@@ -210,7 +210,7 @@ if __name__ == "__main__":
     patient_dir = str(sys.argv[1])
     patient = str(sys.argv[2])
     logdir = str(sys.argv[3])
-    model = str(sys.arg[4])
+    model = str(sys.argv[4])
     sample_ratio = float(sys.argv[5])
 
     single_patient_patcher(user="xmootoo", patient_dir=patient_dir, patient=patient, logdir=logdir, num_electrodes=107, tau_pos=12//0.12, tau_neg=90//0.12, 

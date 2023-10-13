@@ -61,8 +61,12 @@ class gnn_encoder(nn.Module):
 
 
 class relative_positioning(nn.Module):
-    def __init__(self, num_node_features, num_edge_features, hidden_channels, out_channels):
+    def __init__(self, model_parameters):
         super(relative_positioning, self).__init__()
+        num_node_features = model_parameters["num_node_features"]
+        num_edge_features = model_parameters["num_edge_features"]
+        hidden_channels = model_parameters["hidden_channels"]
+        out_channels = model_parameters["out_channels"]
         
         # GNN encoder
         self.encoder = gnn_encoder(num_node_features, num_edge_features, hidden_channels, out_channels)
@@ -71,12 +75,10 @@ class relative_positioning(nn.Module):
         self.fc = nn.Linear(out_channels, 1)
     
     
-    def forward(self, x1, edge_index1, edge_attr1, batch1, x2, edge_index2, edge_attr2, batch2, mode="sigmoid"):
-        # First graph's embeddings
-        z1 = self.encoder(x1, edge_index1, edge_attr1, batch1)
-        
-        # Second graph's embeddings
-        z2 = self.encoder(x2, edge_index2, edge_attr2, batch2)
+    def forward(self, batch, classify="linear"):
+        # Graph embeddings
+        z1 = self.encoder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
+        z2 = self.encoder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
         
         # Contrast the embeddings
         z = torch.abs(z1 - z2)
@@ -84,10 +86,10 @@ class relative_positioning(nn.Module):
         # Linear or Logistic regression
         z = self.fc(z)
         
-        if mode == "sigmoid":
+        if classify == "sigmoid":
             z = torch.sigmoid(z)
             
-        elif mode == "linear":
+        elif classify == "linear":
             pass
         
         return z.squeeze(1)
@@ -96,8 +98,12 @@ class relative_positioning(nn.Module):
     
 
 class temporal_shuffling(nn.Module):
-    def __init__(self, num_node_features, num_edge_features, hidden_channels, out_channels):
+    def __init__(self, model_parameters):
         super(temporal_shuffling, self).__init__()
+        num_node_features = model_parameters["num_node_features"]
+        num_edge_features = model_parameters["num_edge_features"]
+        hidden_channels = model_parameters["hidden_channels"]
+        out_channels = model_parameters["out_channels"]
         
         # GNN Encoder
         self.encoder = gnn_encoder(num_node_features, num_edge_features, hidden_channels, out_channels)
@@ -106,11 +112,11 @@ class temporal_shuffling(nn.Module):
         self.fc = nn.Linear(2 * out_channels, 1)
 
 
-    def forward(self, x1, edge_index1, edge_attr1, batch1, x2, edge_index2, edge_attr2, batch2, x3, edge_index3, edge_attr3, batch3, mode="sigmoid"):
+    def forward(self, batch, classify="linear"):
         # Encoding for each graph
-        z1 = self.encoder(x1, edge_index1, edge_attr1, batch1)
-        z2 = self.encoder(x2, edge_index2, edge_attr2, batch2)
-        z3 = self.encoder(x3, edge_index3, edge_attr3, batch3)
+        z1 = self.encoder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
+        z2 = self.encoder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
+        z3 = self.encoder(batch.x3, batch.edge_index3, batch.edge_attr3, batch.x3_batch)
         
         # Contrast the embeddings
         diff1 = torch.abs(z1 - z2)
@@ -119,20 +125,24 @@ class temporal_shuffling(nn.Module):
 
         # Logistic regression
         z = self.fc(z)
-        
-        if mode == "sigmoid":
-            z = torch.sigmoid(z)
             
-        elif mode == "linear":
+        if classify == "linear":
             pass
-        
+        elif classify == "sigmoid":
+            z = torch.sigmoid(z)
+
         return z.squeeze(1)
     
 
 
 class supervised_model(nn.Module):
-    def __init__(self, num_node_features, num_edge_features, hidden_channels=64, out_channels=32, dropout=0.5):
+    def __init__(self, model_parameters):
         super(supervised_model, self).__init__()
+        num_node_features = model_parameters["num_node_features"]
+        num_edge_features = model_parameters["num_edge_features"]
+        hidden_channels = model_parameters["hidden_channels"]
+        out_channels = model_parameters["out_channels"]
+        dropout = model_parameters["dropout"]
         
         # Initialize the MLP for NNConv
         self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels)
@@ -153,18 +163,18 @@ class supervised_model(nn.Module):
         self.fc2 = nn.Linear(out_channels, 1)
         self.fc3 = nn.Linear(out_channels, 3)
     
-    def forward(self, x, edge_index, edge_attr, batch, classify="binary", dropout=True):
+    def forward(self, batch, classify="binary", dropout=True):
 
         # ECC
-        x = self.conv1(x, edge_index, edge_attr)
+        x = self.conv1(batch.x, batch.edge_index, batch.edge_attr)
         x = F.relu(x)
 
         # GAT
-        x = self.conv2(x, edge_index)
+        x = self.conv2(x, batch.edge_index)
         x = F.relu(x)
 
         # Global average pooling
-        x = global_mean_pool(x, batch)
+        x = global_mean_pool(x, batch.batch)
 
 
         # Fully connected layers
@@ -172,8 +182,12 @@ class supervised_model(nn.Module):
         x = F.relu(x)
 
         if dropout:
-            self.dropout(x)
+            x = self.dropout(x)
 
+        if classify == "linear":
+            x = self.fc2(x)
+            return x.squeeze(1)
+        
         if classify == "binary":
             x = self.fc2(x)
             x = torch.sigmoid(x)

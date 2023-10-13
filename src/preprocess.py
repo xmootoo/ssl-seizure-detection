@@ -5,6 +5,7 @@ import random
 from torch_geometric.data import Data
 from torch.utils.data import random_split
 from torch_geometric.loader import DataLoader
+from sklearn.model_selection import train_test_split
 
 
 
@@ -685,7 +686,7 @@ def convert_to_TripletData(data_list, save = True, logdir = None):
 
 
 
-def create_data_loaders(data, data_size=1.0, train_ratio=0.8, batch_size=32, num_workers=4):
+def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batch_size=32, num_workers=4, model_id="supervised"):
     # Shuffle data
     """
     Create train and validation data loaders.
@@ -700,26 +701,33 @@ def create_data_loaders(data, data_size=1.0, train_ratio=0.8, batch_size=32, num
     - train_loader, val_loader: DataLoader instances for training and validation data
     """
     
-    # Shuffle data
-    random.shuffle(data)
-    
-    # Take the subset of the data
+    # Take the random subset of the data
     n = len(data)
-    n_subset = int(n * data_size)
-    data_subset = data[:n_subset]
+    indices = list(range(n))
+    indices_subset = np.random.choice(indices, size=int(n * data_size), replace=False)
 
-    # Calculate the size of the training and validation sets
-    train_size = int(len(data_subset) * train_ratio)
-    val_size = len(data_subset) - train_size
+    train_idx, test_idx = train_test_split(indices_subset, test_size=test_ratio, shuffle=True)
+    train_idx, val_idx = train_test_split(train_idx, test_size=val_ratio / (1 - test_ratio), shuffle=True)
 
-    # Split the data
-    train_data, val_data = random_split(data_subset, [train_size, val_size])
+    train_data = [data[i] for i in train_idx]
+    val_data = [data[i] for i in val_idx]
+    test_data = [data[i] for i in test_idx]
 
     # Create data loaders
-    train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
-    val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+    if model_id=="supervised":
+        train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers)
+        val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers)
+        test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
+    elif model_id=="relative_positioning":
+        train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+        val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+        test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+    elif model_id=="temporal_shuffling":
+        train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
+        val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
+        test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
 
-    return train_loader, val_loader
+    return train_loader, val_loader, test_loader
 
 
 
