@@ -226,7 +226,7 @@ def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=Non
         
 
         for i, example in enumerate(data_list):
-
+    
             # Parse data
             graph, y = example
             A, x, _ = graph
@@ -247,6 +247,41 @@ def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=Non
     return pyg_data
 
 
+def get_sample_ratio(n, tau_pos, tau_neg, desired_samples=-1,  mode="temporal_shuffling"):
+    """
+    Gives an estimate for the required sample ratio to fit the number of desired samples of maximum of 400,000 and 300,000
+    samples for temporal shuffling and relative positioning respectively, as a function of the length of the input list n.
+
+    Args:
+        n (int): Length of the input list.
+        desired_samples (int): Desired number of samples. Defaults to -1 for suggested value and -2 for sample ratio=1.0.
+        mode (str): Either "temporal_shuffling" or "relative_positioning". Defaults to "temporal_shuffling".
+    """
+    if 0 < desired_samples < 1:
+        return desired_samples
+
+    if mode=="temporal_shuffling":
+        if desired_samples==-1:
+            desired_samples = 400000
+        elif desired_samples==-2:
+            return 1.0
+        total_samples = (tau_pos ** 2) * n + tau_neg * n * (n-tau_neg)
+        sample_ratio = np.sqrt(desired_samples / total_samples)
+
+    if mode=="relative_positioning":
+        if desired_samples==-1:
+            desired_samples = 300000
+        elif desired_samples==-2:
+            return 1.0
+        total_samples = tau_pos * n + n * (n - 2 * tau_neg) / 2
+        sample_ratio = np.sqrt(desired_samples / total_samples)
+
+    if sample_ratio > 1.0:
+        return 1.0
+
+    return sample_ratio
+
+
 
 def graph_pairs(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     """ 
@@ -258,15 +293,18 @@ def graph_pairs(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
         is approx 0.12s.
         tau_pos: Positive context threshold.
         tau_neg: Negative context threshold.
+        sample_ratio: Proportion of desired samples. Defaults to 1.0.
 
     Returns:
         graph_rep_pairs (list): List of graph representation pairs [gr_1, gr_2, Y], where Y corresponds to
         the pseudolabel of the pair.
     """
-
     n = len(graph_reps)
+
+    sample_indices = random.sample(range(n), int(n * sample_ratio))
+
     graph_rep_pairs = []
-    done_tasks = set()
+    seen_pairs = set()
 
     # Get rid of original labels
     data = [graph_reps[i][0] for i in range(n)]
@@ -274,17 +312,19 @@ def graph_pairs(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     pos_pairs = []
     neg_pairs = []
 
-    for i in range(n):
-        for j in range(n):
+    for i in sample_indices:
+        for j in sample_indices:
+            if i >= j:
+                continue
             diff = np.abs(i-j)
 
-            if (i != j) & ((j, i) not in done_tasks):
+            if ((j, i) not in seen_pairs) and ((i, j) not in seen_pairs):
                 if diff <= tau_pos:
                     pos_pairs.append([data[i], data[j], 1])
                 elif diff > tau_neg:
                     neg_pairs.append([data[i], data[j], 0])
-                done_tasks.add((i, j))
-
+                seen_pairs.add((i, j))
+    
     # Randomly shuffle both lists to ensure randomness
     random.shuffle(pos_pairs)
     random.shuffle(neg_pairs)
@@ -292,12 +332,9 @@ def graph_pairs(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     # Balance the dataset by using the minimum of the two class sizes
     min_size = min(len(pos_pairs), len(neg_pairs))
 
-    # Apply the sample_ratio to scale down
-    sample_size = int(min_size * sample_ratio)
-    
     # Trim down to the sample size
-    pos_pairs = pos_pairs[:sample_size]
-    neg_pairs = neg_pairs[:sample_size]
+    pos_pairs = pos_pairs[:min_size]
+    neg_pairs = neg_pairs[:min_size]
 
     # Concatenate the balanced data
     graph_rep_pairs = pos_pairs + neg_pairs
@@ -306,6 +343,7 @@ def graph_pairs(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     random.shuffle(graph_rep_pairs)
 
     return graph_rep_pairs
+
 
 
 def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
@@ -318,7 +356,87 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
         is approx 0.12s.
         tau_pos: Positive context threshold.
         tau_neg: Negative context threshold.
-        sample_ratio: Proportion of the psuedodata to be sampled from the entire dataset. Defaults to 1.0.
+        sample_ratio: Proportion of desired samples. Defaults to 1.0.
+
+    Returns:
+        graph_rep_triplets (list): List of graph representation triplets [gr_1, gr_2, gr_3, Y], where Y corresponds to
+        the pseudolabel of the triplet.
+    """
+    
+    n = len(graph_reps)
+
+    # Get rid of old labels
+    data = [graph_reps[i][0] for i in range(n)]
+
+    pos_triplets = []
+    neg_triplets = []
+    seen_triplets = set()
+
+    # Only use a subset of indices, corresponding to our sample_ratio
+    sample_indices = random.sample(range(n), int(n * sample_ratio))
+
+    for t1 in sample_indices:
+        for t3 in sample_indices:
+            if t1 >= t3: # Ensuring that t1 < t3
+                continue
+            diff_pos = np.abs(t1 - t3) 
+
+            if diff_pos <= tau_pos: # Positive context
+                for t2 in sample_indices:
+                    if t2 == t1 or t2 == t3:
+                        continue
+
+                    if (t1, t2, t3) in seen_triplets:
+                        continue
+                    
+                    # Positive triplet
+                    if t1 < t2 < t3:
+                        pos_triplets.append([data[t1], data[t2], data[t3], 1])
+                    
+                    seen_triplets.add((t1, t2, t3)) # Seen triplet
+
+                    # Negative triplet
+                    # Compute the mid point and the distance of t2 from it
+                    L = diff_pos / 2
+                    midpoint = min(t1, t3) + L  # This handles both t1 < t3 and t1 > t3
+                    diff_midpoint = np.abs(midpoint - t2)
+
+                    # Check negative context and add triplet if so
+                    if diff_midpoint > tau_neg / 2 and not (t1 < t2 < t3):
+                        neg_triplets.append([data[t1], data[t2], data[t3], 0])
+                        seen_triplets.add((t1, t2, t3))  # Remove redundant element
+    
+
+    # Balance the dataset by using the minimum of the two class sizes
+    min_size = min(len(pos_triplets), len(neg_triplets))
+
+    # Trim down to the sample size
+    random.shuffle(pos_triplets)
+    random.shuffle(neg_triplets)
+    pos_triplets = pos_triplets[:min_size]
+    neg_triplets = neg_triplets[:min_size]
+
+    # Concatenate the balanced dataset
+    graph_rep_triplets = pos_triplets + neg_triplets
+
+    # Shuffle the final dataset to ensure randomness
+    random.shuffle(graph_rep_triplets)
+
+    return graph_rep_triplets
+
+
+
+def graph_triplets_old(graph_reps, tau_pos=50, tau_neg=170, desired_samples=-1):
+    """
+    Creates unique sample triplets from a list of samples and their corresponding time indexes.
+    
+    Args:
+        graph_reps (list of [graph_representation, Y]): Ordered list of graph representations each element is a list [graph_representaiton, Y] where
+        Y is its label (ictal or nonictal). The index of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point 
+        is approx 0.12s.
+        tau_pos: Positive context threshold.
+        tau_neg: Negative context threshold.
+        desired_samples: Desired number of samples. Defaults to -1.
 
     Returns:
         graph_rep_triplets (list): List of graph representation triplets [gr_1, gr_2, gr_3, Y], where Y corresponds to
@@ -327,6 +445,7 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     
     n = len(graph_reps)
     data = [graph_reps[i][0] for i in range(n)]
+    sample_ratio = get_sample_ratio(n, tau_pos, tau_neg, desired_samples,  mode="temporal_shuffling")
 
     pos_triplets = []
     neg_triplets = []
@@ -336,21 +455,36 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
         for t3 in random.sample(range(t1 + 1, n), min(int((n - t1 - 1) * sample_ratio), n - t1 - 1)):
             diff_pos = np.abs(t1 - t3)
 
-            available_t2 = [x for x in range(n) if x != t1 and x != t3]
-            for t2 in random.sample(available_t2, min(int(n * sample_ratio), len(available_t2))):
-                if (t1, t2, t3) not in seen_triplets:
+            if diff_pos <= tau_pos:
+                available_t2 = [x for x in range(n) if x != t1 and x != t3]
+                for t2 in random.sample(available_t2, min(int(n * sample_ratio), len(available_t2))):
+                    if ((t1, t2, t3) not in seen_triplets) and ((t3, t2, t1) not in seen_triplets):
+                        
+                        # Positive triplet
+                        if (t1 < t2 < t3):
+                            pos_triplets.append([data[t1], data[t2], data[t3], 1])
+                        elif (t3 < t2 < t1):
+                            pos_triplets.append([data[t3], data[t2], data[t1], 1])
 
-                    M = diff_pos / 2
-                    diff_third = np.abs(M - t2)
+                        seen_triplets.add((t1, t2, t3)) # Remove reudundant element or permutation
+                        seen_triplets.add((t3, t2, t1)) 
 
-                    if (t1 < t2 < t3) or (t3 < t2 < t1):
-                        pos_triplets.append([data[t1], data[t2], data[t3], 1])
-                        seen_triplets.add((t1, t2, t3))
+                        # Negative triplet
+                        L = diff_pos / 2
+                        if t1 < t3:
+                            midpoint = t1 + L
+                        elif t1 > t3:
+                            midpoint = t3 + L
+                        diff_midpoint = np.abs(midpoint - t2)
 
-                    if diff_third > tau_neg // 2:
-                        if not ((t1 < t2 < t3) or (t3 < t2 < t1)):
-                            neg_triplets.append([data[t1], data[t2], data[t3], 0])
-                            seen_triplets.add((t1, t2, t3))
+                        if diff_midpoint > tau_neg / 2:
+                            if not ((t1 < t2 < t3) or (t3 < t2 < t1)):
+                                if t1 < t3:
+                                    neg_triplets.append([data[t1], data[t2], data[t3], 0])
+                                elif t1 > t3:
+                                    neg_triplets.append([data[t3], data[t2], data[t1], 0])
+                                seen_triplets.add((t1, t2, t3)) # Remove redundant element or permutation
+                                seen_triplets.add((t3, t2, t1))
 
     # Randomly shuffle lists
     random.shuffle(pos_triplets)
@@ -359,8 +493,8 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     # Balance the dataset by using the minimum of the two class sizes
     min_size = min(len(pos_triplets), len(neg_triplets))
 
-    # Apply the sample_ratio to scale down
-    sample_size = int(min_size * sample_ratio)
+    # Scale down according to smallest class
+    sample_size = int(min_size)
 
     # Trim down to the sample size
     pos_triplets = pos_triplets[:sample_size]
@@ -375,9 +509,8 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     return graph_rep_triplets
 
 
-
 def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = True, save = True, patientid = "patient", 
-                logdir = None, model = "relative_positioning", sample_ratio = 1.0):
+                logdir = None, model = "relative_positioning", sample_ratio=1.0):
     """
     Creates a pseudolabeled dataset of graph pairs.
     
@@ -389,6 +522,9 @@ def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = 
         stats (bool): Whether to display descriptive statistics on dataset or not. Defaults to True.
         save (bool): Whether to save as pickle file or not. Defaults to True.
         patientid (str): Patient identification code. Defaults to "patient".
+        logdir (str): Directory to save the pickle file. Defaults to None.
+        model (str): Model to use. Either "relative_positioning" or "temporal_shuffling". Defaults to "relative_positioning".
+        desired_samples (int): Desired number of samples. Defaults to -1.
 
     Returns:
         pairs (list): List of the form [[edge_index, x, edge_attr], [edge_index', x', edge_attr'], Y], where Y is the pseudolabel.

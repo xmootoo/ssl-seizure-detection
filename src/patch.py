@@ -25,8 +25,7 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", num_electrodes=107, tau
                                Options: "supervised", "relative_positioning", "temporal_shuffling". Default is "supervised".
         stats (bool, optional): Whether to display statistics about the pseudolabeled data. Default is True.
         save (bool, optional): Whether to save the processed PyTorch Geometric data. Default is True.
-        sample_ratio (float, optional): Ratio of the samples to be considered for processing. 
-                                        Useful for sub-sampling. Default is 1.0.
+        sample_ratio (int, optional): Proportion of samples to be used in relative positioning or temporal shuffling. Defaults to 1.0.
     
     Returns:
         list of PyTorch Geometric Data: If model is "supervised", returns a list of PyTorch Geometric Data objects.
@@ -76,9 +75,7 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", num_electrodes=107, tau
         return Triplet_Data
 
 
-import os
-
-def patcher(user="xmootoo", patient_dir=None, logdir=None, num_electrodes=107, tau_pos=12//0.12, tau_neg=60//0.12, 
+def full_patcher(user="xmootoo", patient_dir=None, logdir=None, num_electrodes=107, tau_pos=12//0.12, tau_neg=60//0.12, 
              model="supervised", stats=True, save=True, sample_ratio=1.0):
     """
     
@@ -141,13 +138,83 @@ def patcher(user="xmootoo", patient_dir=None, logdir=None, num_electrodes=107, t
                         if model == "supervised":
                             file_name = patient + "_run" + str(i)
                         if model == "relative_positioning" or model == "temporal_shuffling":
-                            file_name = patient + "_run" + str(i) + "_" + str(int(tau_pos * 0.12)) + "s" + "_" + str(int(tau_neg * 0.12)) + "s"
+                            file_name = patient + "_run" + str(i) + "_" + str(int(tau_pos * 0.12)) + "s" + "_" + str(int(tau_neg * 0.12)) + "_" + str(sample_ratio) + "sr"
                         patched_data = patch(graphrep_dir=graphrep_dir,  logdir=model_logdir, file_name=file_name, num_electrodes=num_electrodes, tau_pos=tau_pos, 
                                              tau_neg=tau_neg, model=model, stats=stats, save=save, sample_ratio=sample_ratio)
                         
     except Exception as e:
         print(f"An error occurred: {e}")
 
+
+
+
+def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdir=None, num_electrodes=107, tau_pos=12//0.12, tau_neg=60//0.12, 
+             model="supervised", stats=True, save=True, sample_ratio=1.0):
+    """
+    Automates the patch() function for a single patient.
+    """
+    # Assign directory of patient folders
+    if patient is None:
+        print("Please provide a patient identifier.")
+        return
+
+    if patient_dir==None:
+        directory = os.path.join("/home", user, "projects/def-milad777/gr_research/brain-greg/data/ds003029-processed/graph_representation_elements")
+    else:
+        directory=patient_dir
+
+    try:
+        # Create a patient folder in the log directory
+        patient_logdir = os.path.join(logdir, patient)
+        if not os.path.exists(patient_logdir):
+            os.makedirs(patient_logdir)
+        
+        # Create model-specific directory within patient_logdir
+        model_logdir = os.path.join(patient_logdir, model)
+        if not os.path.exists(model_logdir):
+            os.makedirs(model_logdir)
+
+        # Form a path for the patient folder
+        full_path = os.path.join(directory, patient)
+        if os.path.isdir(full_path):
+            
+            # Count how many runs there are
+            runs = 0
+            for file in os.listdir(full_path):
+                if file.startswith("preictal"):
+                    runs += 1
+            
+            # Iterate through all runs in the patient folder
+            for i in range(1, runs+1):
+                path_preictal = os.path.join(full_path, f"preictal_{i}.pickle")
+                path_ictal = os.path.join(full_path, f"ictal_{i}.pickle")
+                path_postictal = os.path.join(full_path, f"postictal_{i}.pickle")
+
+                # Create the graphrep_dir
+                graphrep_dir = (path_preictal, path_ictal, path_postictal)
+
+                if os.path.exists(path_preictal) and os.path.exists(path_ictal) and os.path.exists(path_postictal):
+                    file_name = patient + "_run" + str(i)
+                    if model == "relative_positioning" or model == "temporal_shuffling":
+                        file_name = file_name + "_" + str(int(tau_pos * 0.12)) + "s" + "_" + str(int(tau_neg * 0.12)) + "_" + str(sample_ratio) + "sr"
+                    
+                    patched_data = patch(graphrep_dir=graphrep_dir,  logdir=model_logdir, file_name=file_name, num_electrodes=num_electrodes, tau_pos=tau_pos, 
+                                         tau_neg=tau_neg, model=model, stats=stats, save=save, sample_ratio=sample_ratio)
+                        
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+if __name__ == "__main__":
+    import sys
+    patient_dir = str(sys.argv[1])
+    patient = str(sys.argv[2])
+    logdir = str(sys.argv[3])
+    model = str(sys.arg[4])
+    sample_ratio = float(sys.argv[5])
+
+    single_patient_patcher(user="xmootoo", patient_dir=patient_dir, patient=patient, logdir=logdir, num_electrodes=107, tau_pos=12//0.12, tau_neg=90//0.12, 
+                           model=model, stats=True, save=True, sample_ratio=sample_ratio)
 
 
 
