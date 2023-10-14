@@ -10,13 +10,14 @@ from torch.cuda.amp import autocast, GradScaler
 def load_data(path):
     return torch.load(path)
 
-def forward_pass(model, batch, model_id="supervised", classify="linear", dropout=0.1):
+def forward_pass(model, batch, model_id="supervised", classify="binary", head="linear", dropout=0.1):
     if model_id=="supervised":
-        return model(batch, classify, dropout=dropout)
+        return model(batch, classify, head, dropout)
     elif model_id=="relative_positioning" or model_id=="temporal_shuffling":
-        return model(batch, classify)
+        return model(batch, head)
 
-def train_model(model, train_loader, optimizer, criterion, device, model_id="supervised", timing=True):
+def train_model(model, train_loader, optimizer, criterion, device, classify="binary", head="linear", dropout=True, 
+                model_id="supervised", timing=True):
     
     model.train()
     
@@ -36,7 +37,7 @@ def train_model(model, train_loader, optimizer, criterion, device, model_id="sup
         batch = batch.to(device)
 
         # Compute forward pass
-        outputs = forward_pass(model, batch, model_id)
+        outputs = forward_pass(model, batch, model_id, classify, head, dropout)
         
         # Calculate loss
         loss = criterion(outputs.squeeze().to(device), batch.y.float().to(device))
@@ -61,7 +62,8 @@ def train_model(model, train_loader, optimizer, criterion, device, model_id="sup
 
     return avg_loss, accuracy
 
-def evaluate_model(model, loader, criterion, device, model_id="supervised", timing=True):
+def evaluate_model(model, loader, criterion, device, classify="binary", head="linear", dropout=False, 
+                   model_id="supervised", timing=True):
     
     model.eval()
     
@@ -79,7 +81,7 @@ def evaluate_model(model, loader, criterion, device, model_id="supervised", timi
             batch = batch.to(device)
             
             # Compute forward pass
-            outputs = forward_pass(model, batch, model_id)
+            outputs = forward_pass(model, batch, model_id, classify, head, dropout)
             
             # Calculate loss
             loss = criterion(outputs.squeeze().to(device), batch.y.float().to(device))
@@ -145,7 +147,8 @@ def save_to_json(data, logdir, file_name):
 
 
 def train(data_path, logdir, patient_id, epochs, model_parameters, data_size=1.0, val_ratio=0.2, test_ratio=0.1, 
-          batch_size=32, num_workers=4, lr=1e-3, model_id="supervised", timing=True):
+          batch_size=32, num_workers=4, lr=1e-3, model_id="supervised", timing=True, classify="binary", head="linear",
+          dropout=True):
     """Trains a the Relative Positioning SSL model.
 
     Args:
@@ -174,13 +177,18 @@ def train(data_path, logdir, patient_id, epochs, model_parameters, data_size=1.0
     patience = 20
 
     # Initialize loaders, scaler, model, optimizer, and loss
-    train_loader, val_loader, test_loader = create_data_loaders(data, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
+    if model_id == "supervised":
+        train_loader, val_loader, test_loader = create_data_loaders(data, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
+                                                   batch_size=batch_size, num_workers=num_workers, model_id=model_id)
+    else:
+        train_loader, val_loader = create_data_loaders(data, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
                                                    batch_size=batch_size, num_workers=num_workers, model_id=model_id)
 
 
     print("Number of training batches:", len(train_loader))
     print("Number of validation batches:", len(val_loader))
-    print("Number of test batches:", len(test_loader))
+    if model_id=="supervised":
+        print("Number of test batches:", len(test_loader))
     
     if model_id=="supervised":
         model = supervised_model(model_parameters).to(device)
@@ -188,8 +196,6 @@ def train(data_path, logdir, patient_id, epochs, model_parameters, data_size=1.0
         model = relative_positioning(model_parameters).to(device)
     if model_id=="temporal_shuffling":
         model = temporal_shuffling(model_parameters).to(device)
-
-    print(f"Model information: {model}")
 
     optimizer = torch.optim.Adam(model.parameters(), lr)
     criterion = torch.nn.BCEWithLogitsLoss()
@@ -216,10 +222,11 @@ def train(data_path, logdir, patient_id, epochs, model_parameters, data_size=1.0
     for epoch in range(epochs):
         
         #<----------Training---------->
-        epoch_train_loss, epoch_train_acc = train_model(model, train_loader, optimizer, criterion, device, model_id, timing)
+        epoch_train_loss, epoch_train_acc = train_model(model, train_loader, optimizer, criterion, device, classify, head, dropout, 
+                                                        model_id, timing)
         
         #<----------Validation---------->
-        epoch_val_loss, epoch_val_acc = evaluate_model(model, val_loader, criterion, device, model_id, timing)
+        epoch_val_loss, epoch_val_acc = evaluate_model(model, val_loader, criterion, device, classify, head, dropout=False, model_id=model_id, timing=timing)
 
         print(f'Epoch: {epoch+1}, Train Loss: {epoch_train_loss}, Train Accuracy: {epoch_train_acc}, Validation Loss: {epoch_val_loss}, Validation Accuracy: {epoch_val_acc}')
 
@@ -243,7 +250,8 @@ def train(data_path, logdir, patient_id, epochs, model_parameters, data_size=1.0
         
     #<----------Testing---------->
     if model_id=="supervised":
-        test_loss, test_acc = evaluate_model(model, test_loader, criterion, device, model_id, timing=False)
+        test_loss, test_acc = evaluate_model(model, test_loader, criterion, device, classify, head, dropout=False, model_id=model_id, 
+                                             timing=timing)
         save_to_json(test_loss, stats_dir, "test_loss.json")
         save_to_json(test_acc, stats_dir, "test_acc.json")
         print(f"Epoch: {epoch+1}. Test Loss: {test_loss}. Test Accuracy: {test_acc}.")

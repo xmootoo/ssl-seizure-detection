@@ -75,7 +75,7 @@ class relative_positioning(nn.Module):
         self.fc = nn.Linear(out_channels, 1)
     
     
-    def forward(self, batch, classify="linear"):
+    def forward(self, batch, head="linear"):
         # Graph embeddings
         z1 = self.encoder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
         z2 = self.encoder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
@@ -86,10 +86,10 @@ class relative_positioning(nn.Module):
         # Linear or Logistic regression
         z = self.fc(z)
         
-        if classify == "sigmoid":
+        if head == "sigmoid":
             z = torch.sigmoid(z)
             
-        elif classify == "linear":
+        elif head == "linear":
             pass
         
         return z.squeeze(1)
@@ -112,7 +112,7 @@ class temporal_shuffling(nn.Module):
         self.fc = nn.Linear(2 * out_channels, 1)
 
 
-    def forward(self, batch, classify="linear"):
+    def forward(self, batch, head="linear"):
         # Encoding for each graph
         z1 = self.encoder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
         z2 = self.encoder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
@@ -126,9 +126,9 @@ class temporal_shuffling(nn.Module):
         # Logistic regression
         z = self.fc(z)
             
-        if classify == "linear":
+        if head == "linear":
             pass
-        elif classify == "sigmoid":
+        elif head == "sigmoid":
             z = torch.sigmoid(z)
 
         return z.squeeze(1)
@@ -163,7 +163,7 @@ class supervised_model(nn.Module):
         self.fc2 = nn.Linear(out_channels, 1)
         self.fc3 = nn.Linear(out_channels, 3)
     
-    def forward(self, batch, classify="binary", dropout=True):
+    def forward(self, batch, classify="binary", head="linear", dropout=True):
 
         # ECC
         x = self.conv1(batch.x, batch.edge_index, batch.edge_attr)
@@ -183,20 +183,21 @@ class supervised_model(nn.Module):
 
         if dropout:
             x = self.dropout(x)
-
-        if classify == "linear":
-            x = self.fc2(x)
-            return x.squeeze(1)
+        
         
         if classify == "binary":
             x = self.fc2(x)
-            x = torch.sigmoid(x)
-            return x.squeeze(1)
-        
+            x = x.squeeze(1)
         if classify == "multiclass":
             x = self.fc3(x)
-            x = torch.softmax(x, dim=1)
+        
+        if head == "linear":
             return x
+        if head == "sigmoid":
+            return torch.sigmoid(x)
+        if head == "softmax":
+            return torch.softmax(x, dim=1)
+
         
 
         

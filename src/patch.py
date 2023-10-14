@@ -107,12 +107,12 @@ def full_patcher(user="xmootoo", patient_dir=None, logdir=None, num_electrodes=1
             # Create a patient folder in the log directory
             patient_logdir = os.path.join(logdir, patient)
             if not os.path.exists(patient_logdir):
-                os.makedirs(patient_logdir)
+                os.mkdir(patient_logdir)
             
             # Create model-specific directory within patient_logdir
             model_logdir = os.path.join(patient_logdir, model)
             if not os.path.exists(model_logdir):
-                os.makedirs(model_logdir)
+                os.mkdir(model_logdir)
 
             # Form a path for the patient folder
             full_path = os.path.join(directory, patient)
@@ -167,12 +167,12 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
         # Create a patient folder in the log directory
         patient_logdir = os.path.join(logdir, patient)
         if not os.path.exists(patient_logdir):
-            os.makedirs(patient_logdir)
+            os.mkdir(patient_logdir)
         
         # Create model-specific directory within patient_logdir
         model_logdir = os.path.join(patient_logdir, model)
         if not os.path.exists(model_logdir):
-            os.makedirs(model_logdir)
+            os.mkdir(model_logdir)
 
         # Form a path for the patient folder
         full_path = os.path.join(directory, patient)

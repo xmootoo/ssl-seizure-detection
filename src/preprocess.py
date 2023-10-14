@@ -691,14 +691,19 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
     """
     Create train and validation data loaders.
 
-    Parameters:
-    - data (list): The dataset
-    - val_split (float): Fraction of data to go into validation set
-    - batch_size (int): Size of mini-batches
-    - num_workers (int): Number of worker threads to use with DataLoader
+    Args:
+        data (list): List of PyG Data, PairData, or TripletData objects.
+        data_size (float): Proportion of the data to be used. Defaults to 1.0.
+        val_ratio (float): Proportion of the data to be used for validation. Defaults to 0.2.
+        test_ratio (float): Proportion of the data to be used for testing. Defaults to 0.1. Set to 0 if no testing data is required.
+        batch_size (int): Batch size. Defaults to 32.
+        num_workers (int): Number of workers. Defaults to 4.
+        model_id (str): Model to use. Either "supervised", "relative_positioning", or "temporal_shuffling". Defaults to "supervised".
 
     Returns:
-    - train_loader, val_loader: DataLoader instances for training and validation data
+        train_loader (PyG DataLoader): Training data loader.
+        val_loader (PyG DataLoader): Validation data loader.
+        test_loader (PyG DataLoader): Test data loader (optional). No test data loader is returned if test_ratio is set to 0.
     """
     
     # Take the random subset of the data
@@ -706,28 +711,36 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
     indices = list(range(n))
     indices_subset = np.random.choice(indices, size=int(n * data_size), replace=False)
 
-    train_idx, test_idx = train_test_split(indices_subset, test_size=test_ratio, shuffle=True)
-    train_idx, val_idx = train_test_split(train_idx, test_size=val_ratio / (1 - test_ratio), shuffle=True)
+    train_idx, val_idx = train_test_split(indices_subset, test_size=val_ratio, shuffle=True)
+    if test_ratio != 0:
+        train_idx, test_idx = train_test_split(train_idx, test_size=test_ratio / (1 - val_ratio), shuffle=True)
 
     train_data = [data[i] for i in train_idx]
     val_data = [data[i] for i in val_idx]
-    test_data = [data[i] for i in test_idx]
+    if test_ratio != 0:
+        test_data = [data[i] for i in test_idx]
 
     # Create data loaders
     if model_id=="supervised":
         train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers)
         val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers)
-        test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
+        if test_ratio != 0:
+            test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
     elif model_id=="relative_positioning":
         train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
         val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
-        test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+        if test_ratio != 0:    
+            test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
     elif model_id=="temporal_shuffling":
         train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
         val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
-        test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
+        if test_ratio != 0:    
+            test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
 
-    return train_loader, val_loader, test_loader
+    if test_ratio != 0:
+        return train_loader, val_loader, test_loader
+    else:
+        return train_loader, val_loader
 
 
 
