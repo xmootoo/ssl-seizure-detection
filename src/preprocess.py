@@ -693,7 +693,8 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
 
     Args:
         data (list): List of PyG Data, PairData, or TripletData objects.
-        data_size (float): Proportion of the data to be used. Defaults to 1.0.
+        data_size (float): Proportion of the data to be used if 0 <= data_size <= 1. If data_size > 1, indicates exact number of 
+        examples in data to be used. Defaults to 1.0.
         val_ratio (float): Proportion of the data to be used for validation. Defaults to 0.2.
         test_ratio (float): Proportion of the data to be used for testing. Defaults to 0.1. Set to 0 if no testing data is required.
         batch_size (int): Batch size. Defaults to 32.
@@ -709,15 +710,15 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
     # Take the random subset of the data
     n = len(data)
     indices = list(range(n))
-    indices_subset = np.random.choice(indices, size=int(n * data_size), replace=False)
+    if 0 <= data_size <= 1:
+        indices_subset = np.random.choice(indices, size=int(n * data_size), replace=False)
+    if data_size > 1:
+        indices_subset = np.random.choice(indices, size=int(data_size), replace=False)
 
     train_idx, val_idx = train_test_split(indices_subset, test_size=val_ratio, shuffle=True)
+    train_data, val_data = [data[i] for i in train_idx], [data[i] for i in val_idx]
     if test_ratio != 0:
         train_idx, test_idx = train_test_split(train_idx, test_size=test_ratio / (1 - val_ratio), shuffle=True)
-
-    train_data = [data[i] for i in train_idx]
-    val_data = [data[i] for i in val_idx]
-    if test_ratio != 0:
         test_data = [data[i] for i in test_idx]
 
     # Create data loaders
@@ -737,10 +738,26 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
         if test_ratio != 0:    
             test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
 
+    # Print Stats
+    print(f"Total number of examples in dataset: {n}.")
+    print(f"Total number of examples used: {len(indices_subset)}.")
+    print(f"Number of training examples: {len(train_data)}. Number of training batches: {len(train_loader)}.")
+    print(f"Number of validation examples: {len(val_data)}. Number of validation batches: {len(val_loader)}.")
     if test_ratio != 0:
-        return train_loader, val_loader, test_loader
+        test_data = [data[i] for i in test_idx]
+        print(f"Number of test examples: {len(test_data)}. Number of test batches: {len(test_loader)}.")
+
+    # Organize loaders and stats
+    if test_ratio != 0:
+        loaders = (train_loader, val_loader, test_loader)
+        loader_stats = {"total_examples": len(data), "used_examples": len(indices_subset), "train_examples": len(train_data), "val_examples": len(val_data), 
+                        "test_examples": len(test_data), "train_batches": len(train_loader), "val_batches": len(val_loader), "test_batches": len(test_loader)}
     else:
-        return train_loader, val_loader
+        loaders = (train_loader, val_loader)
+        loader_stats = {"total_examples": len(data), "used_examples": len(indices_subset), "train_examples": len(train_data), "val_examples": len(val_data), "train_batches": len(train_loader), "val_batches": len(val_loader)}
+    
+    return loaders, loader_stats
+        
 
 
 
