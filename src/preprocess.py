@@ -712,8 +712,10 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
     indices = list(range(n))
     if 0 <= data_size <= 1:
         indices_subset = np.random.choice(indices, size=int(n * data_size), replace=False)
-    if data_size > 1:
+    elif 1 < data_size < n:
         indices_subset = np.random.choice(indices, size=int(data_size), replace=False)
+    elif data_size > n:
+        indices_subset = range(n)
 
     train_idx, val_idx = train_test_split(indices_subset, test_size=val_ratio, shuffle=True)
     train_data, val_data = [data[i] for i in train_idx], [data[i] for i in val_idx]

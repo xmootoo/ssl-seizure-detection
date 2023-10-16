@@ -1,0 +1,40 @@
+2023-10-15 20:06:51,687 INFO    StreamThr :4316 [internal.py:wandb_internal():86] W&B internal server running at pid: 4316, started at: 2023-10-15 20:06:51.687126
+2023-10-15 20:06:51,688 DEBUG   HandlerThread:4316 [handler.py:handle_request():146] handle_request: status
+2023-10-15 20:06:51,691 INFO    WriterThread:4316 [datastore.py:open_for_write():85] open: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_200651-83gwxyxt\run-83gwxyxt.wandb
+2023-10-15 20:06:51,691 DEBUG   SenderThread:4316 [sender.py:send():380] send: header
+2023-10-15 20:06:51,731 DEBUG   SenderThread:4316 [sender.py:send():380] send: run
+2023-10-15 20:06:52,300 INFO    SenderThread:4316 [dir_watcher.py:__init__():211] watching files in: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_200651-83gwxyxt\files
+2023-10-15 20:06:52,300 INFO    SenderThread:4316 [sender.py:_start_run_threads():1122] run started: 83gwxyxt with start time 1697414811.686625
+2023-10-15 20:06:52,312 DEBUG   HandlerThread:4316 [handler.py:handle_request():146] handle_request: check_version
+2023-10-15 20:06:52,313 DEBUG   SenderThread:4316 [sender.py:send_request():407] send_request: check_version
+2023-10-15 20:06:52,733 DEBUG   HandlerThread:4316 [handler.py:handle_request():146] handle_request: run_start
+2023-10-15 20:06:52,741 DEBUG   HandlerThread:4316 [system_info.py:__init__():32] System info init
+2023-10-15 20:06:52,741 DEBUG   HandlerThread:4316 [system_info.py:__init__():47] System info init done
+2023-10-15 20:06:52,741 INFO    HandlerThread:4316 [system_monitor.py:start():194] Starting system monitor
+2023-10-15 20:06:52,741 INFO    SystemMonitor:4316 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2023-10-15 20:06:52,741 INFO    HandlerThread:4316 [system_monitor.py:probe():214] Collecting system info
+2023-10-15 20:06:52,747 INFO    SystemMonitor:4316 [interfaces.py:start():190] Started cpu monitoring
+2023-10-15 20:06:52,747 DEBUG   HandlerThread:4316 [system_info.py:probe():196] Probing system
+2023-10-15 20:06:52,748 INFO    SystemMonitor:4316 [interfaces.py:start():190] Started disk monitoring
+2023-10-15 20:06:52,749 INFO    SystemMonitor:4316 [interfaces.py:start():190] Started gpu monitoring
+2023-10-15 20:06:52,750 INFO    SystemMonitor:4316 [interfaces.py:start():190] Started memory monitoring
+2023-10-15 20:06:52,760 INFO    SystemMonitor:4316 [interfaces.py:start():190] Started network monitoring
+2023-10-15 20:06:52,760 DEBUG   HandlerThread:4316 [system_info.py:_probe_git():181] Probing git
+2023-10-15 20:06:52,847 DEBUG   HandlerThread:4316 [system_info.py:_probe_git():189] Probing git done
+2023-10-15 20:06:52,847 DEBUG   HandlerThread:4316 [system_info.py:probe():244] Probing system done
+2023-10-15 20:06:52,848 DEBUG   HandlerThread:4316 [system_monitor.py:probe():223] {'os': 'Windows-10-10.0.19045-SP0', 'python': '3.10.12', 'heartbeatAt': '2023-10-16T00:06:52.747862', 'startedAt': '2023-10-16T00:06:51.679626', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '<python with no main file>', 'codePathLocal': None, 'git': {'remote': 'git@github.com:xmootoo/ssl-seizure-detection.git', 'commit': 'e770c7e524b3c325543abf2be01c29e9fe2679ad'}, 'email': 'xmootoo@gmail.com', 'root': 'C:/Users/xmoot/Desktop/VSCode/ssl-seizure-detection', 'host': 'frost', 'username': 'xmoot', 'executable': 'c:\\tools\\Anaconda3\\envs\\torch2_cuda11.8\\python.exe', 'cpu_count': 8, 'cpu_count_logical': 16, 'cpu_freq': {'current': 3593.0, 'min': 0.0, 'max': 3593.0}, 'cpu_freq_per_core': [{'current': 3593.0, 'min': 0.0, 'max': 3593.0}], 'disk': {'/': {'total': 445.6211471557617, 'used': 393.7922477722168}}, 'gpu': 'NVIDIA GeForce RTX 2070 SUPER', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 2070 SUPER', 'memory_total': 8589934592}], 'memory': {'total': 31.910205841064453}}
+2023-10-15 20:06:52,848 INFO    HandlerThread:4316 [system_monitor.py:probe():224] Finished collecting system info
+2023-10-15 20:06:52,848 INFO    HandlerThread:4316 [system_monitor.py:probe():227] Publishing system info
+2023-10-15 20:06:52,848 DEBUG   HandlerThread:4316 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-10-15 20:06:52,848 DEBUG   HandlerThread:4316 [system_info.py:_save_pip():68] Saving pip packages done
+2023-10-15 20:06:52,849 DEBUG   HandlerThread:4316 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-10-15 20:06:53,306 INFO    Thread-31 :4316 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_200651-83gwxyxt\files\requirements.txt
+2023-10-15 20:06:53,306 INFO    Thread-31 :4316 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_200651-83gwxyxt\files\conda-environment.yaml
+2023-10-15 20:06:56,767 DEBUG   HandlerThread:4316 [system_info.py:_save_conda():87] Saving conda packages done
+2023-10-15 20:06:56,768 INFO    HandlerThread:4316 [system_monitor.py:probe():229] Finished publishing system info
+2023-10-15 20:06:56,768 DEBUG   HandlerThread:4316 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 20:06:56,768 DEBUG   SenderThread:4316 [sender.py:send():380] send: files
+2023-10-15 20:06:56,768 INFO    SenderThread:4316 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-10-15 20:06:57,334 INFO    Thread-31 :4316 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_200651-83gwxyxt\files\conda-environment.yaml
+2023-10-15 20:06:57,334 INFO    Thread-31 :4316 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_200651-83gwxyxt\files\wandb-metadata.json
+2023-10-15 20:06:57,426 INFO    wandb-upload_0:4316 [upload_job.py:push():131] Uploaded file C:\Users\xmoot\AppData\Local\Temp\tmp33bbjj1uwandb\h92lwid9-wandb-metadata.json

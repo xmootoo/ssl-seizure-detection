@@ -1,0 +1,222 @@
+2023-10-16 01:49:58,081 INFO    StreamThr :21972 [internal.py:wandb_internal():86] W&B internal server running at pid: 21972, started at: 2023-10-16 01:49:58.080991
+2023-10-16 01:49:58,082 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status
+2023-10-16 01:49:58,083 INFO    WriterThread:21972 [datastore.py:open_for_write():85] open: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\run-q5xbrnhd.wandb
+2023-10-16 01:49:58,085 DEBUG   SenderThread:21972 [sender.py:send():380] send: header
+2023-10-16 01:49:58,454 DEBUG   SenderThread:21972 [sender.py:send():380] send: run
+2023-10-16 01:49:58,984 INFO    SenderThread:21972 [dir_watcher.py:__init__():211] watching files in: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files
+2023-10-16 01:49:58,984 INFO    SenderThread:21972 [sender.py:_start_run_threads():1122] run started: q5xbrnhd with start time 1697435397.127489
+2023-10-16 01:49:58,997 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: check_version
+2023-10-16 01:49:58,997 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: check_version
+2023-10-16 01:49:59,424 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: run_start
+2023-10-16 01:49:59,432 DEBUG   HandlerThread:21972 [system_info.py:__init__():32] System info init
+2023-10-16 01:49:59,432 DEBUG   HandlerThread:21972 [system_info.py:__init__():47] System info init done
+2023-10-16 01:49:59,432 INFO    HandlerThread:21972 [system_monitor.py:start():194] Starting system monitor
+2023-10-16 01:49:59,432 INFO    SystemMonitor:21972 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2023-10-16 01:49:59,433 INFO    HandlerThread:21972 [system_monitor.py:probe():214] Collecting system info
+2023-10-16 01:49:59,437 INFO    SystemMonitor:21972 [interfaces.py:start():190] Started cpu monitoring
+2023-10-16 01:49:59,437 DEBUG   HandlerThread:21972 [system_info.py:probe():196] Probing system
+2023-10-16 01:49:59,438 INFO    SystemMonitor:21972 [interfaces.py:start():190] Started disk monitoring
+2023-10-16 01:49:59,438 INFO    SystemMonitor:21972 [interfaces.py:start():190] Started gpu monitoring
+2023-10-16 01:49:59,439 INFO    SystemMonitor:21972 [interfaces.py:start():190] Started memory monitoring
+2023-10-16 01:49:59,447 INFO    SystemMonitor:21972 [interfaces.py:start():190] Started network monitoring
+2023-10-16 01:49:59,448 DEBUG   HandlerThread:21972 [system_info.py:_probe_git():181] Probing git
+2023-10-16 01:49:59,516 DEBUG   HandlerThread:21972 [system_info.py:_probe_git():189] Probing git done
+2023-10-16 01:49:59,516 DEBUG   HandlerThread:21972 [system_info.py:probe():244] Probing system done
+2023-10-16 01:49:59,516 DEBUG   HandlerThread:21972 [system_monitor.py:probe():223] {'os': 'Windows-10-10.0.19045-SP0', 'python': '3.10.12', 'heartbeatAt': '2023-10-16T05:49:59.437993', 'startedAt': '2023-10-16T05:49:52.713492', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '<python with no main file>', 'codePathLocal': None, 'git': {'remote': 'git@github.com:xmootoo/ssl-seizure-detection.git', 'commit': 'e770c7e524b3c325543abf2be01c29e9fe2679ad'}, 'email': 'xmootoo@gmail.com', 'root': 'C:/Users/xmoot/Desktop/VSCode/ssl-seizure-detection', 'host': 'frost', 'username': 'xmoot', 'executable': 'c:\\tools\\Anaconda3\\envs\\torch2_cuda11.8\\python.exe', 'cpu_count': 8, 'cpu_count_logical': 16, 'cpu_freq': {'current': 3593.0, 'min': 0.0, 'max': 3593.0}, 'cpu_freq_per_core': [{'current': 3593.0, 'min': 0.0, 'max': 3593.0}], 'disk': {'/': {'total': 445.6211471557617, 'used': 397.5206985473633}}, 'gpu': 'NVIDIA GeForce RTX 2070 SUPER', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 2070 SUPER', 'memory_total': 8589934592}], 'memory': {'total': 31.910205841064453}}
+2023-10-16 01:49:59,516 INFO    HandlerThread:21972 [system_monitor.py:probe():224] Finished collecting system info
+2023-10-16 01:49:59,516 INFO    HandlerThread:21972 [system_monitor.py:probe():227] Publishing system info
+2023-10-16 01:49:59,516 DEBUG   HandlerThread:21972 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-10-16 01:49:59,517 DEBUG   HandlerThread:21972 [system_info.py:_save_pip():68] Saving pip packages done
+2023-10-16 01:49:59,517 DEBUG   HandlerThread:21972 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-10-16 01:49:59,987 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\conda-environment.yaml
+2023-10-16 01:49:59,987 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\requirements.txt
+2023-10-16 01:50:03,310 DEBUG   HandlerThread:21972 [system_info.py:_save_conda():87] Saving conda packages done
+2023-10-16 01:50:03,311 INFO    HandlerThread:21972 [system_monitor.py:probe():229] Finished publishing system info
+2023-10-16 01:50:03,312 DEBUG   SenderThread:21972 [sender.py:send():380] send: files
+2023-10-16 01:50:03,312 INFO    SenderThread:21972 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-10-16 01:50:03,313 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:03,326 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-16 01:50:03,327 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: stop_status
+2023-10-16 01:50:03,329 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-16 01:50:03,851 DEBUG   SenderThread:21972 [sender.py:send():380] send: telemetry
+2023-10-16 01:50:03,981 INFO    wandb-upload_0:21972 [upload_job.py:push():131] Uploaded file C:\Users\xmoot\AppData\Local\Temp\tmpghrsxcjuwandb\5cpv26k8-wandb-metadata.json
+2023-10-16 01:50:04,016 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\conda-environment.yaml
+2023-10-16 01:50:04,016 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\wandb-metadata.json
+2023-10-16 01:50:08,045 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\output.log
+2023-10-16 01:50:08,975 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:10,060 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\output.log
+2023-10-16 01:50:14,012 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:18,321 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-16 01:50:18,337 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-16 01:50:18,337 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: stop_status
+2023-10-16 01:50:19,437 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:22,150 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\output.log
+2023-10-16 01:50:25,296 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:30,210 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\output.log
+2023-10-16 01:50:30,662 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:31,217 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\config.yaml
+2023-10-16 01:50:33,325 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-16 01:50:33,341 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-16 01:50:33,341 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: stop_status
+2023-10-16 01:50:36,471 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:40,285 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\output.log
+2023-10-16 01:50:42,222 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:47,259 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:48,329 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-16 01:50:48,345 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-16 01:50:48,345 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: stop_status
+2023-10-16 01:50:52,436 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:57,468 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:50:59,450 DEBUG   SystemMonitor:21972 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2023-10-16 01:50:59,450 DEBUG   SenderThread:21972 [sender.py:send():380] send: stats
+2023-10-16 01:51:03,314 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-16 01:51:03,345 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-16 01:51:03,346 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: stop_status
+2023-10-16 01:51:03,448 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:51:08,485 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:51:13,516 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:51:18,327 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-16 01:51:18,343 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-16 01:51:18,344 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: stop_status
+2023-10-16 01:51:19,501 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:51:24,533 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:51:29,455 DEBUG   SenderThread:21972 [sender.py:send():380] send: stats
+2023-10-16 01:51:30,460 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:51:32,753 DEBUG   SenderThread:21972 [sender.py:send():380] send: telemetry
+2023-10-16 01:51:32,754 DEBUG   SenderThread:21972 [sender.py:send():380] send: exit
+2023-10-16 01:51:32,754 INFO    SenderThread:21972 [sender.py:send_exit():585] handling exit code: 0
+2023-10-16 01:51:32,755 INFO    SenderThread:21972 [sender.py:send_exit():587] handling runtime: 93
+2023-10-16 01:51:32,755 INFO    SenderThread:21972 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-16 01:51:32,756 INFO    SenderThread:21972 [sender.py:send_exit():593] send defer
+2023-10-16 01:51:32,756 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:32,756 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 0
+2023-10-16 01:51:32,756 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:32,756 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 0
+2023-10-16 01:51:32,756 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 1
+2023-10-16 01:51:32,757 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:32,757 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 1
+2023-10-16 01:51:32,757 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:32,757 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 1
+2023-10-16 01:51:32,757 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 2
+2023-10-16 01:51:32,757 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:32,757 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 2
+2023-10-16 01:51:32,757 INFO    HandlerThread:21972 [system_monitor.py:finish():203] Stopping system monitor
+2023-10-16 01:51:32,757 DEBUG   SystemMonitor:21972 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2023-10-16 01:51:32,764 DEBUG   SystemMonitor:21972 [system_monitor.py:_start():183] Publishing last batch of metrics
+2023-10-16 01:51:32,764 INFO    HandlerThread:21972 [interfaces.py:finish():202] Joined cpu monitor
+2023-10-16 01:51:32,765 INFO    HandlerThread:21972 [interfaces.py:finish():202] Joined disk monitor
+2023-10-16 01:51:32,816 INFO    HandlerThread:21972 [interfaces.py:finish():202] Joined gpu monitor
+2023-10-16 01:51:32,817 INFO    HandlerThread:21972 [interfaces.py:finish():202] Joined memory monitor
+2023-10-16 01:51:32,817 INFO    HandlerThread:21972 [interfaces.py:finish():202] Joined network monitor
+2023-10-16 01:51:32,817 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:32,817 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 2
+2023-10-16 01:51:32,817 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 3
+2023-10-16 01:51:32,817 DEBUG   SenderThread:21972 [sender.py:send():380] send: stats
+2023-10-16 01:51:32,817 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:32,818 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 3
+2023-10-16 01:51:32,818 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:32,818 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 3
+2023-10-16 01:51:32,818 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 4
+2023-10-16 01:51:32,818 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:32,818 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 4
+2023-10-16 01:51:32,819 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:32,819 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 4
+2023-10-16 01:51:32,819 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 5
+2023-10-16 01:51:32,819 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:32,819 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 5
+2023-10-16 01:51:32,819 DEBUG   SenderThread:21972 [sender.py:send():380] send: summary
+2023-10-16 01:51:32,820 INFO    SenderThread:21972 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-16 01:51:32,820 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:32,820 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 5
+2023-10-16 01:51:32,820 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 6
+2023-10-16 01:51:32,820 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:32,820 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 6
+2023-10-16 01:51:32,820 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:32,821 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 6
+2023-10-16 01:51:32,824 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: status_report
+2023-10-16 01:51:32,985 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 7
+2023-10-16 01:51:32,985 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:32,986 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 7
+2023-10-16 01:51:32,986 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:32,986 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 7
+2023-10-16 01:51:33,617 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\config.yaml
+2023-10-16 01:51:33,617 INFO    Thread-59 :21972 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\wandb-summary.json
+2023-10-16 01:51:33,757 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: poll_exit
+2023-10-16 01:51:34,515 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 8
+2023-10-16 01:51:34,515 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: poll_exit
+2023-10-16 01:51:34,515 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:34,516 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 8
+2023-10-16 01:51:34,516 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:34,516 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 8
+2023-10-16 01:51:34,516 INFO    SenderThread:21972 [job_builder.py:build():281] Attempting to build job artifact
+2023-10-16 01:51:34,517 INFO    SenderThread:21972 [job_builder.py:_get_source_type():393] is repo sourced job
+2023-10-16 01:51:34,517 INFO    SenderThread:21972 [job_builder.py:_get_program_relpath():411] run is notebook based run
+2023-10-16 01:51:34,517 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 9
+2023-10-16 01:51:34,517 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:34,517 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 9
+2023-10-16 01:51:34,517 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:34,517 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 9
+2023-10-16 01:51:34,517 INFO    SenderThread:21972 [dir_watcher.py:finish():358] shutting down directory watcher
+2023-10-16 01:51:34,624 INFO    SenderThread:21972 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\output.log
+2023-10-16 01:51:34,624 INFO    SenderThread:21972 [dir_watcher.py:finish():388] scan: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files
+2023-10-16 01:51:34,624 INFO    SenderThread:21972 [dir_watcher.py:finish():402] scan save: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\conda-environment.yaml conda-environment.yaml
+2023-10-16 01:51:34,625 INFO    SenderThread:21972 [dir_watcher.py:finish():402] scan save: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\config.yaml config.yaml
+2023-10-16 01:51:34,627 INFO    SenderThread:21972 [dir_watcher.py:finish():402] scan save: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\output.log output.log
+2023-10-16 01:51:34,629 INFO    SenderThread:21972 [dir_watcher.py:finish():402] scan save: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\requirements.txt requirements.txt
+2023-10-16 01:51:34,632 INFO    SenderThread:21972 [dir_watcher.py:finish():402] scan save: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\wandb-metadata.json wandb-metadata.json
+2023-10-16 01:51:34,632 INFO    SenderThread:21972 [dir_watcher.py:finish():402] scan save: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\wandb-summary.json wandb-summary.json
+2023-10-16 01:51:34,633 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 10
+2023-10-16 01:51:34,636 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:34,638 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 10
+2023-10-16 01:51:34,638 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:34,638 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 10
+2023-10-16 01:51:34,639 INFO    SenderThread:21972 [file_pusher.py:finish():175] shutting down file pusher
+2023-10-16 01:51:34,763 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: poll_exit
+2023-10-16 01:51:34,763 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: poll_exit
+2023-10-16 01:51:34,862 INFO    wandb-upload_0:21972 [upload_job.py:push():131] Uploaded file c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\conda-environment.yaml
+2023-10-16 01:51:35,350 INFO    wandb-upload_1:21972 [upload_job.py:push():131] Uploaded file c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\config.yaml
+2023-10-16 01:51:35,374 INFO    wandb-upload_4:21972 [upload_job.py:push():131] Uploaded file c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\wandb-summary.json
+2023-10-16 01:51:35,738 INFO    wandb-upload_2:21972 [upload_job.py:push():131] Uploaded file c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\output.log
+2023-10-16 01:51:35,750 INFO    wandb-upload_3:21972 [upload_job.py:push():131] Uploaded file c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\files\requirements.txt
+2023-10-16 01:51:35,770 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: poll_exit
+2023-10-16 01:51:35,770 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: poll_exit
+2023-10-16 01:51:35,956 INFO    Thread-58 (_thread_body):21972 [sender.py:transition_state():613] send defer: 11
+2023-10-16 01:51:35,956 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:35,956 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 11
+2023-10-16 01:51:35,956 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:35,956 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 11
+2023-10-16 01:51:35,957 INFO    SenderThread:21972 [file_pusher.py:join():181] waiting for file pusher
+2023-10-16 01:51:35,957 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 12
+2023-10-16 01:51:35,957 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:35,957 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 12
+2023-10-16 01:51:35,957 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:35,957 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 12
+2023-10-16 01:51:35,957 INFO    SenderThread:21972 [file_stream.py:finish():595] file stream finish called
+2023-10-16 01:51:36,217 INFO    SenderThread:21972 [file_stream.py:finish():599] file stream finish is done
+2023-10-16 01:51:36,217 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 13
+2023-10-16 01:51:36,218 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:36,218 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 13
+2023-10-16 01:51:36,218 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:36,218 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 13
+2023-10-16 01:51:36,218 INFO    SenderThread:21972 [sender.py:transition_state():613] send defer: 14
+2023-10-16 01:51:36,218 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: defer
+2023-10-16 01:51:36,218 INFO    HandlerThread:21972 [handler.py:handle_request_defer():172] handle defer: 14
+2023-10-16 01:51:36,218 DEBUG   SenderThread:21972 [sender.py:send():380] send: final
+2023-10-16 01:51:36,219 DEBUG   SenderThread:21972 [sender.py:send():380] send: footer
+2023-10-16 01:51:36,219 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: defer
+2023-10-16 01:51:36,219 INFO    SenderThread:21972 [sender.py:send_request_defer():609] handle sender defer: 14
+2023-10-16 01:51:36,219 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-16 01:51:36,220 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: poll_exit
+2023-10-16 01:51:36,220 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: server_info
+2023-10-16 01:51:36,220 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: get_summary
+2023-10-16 01:51:36,220 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: sampled_history
+2023-10-16 01:51:36,220 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: poll_exit
+2023-10-16 01:51:36,221 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: job_info
+2023-10-16 01:51:36,221 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: server_info
+2023-10-16 01:51:36,276 DEBUG   SenderThread:21972 [sender.py:send_request():407] send_request: job_info
+2023-10-16 01:51:36,277 DEBUG   HandlerThread:21972 [handler.py:handle_request():146] handle_request: shutdown
+2023-10-16 01:51:36,277 INFO    HandlerThread:21972 [handler.py:finish():866] shutting down handler
+2023-10-16 01:51:37,227 INFO    WriterThread:21972 [datastore.py:close():294] close: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_014952-q5xbrnhd\run-q5xbrnhd.wandb
+2023-10-16 01:51:37,289 INFO    SenderThread:21972 [sender.py:finish():1534] shutting down sender
+2023-10-16 01:51:37,289 INFO    SenderThread:21972 [file_pusher.py:finish():175] shutting down file pusher
+2023-10-16 01:51:37,289 INFO    SenderThread:21972 [file_pusher.py:join():181] waiting for file pusher

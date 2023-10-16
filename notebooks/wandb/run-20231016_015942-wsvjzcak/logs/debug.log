@@ -1,0 +1,69 @@
+2023-10-16 01:59:42,619 INFO    MainThread:22564 [wandb_setup.py:_flush():76] Current SDK version is 0.15.12
+2023-10-16 01:59:42,619 INFO    MainThread:22564 [wandb_setup.py:_flush():76] Configure stats pid to 22564
+2023-10-16 01:59:42,619 INFO    MainThread:22564 [wandb_setup.py:_flush():76] Loading settings from C:\Users\xmoot\.config\wandb\settings
+2023-10-16 01:59:42,619 INFO    MainThread:22564 [wandb_setup.py:_flush():76] Loading settings from c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\settings
+2023-10-16 01:59:42,619 INFO    MainThread:22564 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-10-16 01:59:42,619 INFO    MainThread:22564 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-10-16 01:59:42,620 INFO    MainThread:22564 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program': '<python with no main file>'}
+2023-10-16 01:59:42,620 INFO    MainThread:22564 [wandb_init.py:_log_setup():528] Logging user logs to c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_015942-wsvjzcak\logs\debug.log
+2023-10-16 01:59:42,620 INFO    MainThread:22564 [wandb_init.py:_log_setup():529] Logging internal logs to c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231016_015942-wsvjzcak\logs\debug-internal.log
+2023-10-16 01:59:42,620 INFO    MainThread:22564 [wandb_init.py:_jupyter_setup():474] configuring jupyter hooks <wandb.sdk.wandb_init._WandbInit object at 0x000001F153A03A30>
+2023-10-16 01:59:42,621 INFO    MainThread:22564 [wandb_init.py:init():568] calling init triggers
+2023-10-16 01:59:42,621 INFO    MainThread:22564 [wandb_init.py:init():575] wandb.init called with sweep_config: {}
+config: {'num_node_features': 9, 'num_edge_features': 3, 'hidden_channels': [64, 32, 64, 128, 256]}
+2023-10-16 01:59:42,621 INFO    MainThread:22564 [wandb_init.py:init():618] starting backend
+2023-10-16 01:59:42,621 INFO    MainThread:22564 [wandb_init.py:init():622] setting up manager
+2023-10-16 01:59:42,623 INFO    MainThread:22564 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=spawn, using: spawn
+2023-10-16 01:59:42,624 INFO    MainThread:22564 [wandb_init.py:init():628] backend started and connected
+2023-10-16 01:59:42,628 INFO    MainThread:22564 [wandb_run.py:_label_probe_notebook():1276] probe notebook
+2023-10-16 01:59:42,628 INFO    MainThread:22564 [wandb_run.py:_label_probe_notebook():1286] Unable to probe notebook: 'NoneType' object has no attribute 'get'
+2023-10-16 01:59:42,628 INFO    MainThread:22564 [wandb_init.py:init():720] updated telemetry
+2023-10-16 01:59:42,676 INFO    MainThread:22564 [wandb_init.py:init():753] communicating run to backend with 90.0 second timeout
+2023-10-16 01:59:43,204 INFO    MainThread:22564 [wandb_run.py:_on_init():2220] communicating current version
+2023-10-16 01:59:43,640 INFO    MainThread:22564 [wandb_run.py:_on_init():2229] got version response 
+2023-10-16 01:59:43,640 INFO    MainThread:22564 [wandb_init.py:init():804] starting run threads in backend
+2023-10-16 01:59:47,569 INFO    MainThread:22564 [wandb_run.py:_console_start():2199] atexit reg
+2023-10-16 01:59:47,569 INFO    MainThread:22564 [wandb_run.py:_redirect():2054] redirect: wrap_raw
+2023-10-16 01:59:47,569 INFO    MainThread:22564 [wandb_run.py:_redirect():2119] Wrapping output streams.
+2023-10-16 01:59:47,569 INFO    MainThread:22564 [wandb_run.py:_redirect():2144] Redirects installed.
+2023-10-16 01:59:47,570 INFO    MainThread:22564 [wandb_init.py:init():845] run started, returning control to user process
+2023-10-16 02:00:50,709 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Patient ID = jh101 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,710 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Patient ID jh101 None
+2023-10-16 02:00:50,710 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Data size = 0.04 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,710 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Data size 0.04 None
+2023-10-16 02:00:50,710 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Total examples = 278130 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,710 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Total examples 278130 None
+2023-10-16 02:00:50,710 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Used examples = 11125 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,710 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Used examples 11125 None
+2023-10-16 02:00:50,710 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Training examples = 8900 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,711 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Training examples 8900 None
+2023-10-16 02:00:50,711 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Validation examples = 2225 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,711 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Validation examples 2225 None
+2023-10-16 02:00:50,711 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Training batches = 279 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,711 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Training batches 279 None
+2023-10-16 02:00:50,711 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Validation batches = 70 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,711 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Validation batches 70 None
+2023-10-16 02:00:50,711 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Validation ratio = 0.2 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,711 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Validation ratio 0.2 None
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Test ratio = 0 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Test ratio 0 None
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Batch size = 32 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Batch size 32 None
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Number of workers = 4 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Number of workers 4 None
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Learning rate = 0.001 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Learning rate 0.001 None
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Number of epochs = 1 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,712 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Number of epochs 1 None
+2023-10-16 02:00:50,713 INFO    MainThread:22564 [wandb_config.py:__setitem__():151] config set Model parameters = {'num_node_features': 9, 'num_edge_features': 3, 'hidden_channels': [64, 32, 64, 128, 256]} - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001F15DB1AE60>>
+2023-10-16 02:00:50,713 INFO    MainThread:22564 [wandb_run.py:_config_callback():1324] config_cb Model parameters {'num_node_features': 9, 'num_edge_features': 3, 'hidden_channels': [64, 32, 64, 128, 256]} None
+2023-10-16 02:00:50,713 INFO    MainThread:22564 [wandb_run.py:_finish():1934] finishing run xmootoo/ssl-seizure-detection/wsvjzcak
+2023-10-16 02:00:50,714 ERROR   MainThread:22564 [jupyter.py:save_history():437] Run pip install nbformat to save notebook history
+2023-10-16 02:00:50,714 INFO    MainThread:22564 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2023-10-16 02:00:50,714 INFO    MainThread:22564 [wandb_init.py:_jupyter_teardown():456] cleaning up jupyter logic
+2023-10-16 02:00:50,714 INFO    MainThread:22564 [wandb_run.py:_atexit_cleanup():2168] got exitcode: 0
+2023-10-16 02:00:50,714 INFO    MainThread:22564 [wandb_run.py:_restore():2151] restore
+2023-10-16 02:00:50,714 INFO    MainThread:22564 [wandb_run.py:_restore():2157] restore done
+2023-10-16 02:00:55,317 INFO    MainThread:22564 [wandb_run.py:_footer_history_summary_info():3599] rendering history
+2023-10-16 02:00:55,317 INFO    MainThread:22564 [wandb_run.py:_footer_history_summary_info():3631] rendering summary
+2023-10-16 02:00:55,322 INFO    MainThread:22564 [wandb_run.py:_footer_sync_info():3558] logging synced files

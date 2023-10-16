@@ -4,22 +4,8 @@ from train import train
 
 
 
-if __name__ == '__main__':
-    
-    # Training parameters
-    epochs = 1
-    data_size = 0.05
-    train_ratio = 0.8
-    batch_size = 32
-    lr=1e-3
-    timing=True
 
-    # # Hard coded parameters
-    # data_path = r"C:\Users\xmoot\Desktop\Data\ssl-seizure-detection\patient_pseudolabeled\relative_positioning\PyG\jh101_12s_7min_PairData.pt"
-    # model_path = r"C:\Users\xmoot\Desktop\Models\PyTorch\ssl-seizure-detection\relative_positioning\jh101"
-    # stats_path = r"C:\Users\xmoot\Desktop\Models\PyTorch\ssl-seizure-detection\relative_positioning\jh101"
-    # model_name = r"\jh101_12s_7min_1epochs"
-    # num_workers = 4
+if __name__ == '__main__':
 
     # Bash command line parameters
     
@@ -27,18 +13,46 @@ if __name__ == '__main__':
     data_path = sys.argv[1]
     
     # The path to save the model
-    model_path = sys.argv[2]
+    logdir = sys.argv[2]
     
     # The path to save the training statistics
-    stats_path = sys.argv[3]
+    patient_id = sys.argv[3]
     
     # The name of the model
-    model_name = sys.argv[4]
+    model_id = sys.argv[4]
     
-    # The number of workers for training
-    num_workers = int(sys.argv[5])
 
-    # Train the model
-    train(data_path, model_path, stats_path, model_name, epochs, data_size, train_ratio, batch_size, num_workers,
-          lr, timing)
+    # PC
+    data_path = r"C:\Users\xmoot\Desktop\Data\ssl-seizure-detection\patient_pyg\jh101\supervised\jh101_run1.pt"
+    logdir = r"C:\Users\xmoot\Desktop\Data\ssl-seizure-detection\models"
+
+    # Training parameters
+    epochs = 200
+
+    if model_id == "supervised":
+        config = {
+            "num_node_features": 9,
+            "num_edge_features": 3,
+            "hidden_channels": 64,
+            "out_channels": 32,
+            "dropout": 0.1,
+        }
+        data_size=1.0
+        val_ratio=0.2
+        test_ratio=0.1
+
+    elif model_id == "relative_positioning":
+        config = {
+        "num_node_features": 9,
+        "num_edge_features": 3,
+        "hidden_channels": [64, 32, 64, 128, 256],
+        }
+        data_size=1.0
+        val_ratio=0.2
+        test_ratio=0
+    elif model_id == "temporal_shuffling":
+        pass
+
+    train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
+            batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, timing=True, model_id=model_id)
 

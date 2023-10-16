@@ -146,8 +146,8 @@ def save_to_json(data, logdir, file_name):
 
 
 def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_ratio=0.2, test_ratio=0.1, 
-          batch_size=32, num_workers=4, lr=1e-3, model_id="supervised", timing=True, classify="binary", head="linear",
-          dropout=True):
+          batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id="supervised", timing=True, 
+          classify="binary", head="linear", dropout=True):
     """Trains a the Relative Positioning SSL model.
 
     Args:
@@ -180,7 +180,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
 
     # Patience parameter
     patience = 20
-
+    
     # Initialize loaders, scaler, model, optimizer, and loss
     loaders, loader_stats = create_data_loaders(data, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
                                                    batch_size=batch_size, num_workers=num_workers, model_id=model_id)
@@ -199,7 +199,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         model = temporal_shuffling(config).to(device)
 
     # Initialize optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
     # Initialize loss based on classification method and head
     if classify=="binary" and head=="linear":
@@ -248,6 +248,10 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         train_acc.append((epoch, epoch_train_acc))
         val_acc.append((epoch, epoch_val_acc))
 
+        # Weights & Biases Logging
+        wandb.log({"Epoch": epoch+1, "Training Loss": epoch_train_loss, "Validation Loss": epoch_val_loss, 
+                   "Training Accuracy": epoch_train_acc, "Validation Accuracy": epoch_val_acc})
+        
         #<----------Early Stopping---------->
         if epoch_val_loss < best_val_loss:
             best_val_loss = epoch_val_loss
@@ -259,7 +263,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
                 print("Early stopping triggered.")
                 break
     
-    wandb.log({"epoch": epoch+1, "train_loss": train_loss, "val_loss": val_loss, "train_acc": train_acc, "val_acc": val_acc})    
+           
     #<----------Testing---------->
     if model_id=="supervised":
         test_loss, test_acc = evaluate_model(model, test_loader, criterion, device, classify, head, dropout=False, model_id=model_id, 
@@ -290,14 +294,16 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         'Batch size': batch_size,
         'Number of workers': num_workers,
         'Learning rate': lr,
+        'Weight decay': weight_decay,
         'Number of epochs': epochs,
         'Model parameters': config,
+        'Dropout': dropout,
     }
     if model == "supervised":
         info_dict['Test examples'] = loader_stats["test_examples"]
         info_dict['Test batches'] = loader_stats["test_batches"]
     
-    # Save to Weights & Biases
+    # Weights & Biases Saving
     for key, value in info_dict.items():
         wandb.config[key] = value
 
@@ -308,3 +314,6 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         f.write(info)
     
     print("Training complete.")
+    
+    # Weights & Biases finish the experiment
+    wandb.finish()

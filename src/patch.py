@@ -138,7 +138,7 @@ def full_patcher(user="xmootoo", patient_dir=None, logdir=None, num_electrodes=1
                         if model == "supervised":
                             file_name = patient + "_run" + str(i)
                         if model == "relative_positioning" or model == "temporal_shuffling":
-                            file_name = patient + "_run" + str(i) + "_" + str(int(tau_pos * 0.12)) + "s" + "_" + str(int(tau_neg * 0.12)) + "_" + str(sample_ratio) + "sr"
+                            file_name = patient + "_run" + str(i) + "_" + str(int(tau_pos * 0.12)) + "s_" + str(int(tau_neg * 0.12)) + "s_" + str(sample_ratio) + "sr"
                         patched_data = patch(graphrep_dir=graphrep_dir,  logdir=model_logdir, file_name=file_name, num_electrodes=num_electrodes, tau_pos=tau_pos, 
                                              tau_neg=tau_neg, model=model, stats=stats, save=save, sample_ratio=sample_ratio)
                         
@@ -196,7 +196,7 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
                 if os.path.exists(path_preictal) and os.path.exists(path_ictal) and os.path.exists(path_postictal):
                     file_name = patient + "_run" + str(i)
                     if model == "relative_positioning" or model == "temporal_shuffling":
-                        file_name = file_name + "_" + str(int(tau_pos * 0.12)) + "s" + "_" + str(int(tau_neg * 0.12)) + "_" + str(sample_ratio) + "sr"
+                        file_name = file_name + "_" + str(int(tau_pos * 0.12)) + "s_" + str(int(tau_neg * 0.12)) + "s_" + str(sample_ratio) + "sr"
                     
                     patched_data = patch(graphrep_dir=graphrep_dir,  logdir=model_logdir, file_name=file_name, num_electrodes=num_electrodes, tau_pos=tau_pos, 
                                          tau_neg=tau_neg, model=model, stats=stats, save=save, sample_ratio=sample_ratio)

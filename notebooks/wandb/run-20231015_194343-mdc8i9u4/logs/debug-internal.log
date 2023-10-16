@@ -1,0 +1,339 @@
+2023-10-15 19:43:49,910 INFO    StreamThr :8504 [internal.py:wandb_internal():86] W&B internal server running at pid: 8504, started at: 2023-10-15 19:43:49.909672
+2023-10-15 19:43:49,911 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status
+2023-10-15 19:43:49,912 INFO    WriterThread:8504 [datastore.py:open_for_write():85] open: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\run-mdc8i9u4.wandb
+2023-10-15 19:43:49,913 DEBUG   SenderThread:8504 [sender.py:send():380] send: header
+2023-10-15 19:43:49,914 DEBUG   SenderThread:8504 [sender.py:send():380] send: run
+2023-10-15 19:43:50,490 INFO    SenderThread:8504 [dir_watcher.py:__init__():211] watching files in: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files
+2023-10-15 19:43:50,490 INFO    SenderThread:8504 [sender.py:_start_run_threads():1122] run started: mdc8i9u4 with start time 1697413428.962131
+2023-10-15 19:43:50,505 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: check_version
+2023-10-15 19:43:50,506 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: check_version
+2023-10-15 19:43:50,962 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: run_start
+2023-10-15 19:43:50,969 DEBUG   HandlerThread:8504 [system_info.py:__init__():32] System info init
+2023-10-15 19:43:50,969 DEBUG   HandlerThread:8504 [system_info.py:__init__():47] System info init done
+2023-10-15 19:43:50,970 INFO    HandlerThread:8504 [system_monitor.py:start():194] Starting system monitor
+2023-10-15 19:43:50,970 INFO    SystemMonitor:8504 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2023-10-15 19:43:50,970 INFO    HandlerThread:8504 [system_monitor.py:probe():214] Collecting system info
+2023-10-15 19:43:50,974 INFO    SystemMonitor:8504 [interfaces.py:start():190] Started cpu monitoring
+2023-10-15 19:43:50,975 DEBUG   HandlerThread:8504 [system_info.py:probe():196] Probing system
+2023-10-15 19:43:50,975 INFO    SystemMonitor:8504 [interfaces.py:start():190] Started disk monitoring
+2023-10-15 19:43:50,977 INFO    SystemMonitor:8504 [interfaces.py:start():190] Started gpu monitoring
+2023-10-15 19:43:50,977 INFO    SystemMonitor:8504 [interfaces.py:start():190] Started memory monitoring
+2023-10-15 19:43:50,985 INFO    SystemMonitor:8504 [interfaces.py:start():190] Started network monitoring
+2023-10-15 19:43:50,986 DEBUG   HandlerThread:8504 [system_info.py:_probe_git():181] Probing git
+2023-10-15 19:43:51,058 DEBUG   HandlerThread:8504 [system_info.py:_probe_git():189] Probing git done
+2023-10-15 19:43:51,059 DEBUG   HandlerThread:8504 [system_info.py:probe():244] Probing system done
+2023-10-15 19:43:51,059 DEBUG   HandlerThread:8504 [system_monitor.py:probe():223] {'os': 'Windows-10-10.0.19045-SP0', 'python': '3.10.12', 'heartbeatAt': '2023-10-15T23:43:50.975497', 'startedAt': '2023-10-15T23:43:43.945106', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '<python with no main file>', 'codePathLocal': None, 'git': {'remote': 'git@github.com:xmootoo/ssl-seizure-detection.git', 'commit': 'e770c7e524b3c325543abf2be01c29e9fe2679ad'}, 'email': 'xmootoo@gmail.com', 'root': 'C:/Users/xmoot/Desktop/VSCode/ssl-seizure-detection', 'host': 'frost', 'username': 'xmoot', 'executable': 'c:\\tools\\Anaconda3\\envs\\torch2_cuda11.8\\python.exe', 'cpu_count': 8, 'cpu_count_logical': 16, 'cpu_freq': {'current': 3593.0, 'min': 0.0, 'max': 3593.0}, 'cpu_freq_per_core': [{'current': 3593.0, 'min': 0.0, 'max': 3593.0}], 'disk': {'/': {'total': 445.6211471557617, 'used': 393.8453063964844}}, 'gpu': 'NVIDIA GeForce RTX 2070 SUPER', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 2070 SUPER', 'memory_total': 8589934592}], 'memory': {'total': 31.910205841064453}}
+2023-10-15 19:43:51,059 INFO    HandlerThread:8504 [system_monitor.py:probe():224] Finished collecting system info
+2023-10-15 19:43:51,059 INFO    HandlerThread:8504 [system_monitor.py:probe():227] Publishing system info
+2023-10-15 19:43:51,059 DEBUG   HandlerThread:8504 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-10-15 19:43:51,059 DEBUG   HandlerThread:8504 [system_info.py:_save_pip():68] Saving pip packages done
+2023-10-15 19:43:51,059 DEBUG   HandlerThread:8504 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-10-15 19:43:51,504 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\conda-environment.yaml
+2023-10-15 19:43:51,504 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\requirements.txt
+2023-10-15 19:43:55,101 DEBUG   HandlerThread:8504 [system_info.py:_save_conda():87] Saving conda packages done
+2023-10-15 19:43:55,102 INFO    HandlerThread:8504 [system_monitor.py:probe():229] Finished publishing system info
+2023-10-15 19:43:55,103 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:43:55,103 DEBUG   SenderThread:8504 [sender.py:send():380] send: files
+2023-10-15 19:43:55,104 INFO    SenderThread:8504 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-10-15 19:43:55,116 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:43:55,117 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:43:55,118 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:43:55,531 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\conda-environment.yaml
+2023-10-15 19:43:55,531 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\wandb-metadata.json
+2023-10-15 19:43:55,646 DEBUG   SenderThread:8504 [sender.py:send():380] send: telemetry
+2023-10-15 19:43:55,841 INFO    wandb-upload_0:8504 [upload_job.py:push():131] Uploaded file C:\Users\xmoot\AppData\Local\Temp\tmpdcjs7p0ewandb\73o55y7q-wandb-metadata.json
+2023-10-15 19:44:00,037 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:00,567 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\output.log
+2023-10-15 19:44:02,581 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\output.log
+2023-10-15 19:44:05,091 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:10,126 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:10,127 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:44:10,127 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:44:10,127 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:44:15,347 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:16,679 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\output.log
+2023-10-15 19:44:20,386 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:20,709 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\config.yaml
+2023-10-15 19:44:25,120 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:44:25,135 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:44:25,136 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:44:26,281 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:31,318 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:32,619 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: partial_history
+2023-10-15 19:44:32,621 DEBUG   SenderThread:8504 [sender.py:send():380] send: history
+2023-10-15 19:44:32,621 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: summary_record
+2023-10-15 19:44:32,621 INFO    SenderThread:8504 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-15 19:44:32,631 DEBUG   SenderThread:8504 [sender.py:send():380] send: telemetry
+2023-10-15 19:44:32,631 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,631 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,632 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,632 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,632 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,633 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,633 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,633 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,633 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,634 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,634 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,634 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,634 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,634 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,635 DEBUG   SenderThread:8504 [sender.py:send():380] send: config
+2023-10-15 19:44:32,791 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\output.log
+2023-10-15 19:44:32,791 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_created():271] file/dir created: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\wandb-summary.json
+2023-10-15 19:44:34,805 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\output.log
+2023-10-15 19:44:36,660 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:40,136 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:44:40,151 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:44:40,152 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:44:42,315 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:47,343 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:50,993 DEBUG   SystemMonitor:8504 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2023-10-15 19:44:50,994 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:44:53,005 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:44:53,899 INFO    Thread-87 :8504 [dir_watcher.py:_on_file_modified():288] file/dir modified: c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231015_194343-mdc8i9u4\files\config.yaml
+2023-10-15 19:44:55,148 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:44:55,163 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:44:55,163 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:44:59,262 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:04,287 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:09,311 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:10,163 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:45:10,179 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:45:10,179 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:45:14,323 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:19,352 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:21,009 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:45:25,025 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:25,165 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:45:25,196 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:45:25,196 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:45:30,368 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:35,397 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:40,176 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:45:40,191 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:45:40,192 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:45:41,302 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:46,325 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:51,010 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:45:52,014 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:45:55,186 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:45:55,201 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:45:55,202 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:45:57,305 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:02,336 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:07,367 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:10,198 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:46:10,198 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:46:10,198 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:46:13,287 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:18,310 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:21,016 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:46:24,025 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:25,212 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:46:25,212 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:46:25,212 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:46:29,325 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:34,356 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:39,383 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:40,218 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:46:40,219 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:46:40,219 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:46:45,320 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:50,342 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:46:51,022 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:46:55,224 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:46:55,224 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:46:55,225 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:46:56,334 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:01,365 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:06,393 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:10,232 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:47:10,233 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:47:10,233 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:47:12,351 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:17,365 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:21,029 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:47:23,038 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:25,235 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:47:25,236 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:47:25,236 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:47:28,437 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:33,461 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:38,494 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:40,233 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:47:40,233 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:47:40,245 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:47:44,377 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:49,405 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:51,044 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:47:55,060 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:47:55,231 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:47:55,232 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:47:55,246 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:48:00,393 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:05,420 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:10,237 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:48:10,237 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:48:10,252 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:48:11,395 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:16,430 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:21,054 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:48:22,059 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:25,231 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:48:25,231 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:48:25,246 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:48:27,367 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:32,397 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:37,427 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:40,246 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:48:40,247 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:48:40,262 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:48:43,416 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:48,437 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:51,067 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:48:54,080 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:48:55,258 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:48:55,258 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:48:55,273 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:48:59,427 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:04,446 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:09,473 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:10,278 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:49:10,279 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:49:10,279 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:49:15,374 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:20,397 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:21,080 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:49:25,289 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:49:25,290 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:49:25,290 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:49:25,451 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:30,484 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:35,520 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:40,302 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:49:40,302 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:49:40,303 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:49:41,430 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:46,461 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:51,085 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:49:52,092 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:49:55,314 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:49:55,314 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:49:55,315 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:49:57,447 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:02,468 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:07,497 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:10,309 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:50:10,310 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:50:10,325 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:50:13,495 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:18,519 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:21,100 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:50:24,117 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:25,319 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:50:25,320 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:50:25,335 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:50:29,506 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:34,529 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:39,558 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:40,333 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:50:40,334 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:50:40,349 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:50:45,512 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:50,542 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:50:51,100 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:50:55,356 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:50:55,356 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:50:55,357 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:50:56,517 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:01,547 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:06,579 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:10,370 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:51:10,370 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:51:10,370 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:51:12,491 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:17,518 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:21,106 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:51:23,117 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:25,379 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:51:25,380 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:51:25,380 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:51:28,547 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:33,576 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:38,597 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:40,392 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:51:40,392 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:51:40,392 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:51:44,498 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:49,521 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:51,115 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:51:55,126 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:51:55,389 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:51:55,404 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:51:55,405 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:52:00,518 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:05,539 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:10,396 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:52:10,412 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:52:10,412 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:52:11,510 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:16,533 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:21,127 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:52:22,130 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:25,407 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:52:25,422 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:52:25,422 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:52:27,585 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:32,598 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:37,628 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:40,418 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:52:40,419 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:52:40,419 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:52:43,560 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:48,581 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:51,131 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:52:54,146 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:52:55,417 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:52:55,418 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:52:55,439 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:52:59,530 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:04,547 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:09,566 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:10,433 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:53:10,433 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:53:10,448 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:53:14,584 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:19,616 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:21,146 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:53:25,163 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:25,443 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:53:25,443 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:53:25,458 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:53:30,613 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:35,636 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:40,456 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:53:40,457 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:53:40,472 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:53:41,569 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:46,588 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:51,161 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:53:52,165 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:53:55,474 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:53:55,474 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:53:55,475 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:53:57,602 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:54:02,622 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:54:07,646 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:54:10,489 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:54:10,490 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:54:10,490 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:54:13,597 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:54:18,616 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:54:21,169 DEBUG   SenderThread:8504 [sender.py:send():380] send: stats
+2023-10-15 19:54:24,180 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:54:25,494 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: stop_status
+2023-10-15 19:54:25,494 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: internal_messages
+2023-10-15 19:54:25,495 DEBUG   SenderThread:8504 [sender.py:send_request():407] send_request: stop_status
+2023-10-15 19:54:29,587 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
+2023-10-15 19:54:34,601 DEBUG   HandlerThread:8504 [handler.py:handle_request():146] handle_request: status_report
