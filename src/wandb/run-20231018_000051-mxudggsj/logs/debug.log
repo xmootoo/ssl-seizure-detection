@@ -1,0 +1,21 @@
+2023-10-18 00:00:51,030 INFO    MainThread:33520 [wandb_setup.py:_flush():76] Current SDK version is 0.15.12
+2023-10-18 00:00:51,030 INFO    MainThread:33520 [wandb_setup.py:_flush():76] Configure stats pid to 33520
+2023-10-18 00:00:51,030 INFO    MainThread:33520 [wandb_setup.py:_flush():76] Loading settings from C:\Users\xmoot\.config\wandb\settings
+2023-10-18 00:00:51,030 INFO    MainThread:33520 [wandb_setup.py:_flush():76] Loading settings from C:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\src\wandb\settings
+2023-10-18 00:00:51,030 INFO    MainThread:33520 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-10-18 00:00:51,031 INFO    MainThread:33520 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-10-18 00:00:51,031 INFO    MainThread:33520 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'src\\main.py', 'program_abspath': 'C:\\Users\\xmoot\\Desktop\\VSCode\\ssl-seizure-detection\\src\\main.py', 'program': 'C:\\Users\\xmoot\\Desktop\\VSCode\\ssl-seizure-detection\\src\\main.py'}
+2023-10-18 00:00:51,031 INFO    MainThread:33520 [wandb_init.py:_log_setup():528] Logging user logs to C:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\src\wandb\run-20231018_000051-mxudggsj\logs\debug.log
+2023-10-18 00:00:51,031 INFO    MainThread:33520 [wandb_init.py:_log_setup():529] Logging internal logs to C:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\src\wandb\run-20231018_000051-mxudggsj\logs\debug-internal.log
+2023-10-18 00:00:51,031 INFO    MainThread:33520 [wandb_init.py:init():568] calling init triggers
+2023-10-18 00:00:51,031 INFO    MainThread:33520 [wandb_init.py:init():575] wandb.init called with sweep_config: {}
+config: {'num_node_features': 9, 'num_edge_features': 3, 'hidden_channels': 64, 'out_channels': 32, 'dropout': 0.1}
+2023-10-18 00:00:51,031 INFO    MainThread:33520 [wandb_init.py:init():618] starting backend
+2023-10-18 00:00:51,031 INFO    MainThread:33520 [wandb_init.py:init():622] setting up manager
+2023-10-18 00:00:51,033 INFO    MainThread:33520 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=spawn, using: spawn
+2023-10-18 00:00:51,036 INFO    MainThread:33520 [wandb_init.py:init():628] backend started and connected
+2023-10-18 00:00:51,040 INFO    MainThread:33520 [wandb_init.py:init():720] updated telemetry
+2023-10-18 00:00:51,089 INFO    MainThread:33520 [wandb_init.py:init():753] communicating run to backend with 90.0 second timeout
+2023-10-18 00:00:51,632 INFO    MainThread:33520 [wandb_run.py:_on_init():2220] communicating current version
+2023-10-18 00:00:52,130 INFO    MainThread:33520 [wandb_run.py:_on_init():2229] got version response 
+2023-10-18 00:00:52,130 INFO    MainThread:33520 [wandb_init.py:init():804] starting run threads in backend

@@ -23,7 +23,7 @@ for i in "${!model_ids[@]}"; do
     
     # Define the data path
     if [ "$model_id" == "supervised" ]; then
-        data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}/${patient_id}_run1.out"
+        data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}/${patient_id}_run1.pt"
         logdir="${base_dir}/${model_id}_${date_and_time}"
         mkdir -p "${logdir}"
     elif [ "$model_id" == "relative_positioning" ] || [ "$model_id" == "temporal_shuffling" ]; then
@@ -49,6 +49,10 @@ for i in "${!model_ids[@]}"; do
 cd "${xav}/ssl_epilepsy/ssl-seizure-detection/src"
 module load cuda/11.7 cudnn python/3.10
 source ~/torch2_cuda11.7/bin/activate
+
+# Debugging lines to print Python executable and installed packages
+which python
+pip freeze
 
 export WANDB_API_KEY="${wandb_api_key}"
 

@@ -4,16 +4,16 @@ from train import train
 
 if __name__ == '__main__':
 
-    # The path to .pt file of PairData objects list
+    # The path to .pt file of Data, PairData, or TripletData objects list
     data_path = sys.argv[1]
     
-    # The path to save the model
+    # Path to save the model, statistics, and training information
     logdir = sys.argv[2]
     
-    # The path to save the training statistics
+    # Patient identifier
     patient_id = sys.argv[3]
     
-    # The name of the model
+    # Model identifier
     model_id = sys.argv[4]
 
     # Training parameters
