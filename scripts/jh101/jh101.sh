@@ -1,10 +1,21 @@
 #!/bin/bash
-job_name="jh101_12s_7min_pyg1"
 data_path="$xav/ssl_epilepsy/data/pseudolabeled/jh101/jh101_12s_7min_PairData.pt"
 model_path="$xav/ssl_epilepsy/jobs/relative_positioning/jh101/models"
 stats_path="$xav/ssl_epilepsy/jobs/relative_positioning/jh101/stats"
 model_name="jh101_12s_7min_pyg1"
 num_workers="8" 
+
+
+data_path = sys.argv[1]
+    
+    # The path to save the model
+    logdir = sys.argv[2]
+    
+    # The path to save the training statistics
+    patient_id = sys.argv[3]
+    
+    # The name of the model
+    model_id = sys.argv[4]
 
 sbatch <<EOT
 #!/bin/bash
