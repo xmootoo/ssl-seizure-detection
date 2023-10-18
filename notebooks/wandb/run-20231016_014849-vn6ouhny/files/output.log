@@ -1,5 +1,0 @@
-Using device: cuda
-Total number of examples in dataset: 278130.
-Total number of examples used: 1390.
-Number of training examples: 1112. Number of training batches: 35.
-Number of validation examples: 278. Number of validation batches: 9.
