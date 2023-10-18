@@ -41,8 +41,8 @@ for i in "${!model_ids[@]}"; do
 #SBATCH --mem-per-cpu=12G       # memory per CPU core
 #SBATCH --time="${time}"        # Time limit for the job  
 #SBATCH --job-name="${job_name}"
-#SBATCH --output="${xav}/ssl_epilepsy/jobs/${job_name}.out"
-#SBATCH --error="${xav}/ssl_epilepsy/jobs/${job_name}.err"
+#SBATCH --output="${xav}/ssl_epilepsy/jobs/training/${job_name}.out"
+#SBATCH --error="${xav}/ssl_epilepsy/jobs/training/${job_name}.err"
 #SBATCH --mail-user=xmootoo@gmail.com
 #SBATCH --mail-type=ALL
 
