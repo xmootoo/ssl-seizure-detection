@@ -81,3 +81,47 @@ config: {'num_node_features': 9, 'num_edge_features': 3, 'hidden_channels': 64, 
 2023-10-19 00:28:19,692 INFO    MainThread:36576 [wandb_run.py:_redirect():2119] Wrapping output streams.
 2023-10-19 00:28:19,693 INFO    MainThread:36576 [wandb_run.py:_redirect():2144] Redirects installed.
 2023-10-19 00:28:19,693 INFO    MainThread:36576 [wandb_init.py:init():845] run started, returning control to user process
+2023-10-19 00:40:08,748 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Patient ID = jh101 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,749 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Patient ID jh101 None
+2023-10-19 00:40:08,749 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Data size = 1.0 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,749 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Data size 1.0 None
+2023-10-19 00:40:08,749 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Total examples = 1113 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,749 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Total examples 1113 None
+2023-10-19 00:40:08,749 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Used examples = 1113 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,749 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Used examples 1113 None
+2023-10-19 00:40:08,749 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Training examples = 890 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,750 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Training examples 890 None
+2023-10-19 00:40:08,750 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Validation examples = 223 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,750 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Validation examples 223 None
+2023-10-19 00:40:08,750 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Training batches = 28 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,750 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Training batches 28 None
+2023-10-19 00:40:08,750 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Validation batches = 7 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,750 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Validation batches 7 None
+2023-10-19 00:40:08,750 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Validation ratio = 0.2 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,751 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Validation ratio 0.2 None
+2023-10-19 00:40:08,751 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Test ratio = 0.1 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,751 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Test ratio 0.1 None
+2023-10-19 00:40:08,751 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Batch size = 32 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,751 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Batch size 32 None
+2023-10-19 00:40:08,751 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Number of workers = 4 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,751 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Number of workers 4 None
+2023-10-19 00:40:08,751 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Learning rate = 0.001 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,752 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Learning rate 0.001 None
+2023-10-19 00:40:08,752 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Weight decay = 0.001 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,752 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Weight decay 0.001 None
+2023-10-19 00:40:08,752 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Number of epochs = 30 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,752 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Number of epochs 30 None
+2023-10-19 00:40:08,753 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Model parameters = {'num_node_features': 9, 'num_edge_features': 3, 'hidden_channels': 64, 'out_channels': 32, 'dropout': 0.1} - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,753 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Model parameters {'num_node_features': 9, 'num_edge_features': 3, 'hidden_channels': 64, 'out_channels': 32, 'dropout': 0.1} None
+2023-10-19 00:40:08,753 INFO    MainThread:36576 [wandb_config.py:__setitem__():151] config set Dropout = True - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x000001CB24F48430>>
+2023-10-19 00:40:08,753 INFO    MainThread:36576 [wandb_run.py:_config_callback():1324] config_cb Dropout True None
+2023-10-19 00:40:08,754 INFO    MainThread:36576 [wandb_run.py:_finish():1934] finishing run xmootoo/ssl-seizure-detection/x3m62zy8
+2023-10-19 00:40:08,754 ERROR   MainThread:36576 [jupyter.py:save_history():437] Run pip install nbformat to save notebook history
+2023-10-19 00:40:08,755 INFO    MainThread:36576 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2023-10-19 00:40:08,755 INFO    MainThread:36576 [wandb_init.py:_jupyter_teardown():456] cleaning up jupyter logic
+2023-10-19 00:40:08,755 INFO    MainThread:36576 [wandb_run.py:_atexit_cleanup():2168] got exitcode: 0
+2023-10-19 00:40:08,755 INFO    MainThread:36576 [wandb_run.py:_restore():2151] restore
+2023-10-19 00:40:08,755 INFO    MainThread:36576 [wandb_run.py:_restore():2157] restore done
+2023-10-19 00:40:12,829 INFO    MainThread:36576 [wandb_run.py:_footer_history_summary_info():3599] rendering history
+2023-10-19 00:40:12,830 INFO    MainThread:36576 [wandb_run.py:_footer_history_summary_info():3631] rendering summary
+2023-10-19 00:40:12,836 INFO    MainThread:36576 [wandb_run.py:_footer_sync_info():3558] logging synced files
