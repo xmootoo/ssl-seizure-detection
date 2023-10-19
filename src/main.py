@@ -16,6 +16,9 @@ if __name__ == '__main__':
     # Model identifier
     model_id = sys.argv[4]
 
+    # Date and time identifier
+    datetime_id = sys.argv[5]
+
     # Training parameters
     epochs = 200
     val_ratio=0.2
@@ -41,5 +44,6 @@ if __name__ == '__main__':
         test_ratio=0
 
     train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
-            batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, timing=True, model_id=model_id)
+        batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, timing=True, model_id=model_id,
+        datetime_id=datetime_id)
 
