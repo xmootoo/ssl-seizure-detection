@@ -1,0 +1,69 @@
+2023-10-19 00:12:02,854 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Current SDK version is 0.15.12
+2023-10-19 00:12:02,854 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Configure stats pid to 25664
+2023-10-19 00:12:02,854 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Loading settings from C:\Users\xmoot\.config\wandb\settings
+2023-10-19 00:12:02,854 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Loading settings from c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\settings
+2023-10-19 00:12:02,854 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-10-19 00:12:02,854 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-10-19 00:12:02,855 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program': '<python with no main file>'}
+2023-10-19 00:12:02,855 INFO    MainThread:25664 [wandb_init.py:_log_setup():528] Logging user logs to c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231019_001202-fc7ufsmx\logs\debug.log
+2023-10-19 00:12:02,855 INFO    MainThread:25664 [wandb_init.py:_log_setup():529] Logging internal logs to c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231019_001202-fc7ufsmx\logs\debug-internal.log
+2023-10-19 00:12:02,855 INFO    MainThread:25664 [wandb_init.py:init():568] calling init triggers
+2023-10-19 00:12:02,855 INFO    MainThread:25664 [wandb_init.py:init():575] wandb.init called with sweep_config: {}
+config: {'num_node_features': 9, 'num_edge_features': 3, 'hidden_channels': [64, 32, 64, 128, 256]}
+2023-10-19 00:12:02,855 INFO    MainThread:25664 [wandb_init.py:init():618] starting backend
+2023-10-19 00:12:02,855 INFO    MainThread:25664 [wandb_init.py:init():622] setting up manager
+2023-10-19 00:12:02,857 INFO    MainThread:25664 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=spawn, using: spawn
+2023-10-19 00:12:02,858 INFO    MainThread:25664 [wandb_init.py:init():628] backend started and connected
+2023-10-19 00:12:02,861 INFO    MainThread:25664 [wandb_run.py:_label_probe_notebook():1276] probe notebook
+2023-10-19 00:12:02,861 INFO    MainThread:25664 [wandb_run.py:_label_probe_notebook():1286] Unable to probe notebook: 'NoneType' object has no attribute 'get'
+2023-10-19 00:12:02,861 INFO    MainThread:25664 [wandb_init.py:init():720] updated telemetry
+2023-10-19 00:12:02,899 INFO    MainThread:25664 [wandb_init.py:init():753] communicating run to backend with 90.0 second timeout
+2023-10-19 00:12:03,481 INFO    MainThread:25664 [wandb_run.py:_on_init():2220] communicating current version
+2023-10-19 00:12:27,642 WARNING MainThread:25664 [wandb_init.py:init():1192] interrupted
+Traceback (most recent call last):
+  File "c:\tools\Anaconda3\envs\torch2_cuda11.8\lib\site-packages\wandb\sdk\wandb_init.py", line 1170, in init
+    run = wi.init()
+  File "c:\tools\Anaconda3\envs\torch2_cuda11.8\lib\site-packages\wandb\sdk\wandb_init.py", line 802, in init
+    run._on_init()
+  File "c:\tools\Anaconda3\envs\torch2_cuda11.8\lib\site-packages\wandb\sdk\wandb_run.py", line 2224, in _on_init
+    version_result = version_handle.wait(timeout=30)
+  File "c:\tools\Anaconda3\envs\torch2_cuda11.8\lib\site-packages\wandb\sdk\lib\mailbox.py", line 283, in wait
+    found, abandoned = self._slot._get_and_clear(timeout=wait_timeout)
+  File "c:\tools\Anaconda3\envs\torch2_cuda11.8\lib\site-packages\wandb\sdk\lib\mailbox.py", line 130, in _get_and_clear
+    if self._wait(timeout=timeout):
+  File "c:\tools\Anaconda3\envs\torch2_cuda11.8\lib\site-packages\wandb\sdk\lib\mailbox.py", line 126, in _wait
+    return self._event.wait(timeout=timeout)
+  File "c:\tools\Anaconda3\envs\torch2_cuda11.8\lib\threading.py", line 607, in wait
+    signaled = self._cond.wait(timeout)
+  File "c:\tools\Anaconda3\envs\torch2_cuda11.8\lib\threading.py", line 324, in wait
+    gotit = waiter.acquire(True, timeout)
+KeyboardInterrupt
+2023-10-19 00:12:29,093 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Current SDK version is 0.15.12
+2023-10-19 00:12:29,093 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Configure stats pid to 25664
+2023-10-19 00:12:29,093 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Loading settings from C:\Users\xmoot\.config\wandb\settings
+2023-10-19 00:12:29,093 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Loading settings from c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\settings
+2023-10-19 00:12:29,094 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-10-19 00:12:29,094 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-10-19 00:12:29,094 INFO    MainThread:25664 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program': '<python with no main file>'}
+2023-10-19 00:12:29,094 INFO    MainThread:25664 [wandb_init.py:_log_setup():528] Logging user logs to c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231019_001229-driisnvf\logs\debug.log
+2023-10-19 00:12:29,094 INFO    MainThread:25664 [wandb_init.py:_log_setup():529] Logging internal logs to c:\Users\xmoot\Desktop\VSCode\ssl-seizure-detection\notebooks\wandb\run-20231019_001229-driisnvf\logs\debug-internal.log
+2023-10-19 00:12:29,095 INFO    MainThread:25664 [wandb_init.py:init():568] calling init triggers
+2023-10-19 00:12:29,095 INFO    MainThread:25664 [wandb_init.py:init():575] wandb.init called with sweep_config: {}
+config: {'num_node_features': 9, 'num_edge_features': 3, 'hidden_channels': [64, 32, 64, 128, 256]}
+2023-10-19 00:12:29,095 INFO    MainThread:25664 [wandb_init.py:init():618] starting backend
+2023-10-19 00:12:29,095 INFO    MainThread:25664 [wandb_init.py:init():622] setting up manager
+2023-10-19 00:12:29,098 INFO    MainThread:25664 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=spawn, using: spawn
+2023-10-19 00:12:29,099 INFO    MainThread:25664 [wandb_init.py:init():628] backend started and connected
+2023-10-19 00:12:29,102 INFO    MainThread:25664 [wandb_run.py:_label_probe_notebook():1276] probe notebook
+2023-10-19 00:12:29,103 INFO    MainThread:25664 [wandb_run.py:_label_probe_notebook():1286] Unable to probe notebook: 'NoneType' object has no attribute 'get'
+2023-10-19 00:12:29,103 INFO    MainThread:25664 [wandb_init.py:init():720] updated telemetry
+2023-10-19 00:12:29,142 INFO    MainThread:25664 [wandb_init.py:init():753] communicating run to backend with 90.0 second timeout
+2023-10-19 00:12:29,773 INFO    MainThread:25664 [wandb_run.py:_on_init():2220] communicating current version
+2023-10-19 00:12:30,216 INFO    MainThread:25664 [wandb_run.py:_on_init():2229] got version response 
+2023-10-19 00:12:30,216 INFO    MainThread:25664 [wandb_init.py:init():804] starting run threads in backend
+2023-10-19 00:13:00,422 INFO    MainThread:25664 [wandb_run.py:_console_start():2199] atexit reg
+2023-10-19 00:13:00,422 INFO    MainThread:25664 [wandb_run.py:_redirect():2054] redirect: wrap_raw
+2023-10-19 00:13:00,423 INFO    MainThread:25664 [wandb_run.py:_redirect():2119] Wrapping output streams.
+2023-10-19 00:13:00,423 INFO    MainThread:25664 [wandb_run.py:_redirect():2144] Redirects installed.
+2023-10-19 00:13:00,423 INFO    MainThread:25664 [wandb_init.py:init():845] run started, returning control to user process
+2023-10-19 00:14:22,278 WARNING MsgRouterThr:25664 [router.py:message_loop():77] message_loop has been closed

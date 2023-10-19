@@ -41,6 +41,10 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
         # Calculate loss
         loss = criterion(outputs.squeeze().to(device), batch.y.float().to(device))
 
+        # Backward pass and optimization
+        loss.backward()
+        optimizer.step()
+        
         # Training statistics
         epoch_train_loss += loss.item()
         

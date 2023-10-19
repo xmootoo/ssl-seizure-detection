@@ -116,7 +116,7 @@ class temporal_shuffling(nn.Module):
         self.encoder = gnn_encoder(num_node_features, num_edge_features, hidden_channels)
         
         # Fully connected layer
-        self.fc = nn.Linear(2 * hidden_channels[4], 1)
+        self.fc = nn.Linear(2 * hidden_channels[3], 1)
         
         # Weight initialization
         self.apply(init_weights)

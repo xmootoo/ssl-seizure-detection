@@ -1,0 +1,36 @@
+Using device: cuda
+Total number of examples in dataset: 1113.
+Total number of examples used: 1113.
+Number of training examples: 890. Number of training batches: 28.
+Number of validation examples: 223. Number of validation batches: 7.
+Number of test examples: 112. Number of test batches: 4.
+Time elapsed after 100 batches (training): 12.176496982574463
+Time elapsed after 100 batches (evaluation): 10.492000579833984
+Epoch: 1, Train Loss: 0.3753520915550845, Train Accuracy: 86.06741573033707, Validation Loss: 0.44631307891436983, Validation Accuracy: 79.37219730941705
+Time elapsed after 100 batches (training): 11.137999057769775
+Time elapsed after 100 batches (evaluation): 10.601998567581177
+Epoch: 2, Train Loss: 0.30813442622976644, Train Accuracy: 85.95505617977528, Validation Loss: 0.38933708518743515, Validation Accuracy: 81.16591928251121
+Time elapsed after 100 batches (training): 11.196998834609985
+Time elapsed after 100 batches (evaluation): 10.517999172210693
+Epoch: 3, Train Loss: 0.26618041869785103, Train Accuracy: 87.19101123595506, Validation Loss: 0.3820166843278067, Validation Accuracy: 85.65022421524664
+Time elapsed after 100 batches (training): 11.121999502182007
+Time elapsed after 100 batches (evaluation): 10.884000301361084
+Epoch: 4, Train Loss: 0.24781421172831739, Train Accuracy: 87.52808988764045, Validation Loss: 0.3800951157297407, Validation Accuracy: 86.54708520179372
+Time elapsed after 100 batches (training): 11.078499794006348
+Time elapsed after 100 batches (evaluation): 10.469999313354492
+Epoch: 5, Train Loss: 0.25726416760257315, Train Accuracy: 88.20224719101124, Validation Loss: 0.3336894416383335, Validation Accuracy: 86.54708520179372
+Time elapsed after 100 batches (training): 10.645999670028687
+Time elapsed after 100 batches (evaluation): 10.210500240325928
+Epoch: 6, Train Loss: 0.24103038518556527, Train Accuracy: 88.20224719101124, Validation Loss: 0.34371077695063185, Validation Accuracy: 85.65022421524664
+Time elapsed after 100 batches (training): 10.89199948310852
+Time elapsed after 100 batches (evaluation): 10.344499111175537
+Epoch: 7, Train Loss: 0.2326044182160071, Train Accuracy: 90.11235955056179, Validation Loss: 0.3934572956391743, Validation Accuracy: 86.54708520179372
+Time elapsed after 100 batches (training): 10.729498863220215
+Time elapsed after 100 batches (evaluation): 10.463000059127808
+Epoch: 8, Train Loss: 0.2348997596917408, Train Accuracy: 89.7752808988764, Validation Loss: 0.35920629650354385, Validation Accuracy: 86.99551569506727
+Time elapsed after 100 batches (training): 10.887003660202026
+Time elapsed after 100 batches (evaluation): 10.070500612258911
+Epoch: 9, Train Loss: 0.22972149694604532, Train Accuracy: 90.11235955056179, Validation Loss: 0.3474595919251442, Validation Accuracy: 86.99551569506727
+Time elapsed after 100 batches (training): 10.594998359680176
+Time elapsed after 100 batches (evaluation): 11.395496606826782
+Epoch: 10, Train Loss: 0.22633468945111548, Train Accuracy: 91.34831460674157, Validation Loss: 0.3919241673180035, Validation Accuracy: 87.4439461883408

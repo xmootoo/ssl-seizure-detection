@@ -33,7 +33,7 @@ for i in "${!model_ids[@]}"; do
             data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}/${patient_id}_run1_12s_90_1.0sr.pt"
             ;;
         "temporal_shuffling")
-            data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}/${patient_id}_run1_ts.pt"
+            data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}/${patient_id}_run1_12s_90_0.22sr.pt"
             ;;
         *)
             echo "Unknown model_id: $model_id"
