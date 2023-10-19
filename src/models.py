@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 # Define the MLP for NNConv
 class EdgeMLP(nn.Module):
-    def __init__(self, num_edge_features, in_channels, out_channels):
+    def __init__(self, num_edge_features, input_node_features, output_node_features):
         super(EdgeMLP, self).__init__()
         
         # Define a sequential architecture
@@ -16,7 +16,7 @@ class EdgeMLP(nn.Module):
             nn.ReLU(),
             nn.Linear(128, 64),
             nn.ReLU(),
-            nn.Linear(64, in_channels * out_channels)
+            nn.Linear(64, input_node_features * output_node_features)
         )
     
         # Weight initialization
@@ -76,7 +76,7 @@ class relative_positioning(nn.Module):
         self.encoder = gnn_encoder(num_node_features, num_edge_features, hidden_channels)
 
         # Fully connected layers
-        self.fc = nn.Linear(hidden_channels[3], 1)
+        self.fc = nn.Linear(hidden_channels[4], 1)
         
         # Weight initialization
         self.apply(init_weights)
@@ -116,7 +116,7 @@ class temporal_shuffling(nn.Module):
         self.encoder = gnn_encoder(num_node_features, num_edge_features, hidden_channels)
         
         # Fully connected layer
-        self.fc = nn.Linear(2 * hidden_channels[3], 1)
+        self.fc = nn.Linear(2 * hidden_channels[4], 1)
         
         # Weight initialization
         self.apply(init_weights)
