@@ -147,7 +147,7 @@ def full_patcher(user="xmootoo", patient_dir=None, logdir=None, num_electrodes=1
 
 
 
-
+#TODO: Handle for flexible number of nodes (e.g., num_electrodes=84) as this causes the patch script to fail.
 def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdir=None, num_electrodes=107, tau_pos=12//0.12, tau_neg=60//0.12, 
              model="supervised", stats=True, save=True, sample_ratio=1.0):
     """
