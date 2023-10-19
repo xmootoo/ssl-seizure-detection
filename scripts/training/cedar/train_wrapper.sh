@@ -6,6 +6,12 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+# Check if the run ID is provided
+if [ -z "$2" ]; then
+    echo "Error: No run ID provided."
+    exit 1
+fi
+
 # The patient ID (e.g., jh101)
 patient_id="$1"
 
