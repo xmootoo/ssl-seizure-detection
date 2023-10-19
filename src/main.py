@@ -19,6 +19,9 @@ if __name__ == '__main__':
     # Date and time identifier
     datetime_id = sys.argv[5]
 
+    # Run identifier
+    run_id = sys.argv[6]
+
     # Training parameters
     epochs = 200
     val_ratio=0.2

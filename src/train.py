@@ -151,7 +151,7 @@ def save_to_json(data, logdir, file_name):
 
 def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_ratio=0.2, test_ratio=0.1, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id="supervised", timing=True, 
-          classify="binary", head="linear", dropout=True, datetime_id=None):
+          classify="binary", head="linear", dropout=True, datetime_id=None, run_id=None):
     """
     Trains the supervised GNN model, relative positioning model, or temporal shuffling model.
 
@@ -170,7 +170,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         head (str, optional): Whether to use a "linear", "sigmoid", or "softmax" head. Defaults to "linear".
     """
     # Initialize Weights & Biases
-    wandb.init(project="ssl-seizure-detection", config=config, name=f"{patient_id}_{model_id}_{datetime_id}")
+    wandb.init(project="ssl-seizure-detection", config=config, name=f"{patient_id}_{model_id}_{datetime_id}_run{run_id}")
 
     # Load data
     data = load_data(data_path)

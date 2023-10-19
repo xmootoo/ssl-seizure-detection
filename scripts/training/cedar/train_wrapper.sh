@@ -9,9 +9,12 @@ fi
 # The patient ID (e.g., jh101)
 patient_id="$1"
 
+# Run ID (e.g., 1,2,3,4)
+run_id="$2"
+
 # Training arguments
 model_ids=("supervised" "relative_positioning" "temporal_shuffling")
-times=("00:30:00" "11:59:00" "20:00:00")
+times=("00:30:00" "11:59:00" "24:00:00")
 date_and_time=$(date "+%Y-%m-%d_%H.%M.%S")
 
 # Base directory
@@ -64,6 +67,6 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${date_and_time}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${date_and_time}" "${run_id}"
 EOT
 done
