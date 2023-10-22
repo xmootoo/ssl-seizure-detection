@@ -9,8 +9,8 @@ logdir="${xav}/ssl_epilepsy/data/patient_pyg"
 
 # Define arrays for different models, sample_ratios, and times
 models=("supervised" "relative_positioning" "temporal_shuffling")
-sample_ratios=("1.0" "1.0" "0.22")
-times=("00:10:00" "00:20:00" "00:30:00")
+sample_ratios=("1.0" "0.9" "0.22")
+times=("00:15:00" "00:30:00" "00:45:00")
 
 # Iterate over each model and its corresponding sample_ratio and time
 for i in "${!models[@]}"; do

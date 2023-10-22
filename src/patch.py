@@ -2,7 +2,7 @@ import os
 import pickle
 from preprocess import new_grs, create_tensordata_new, convert_to_Data, pseudo_data, convert_to_PairData, convert_to_TripletData
 
-def patch(graphrep_dir=None,  logdir=None, file_name="", num_electrodes=107, tau_pos=12//0.12, tau_neg=60//0.12, 
+def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_neg=60//0.12, 
           model="supervised", stats=True, save=True, sample_ratio=1.0):
     """
     Preprocesses and convert various types of graph representations (GRs) to PyTorch Geometric data format.
@@ -16,7 +16,6 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", num_electrodes=107, tau
                               Format: (path_preictal, path_ictal, path_postictal).
         logdir (str, optional): Directory where the processed PyTorch Geometric data will be saved.
         file_name (str, optional): Name of the saved PyTorch Geometric data file (no extension, e.g., "jh101").
-        num_electrodes (int, optional): Number of electrodes in the graph representation. Default is 107.
         tau_pos (float, optional): Positive time constant for the relative positioning or temporal shuffling model. 
                                    Default is 12//0.12.
         tau_neg (float, optional): Negative time constant for the relative positioning or temporal shuffling model.
@@ -55,6 +54,9 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", num_electrodes=107, tau
     # Concatenate all data temporally
     new_data = new_data_preictal + new_data_ictal + new_data_postictal
 
+    # Get number of electrodes
+    num_electrodes = new_data[0][0][0].shape[0]
+    
     # Convert standard graph representations to Pytorch Geometric data
     pyg_grs = create_tensordata_new(num_nodes=num_electrodes, data_list=new_data, complete=True, save=False, logdir=None)
     
@@ -75,7 +77,7 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", num_electrodes=107, tau
         return Triplet_Data
 
 
-def full_patcher(user="xmootoo", patient_dir=None, logdir=None, num_electrodes=107, tau_pos=12//0.12, tau_neg=60//0.12, 
+def full_patcher(user="xmootoo", patient_dir=None, logdir=None, tau_pos=12//0.12, tau_neg=60//0.12, 
              model="supervised", stats=True, save=True, sample_ratio=1.0):
     """
     
@@ -139,7 +141,7 @@ def full_patcher(user="xmootoo", patient_dir=None, logdir=None, num_electrodes=1
                             file_name = patient + "_run" + str(i)
                         if model == "relative_positioning" or model == "temporal_shuffling":
                             file_name = patient + "_run" + str(i) + "_" + str(int(tau_pos * 0.12)) + "s_" + str(int(tau_neg * 0.12)) + "s_" + str(sample_ratio) + "sr"
-                        patched_data = patch(graphrep_dir=graphrep_dir,  logdir=model_logdir, file_name=file_name, num_electrodes=num_electrodes, tau_pos=tau_pos, 
+                        patched_data = patch(graphrep_dir=graphrep_dir,  logdir=model_logdir, file_name=file_name, tau_pos=tau_pos, 
                                              tau_neg=tau_neg, model=model, stats=stats, save=save, sample_ratio=sample_ratio)
                         
     except Exception as e:
@@ -147,8 +149,7 @@ def full_patcher(user="xmootoo", patient_dir=None, logdir=None, num_electrodes=1
 
 
 
-#TODO: Handle for flexible number of nodes (e.g., num_electrodes=84) as this causes the patch script to fail.
-def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdir=None, num_electrodes=107, tau_pos=12//0.12, tau_neg=60//0.12, 
+def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdir=None, tau_pos=12//0.12, tau_neg=60//0.12, 
              model="supervised", stats=True, save=True, sample_ratio=1.0):
     """
     Automates the patch() function for a single patient.
@@ -198,7 +199,7 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
                     if model == "relative_positioning" or model == "temporal_shuffling":
                         file_name = file_name + "_" + str(int(tau_pos * 0.12)) + "s_" + str(int(tau_neg * 0.12)) + "s_" + str(sample_ratio) + "sr"
                     
-                    patched_data = patch(graphrep_dir=graphrep_dir,  logdir=model_logdir, file_name=file_name, num_electrodes=num_electrodes, tau_pos=tau_pos, 
+                    patched_data = patch(graphrep_dir=graphrep_dir,  logdir=model_logdir, file_name=file_name, tau_pos=tau_pos, 
                                          tau_neg=tau_neg, model=model, stats=stats, save=save, sample_ratio=sample_ratio)
                         
     except Exception as e:
@@ -213,7 +214,7 @@ if __name__ == "__main__":
     model = str(sys.argv[4])
     sample_ratio = float(sys.argv[5])
 
-    single_patient_patcher(user="xmootoo", patient_dir=patient_dir, patient=patient, logdir=logdir, num_electrodes=107, tau_pos=12//0.12, tau_neg=90//0.12, 
+    single_patient_patcher(user="xmootoo", patient_dir=patient_dir, patient=patient, logdir=logdir, tau_pos=12//0.12, tau_neg=90//0.12, 
                            model=model, stats=True, save=True, sample_ratio=sample_ratio)
 
 
