@@ -193,7 +193,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         train_loader, val_loader, test_loader = loaders
     else:
         train_loader, val_loader = loaders
-
+    
 
     # Select model
     if model_id=="supervised":

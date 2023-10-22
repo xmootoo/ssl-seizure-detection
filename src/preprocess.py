@@ -59,7 +59,7 @@ def new_grs(data, type="preictal", mode="binary"):
             Y = 1
         if type == "postictal":
             Y = 2
-
+    
     new_grs = []
     for i in range(len(data)):
         # Node features
