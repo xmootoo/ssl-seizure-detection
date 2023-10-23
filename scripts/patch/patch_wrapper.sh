@@ -12,6 +12,12 @@ models=("supervised" "relative_positioning" "temporal_shuffling")
 sample_ratios=("1.0" "0.9" "0.22")
 times=("00:15:00" "00:30:00" "00:45:00")
 
+# Conditionally change times and sample_ratios if patient is "pt15" or "pt2", as they fail for the above settings.
+if [[ "$patient" == "pt15" || "$patient" == "pt2" ]]; then
+    times=("00:30:00" "00:50:00" "01:00:00")
+    sample_ratios=("1.0" "0.75" "0.13")
+fi
+
 # Iterate over each model and its corresponding sample_ratio and time
 for i in "${!models[@]}"; do
     model="${models[$i]}"
