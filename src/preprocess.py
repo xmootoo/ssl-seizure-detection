@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import torch
 import random
+import os
 from torch_geometric.data import Data
 from torch.utils.data import random_split
 from torch_geometric.loader import DataLoader
@@ -657,7 +658,7 @@ def convert_to_PairData(data_list, save = True, logdir = None):
     return converted_data
 
 
-def convert_to_TripletData(data_list, save = True, logdir = None):
+def convert_to_TripletData(data_list, save=True, logdir=None):
     """
     Converts a list of data entries of the form [graph1, graph2, graph3, y] to PyG Data objects.
 
@@ -685,6 +686,79 @@ def convert_to_TripletData(data_list, save = True, logdir = None):
     return converted_data
 
 
+def run_sorter(logdir, runtype="all"):
+    """
+    Returns the list of patients runs dependent on the settings.
+
+    Args:
+        logdir (str): Directory path (e.g., pyg_data/patient_id/model_id/), the folder containing the .pt runs.
+        runtype (str): Specifies which runs to load. Options are "all", "combined", or "runx" where x is the run number. 
+                       Defaults to "all".
+
+    Returns:
+        list or tensor: List of runs if runtype="all", single run otherwise.
+    """
+    if runtype == "combined":
+        for run in os.listdir(logdir):
+            if run.endswith("_combined.pt"):
+                return torch.load(os.path.join(logdir, run))
+    elif runtype == "all":
+        all_runs = []
+        for run in os.listdir(logdir):
+            if not run.endswith("_combined.pt"):
+                all_runs.append(torch.load(os.path.join(logdir, run)))
+        return all_runs
+    else:
+        for run in os.listdir(logdir):
+            if run.endswith(runtype + ".pt"):
+                return torch.load(os.path.join(logdir, run))
+
+
+def combiner(all_lists, desired_samples):
+    """
+    Combines multiple lists by randomly sampling from each, ensuring an almost equal contribution 
+    from each list to meet a desired total number of samples.
+    
+    Args:
+        all_lists (List[List[any]]): A list of lists to be combined.
+        desired_samples (int): The total number of samples desired in the final list.
+        
+    Returns:
+        List[any]: A list containing the sampled items from all input lists, shuffled.
+    """
+    # Check if sum of all list lengths is smaller than desired_samples
+    total_length = sum(len(lst) for lst in all_lists)
+    if total_length < desired_samples:
+        final_list = [item for sublist in all_lists for item in sublist]
+        random.shuffle(final_list)
+        return final_list
+    
+    # Sort lists by length
+    sorted_lists = sorted(all_lists, key=len)
+    
+    # Calculate initial quota
+    Quota = desired_samples // len(all_lists)
+
+    # Initialize an empty list to hold the final sampled elements
+    final_list = []
+    
+    remaining_lists = len(sorted_lists)
+    for lst in sorted_lists:
+        remaining_lists -= 1  # Decrement the count of remaining lists
+        random.shuffle(lst)  # Shuffle before sampling
+        if len(lst) < Quota:
+            final_list.extend(lst)
+            if remaining_lists:  # Avoid division by zero
+                Quota = (desired_samples - len(final_list)) // remaining_lists
+        else:
+            final_list.extend(random.sample(lst, Quota))
+
+    # Shuffle final list to mix samples from different runs
+    random.shuffle(final_list)
+    
+    return final_list
+
+
 
 def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batch_size=32, num_workers=4, model_id="supervised"):
     # Shuffle data
@@ -710,14 +784,8 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
     # Take the random subset of the data
     n = len(data)
     indices = list(range(n))
-    if 0 <= data_size <= 1:
-        indices_subset = np.random.choice(indices, size=int(n * data_size), replace=False)
-    elif 1 < data_size < n:
-        indices_subset = np.random.choice(indices, size=int(data_size), replace=False)
-    elif data_size > n:
-        indices_subset = range(n)
 
-    train_idx, val_idx = train_test_split(indices_subset, test_size=val_ratio, shuffle=True)
+    train_idx, val_idx = train_test_split(indices, test_size=val_ratio, shuffle=True)
     train_data, val_data = [data[i] for i in train_idx], [data[i] for i in val_idx]
     if test_ratio != 0:
         train_idx, test_idx = train_test_split(train_idx, test_size=test_ratio / (1 - val_ratio), shuffle=True)
@@ -742,7 +810,7 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
 
     # Print Stats
     print(f"Total number of examples in dataset: {n}.")
-    print(f"Total number of examples used: {len(indices_subset)}.")
+    print(f"Total number of examples used: {len(indices)}.")
     print(f"Number of training examples: {len(train_data)}. Number of training batches: {len(train_loader)}.")
     print(f"Number of validation examples: {len(val_data)}. Number of validation batches: {len(val_loader)}.")
     if test_ratio != 0:
@@ -752,11 +820,11 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
     # Organize loaders and stats
     if test_ratio != 0:
         loaders = (train_loader, val_loader, test_loader)
-        loader_stats = {"total_examples": len(data), "used_examples": len(indices_subset), "train_examples": len(train_data), "val_examples": len(val_data), 
+        loader_stats = {"total_examples": len(data), "used_examples": len(indices), "train_examples": len(train_data), "val_examples": len(val_data), 
                         "test_examples": len(test_data), "train_batches": len(train_loader), "val_batches": len(val_loader), "test_batches": len(test_loader)}
     else:
         loaders = (train_loader, val_loader)
-        loader_stats = {"total_examples": len(data), "used_examples": len(indices_subset), "train_examples": len(train_data), "val_examples": len(val_data), "train_batches": len(train_loader), "val_batches": len(val_loader)}
+        loader_stats = {"total_examples": len(data), "used_examples": len(indices), "train_examples": len(train_data), "val_examples": len(val_data), "train_batches": len(train_loader), "val_batches": len(val_loader)}
     
     return loaders, loader_stats
         

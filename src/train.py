@@ -2,12 +2,46 @@ import time
 import json
 import os
 import torch
+import random
 import wandb
-from preprocess import create_data_loaders
+from preprocess import run_sorter, combiner, create_data_loaders
 from models import relative_positioning, temporal_shuffling, supervised_model
 
-def load_data(path):
-    return torch.load(path)
+def load_data(data_path, run_type="all", data_size=1.0):
+    """
+    Loads data from a folder of multiple runs.
+
+    Args:
+        data_path (str): Path to the data folder.
+        run_type (str): Specifies which runs to load. Options are "all", "combined", or "runx" where x is the run number.
+        data_size (float or int): The proportion of the full dataset to use.
+    """
+    
+    data = run_sorter(data_path, run_type)
+    
+    # Compute total samples
+    n = 0
+    for run in data:
+        n += len(run)
+
+    if data_size <= 1.0:
+        desired_samples = int(n * data_size)
+    elif data_size > 1.0:
+        desired_samples = data_size
+    
+    if run_type == "all":
+        if data:  # Check if data is not empty
+            data = combiner(data, desired_samples)
+        else:
+            print("Error. No data provided from run_sorter().")
+            return None
+    else:
+        # Scale down data size and return
+        random.shuffle(data)
+        data = data[:desired_samples]
+
+    return data
+
 
 def forward_pass(model, batch, model_id="supervised", classify="binary", head="linear", dropout=0.1):
     if model_id=="supervised":
@@ -148,10 +182,9 @@ def save_to_json(data, logdir, file_name):
         json.dump(data, f)
 
 
-
 def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_ratio=0.2, test_ratio=0.1, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id="supervised", timing=True, 
-          classify="binary", head="linear", dropout=True, datetime_id=None, run_id=None):
+          classify="binary", head="linear", dropout=True, datetime_id=None, run_type="all"):
     """
     Trains the supervised GNN model, relative positioning model, or temporal shuffling model.
 
@@ -169,11 +202,16 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         classify (str, optional): Whether to use binary or multiclass classification. Defaults to "binary".
         head (str, optional): Whether to use a "linear", "sigmoid", or "softmax" head. Defaults to "linear".
     """
+    
     # Initialize Weights & Biases
-    wandb.init(project="ssl-seizure-detection", config=config, name=f"{patient_id}_{model_id}_{datetime_id}_run{run_id}")
+    if run_type != "all" and run_type != "combined":
+        wandb.init(project="ssl-seizure-detection", config=config, name=f"{patient_id}_{model_id}_{datetime_id}_{run_type}")
+    else:
+        wandb.init(project="ssl-seizure-detection", config=config, name=f"{patient_id}_{model_id}_{datetime_id}_combined")
+    
 
     # Load data
-    data = load_data(data_path)
+    data = load_data(data_path, run_type, data_size)
     
     # Assign GPU if available
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -182,13 +220,12 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     else:
          print(f"Using device: {device}")
 
-
     # Patience parameter
     patience = 20
     
     # Initialize loaders, scaler, model, optimizer, and loss
-    loaders, loader_stats = create_data_loaders(data, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
-                                                   batch_size=batch_size, num_workers=num_workers, model_id=model_id)
+    loaders, loader_stats = create_data_loaders(data, val_ratio=val_ratio, test_ratio=test_ratio, batch_size=batch_size, 
+                                                num_workers=num_workers, model_id=model_id)
     if model_id == "supervised":
         train_loader, val_loader, test_loader = loaders
     else:
