@@ -12,7 +12,6 @@ patient_id="$1"
 # SSL Parameters
 tau_pos="$2"
 tau_neg="$3"
-sr="$4"
 
 # Training arguments
 run_types=("combined" "all" "all")
