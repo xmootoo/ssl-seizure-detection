@@ -49,6 +49,7 @@ def forward_pass(model, batch, model_id="supervised", classify="binary", head="l
     elif model_id=="relative_positioning" or model_id=="temporal_shuffling":
         return model(batch, head)
 
+
 def train_model(model, train_loader, optimizer, criterion, device, classify="binary", head="linear", dropout=True, 
                 model_id="supervised", timing=True):
     
@@ -99,6 +100,7 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
 
     return avg_loss, accuracy
 
+
 def evaluate_model(model, loader, criterion, device, classify="binary", head="linear", dropout=False, 
                    model_id="supervised", timing=True):
     
@@ -142,8 +144,6 @@ def evaluate_model(model, loader, criterion, device, classify="binary", head="li
     accuracy = 100.0 * correct_eval / total_eval
 
     return avg_loss, accuracy
-
-
 
 
 def save_model(model, logdir, model_name):
@@ -226,7 +226,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     # Initialize loaders, scaler, model, optimizer, and loss
     loaders, loader_stats = create_data_loaders(data, val_ratio=val_ratio, test_ratio=test_ratio, batch_size=batch_size, 
                                                 num_workers=num_workers, model_id=model_id)
-    if model_id == "supervised":
+    if test_ratio != 0:
         train_loader, val_loader, test_loader = loaders
     else:
         train_loader, val_loader = loaders
@@ -307,7 +307,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     
            
     #<----------Testing---------->
-    if model_id=="supervised":
+    if test_ratio!=0:
         test_loss, test_acc = evaluate_model(model, test_loader, criterion, device, classify, head, dropout=False, model_id=model_id, 
                                              timing=timing)
         save_to_json(test_loss, stats_dir, "test_loss.json")

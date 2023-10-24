@@ -11,20 +11,21 @@ if __name__ == '__main__':
     logdir = sys.argv[2]
     
     # Patient identifier
-    patient_id = sys.argv[3]
+    patient_id = str(sys.argv[3])
     
     # Model identifier
-    model_id = sys.argv[4]
+    model_id = str(sys.argv[4])
 
     # Date and time identifier
-    datetime_id = sys.argv[5]
+    datetime_id = str(sys.argv[5])
 
     # Run identifier
-    run_id = sys.argv[6]
+    run_type = str(sys.argv[6])
 
     # Training parameters
-    epochs = 200
+    epochs=200
     val_ratio=0.2
+    test_ratio=0.1
 
     if model_id == "supervised":
         config = {
@@ -43,10 +44,8 @@ if __name__ == '__main__':
         "num_edge_features": 3,
         "hidden_channels": [64, 32, 64, 128, 256],
         }
-        data_size=100000
-        test_ratio=0
+        data_size=115000    
 
     train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
-        batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, timing=True, model_id=model_id,
-        datetime_id=datetime_id)
-
+          batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id=model_id, timing=True, 
+          classify="binary", head="linear", dropout=True, datetime_id=datetime_id, run_type=run_type)
