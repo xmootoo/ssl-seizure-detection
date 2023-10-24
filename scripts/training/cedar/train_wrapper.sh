@@ -9,6 +9,11 @@ fi
 # The patient ID (e.g., jh101)
 patient_id="$1"
 
+# SSL Parameters
+tau_pos="$2"
+tau_neg="$3"
+sr="$4"
+
 # Training arguments
 run_types=("combined" "all" "all")
 model_ids=("supervised" "relative_positioning" "temporal_shuffling")
@@ -27,6 +32,11 @@ for i in "${!model_ids[@]}"; do
     job_name="training_${patient_id}_${model_id}_${time}"
     run_type="${run_types[$i]}"
     data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}"
+    
+    if [ "$model_id" == "relative_positioning" ] || [ "$model_id" == "temporal_shuffling" ]; then
+        data_path="${data_path}/${tau_pos}s_${tau_neg}s" 
+    fi
+    
     logdir="${base_dir}/${model_id}/${datetime_id}"
     mkdir -p "${logdir}"
 
