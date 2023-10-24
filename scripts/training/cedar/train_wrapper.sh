@@ -6,51 +6,28 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-# Check if the run ID is provided
-if [ -z "$2" ]; then
-    echo "Error: No run ID provided."
-    exit 1
-fi
-
 # The patient ID (e.g., jh101)
 patient_id="$1"
 
-# Run ID (e.g., 1,2,3,4)
-run_type="$2"
-
 # Training arguments
+run_types=("combined" "all" "all")
 model_ids=("supervised" "relative_positioning" "temporal_shuffling")
 times=("03:00:00" "23:59:00" "32:00:00")
-date_and_time=$(date "+%Y-%m-%d_%H.%M.%S")
+datetime_id=$(date "+%Y-%m-%d_%H.%M.%S")
 
 # Base directory
 base_dir="${xav}/ssl_epilepsy/models/${patient_id}"
-mkdir -p "${base_dir}"
+mkdir -p "${base_dir}" || { echo "Error: Cannot create directory ${base_dir}"; exit 1; }
+
 
 # Iterate over each model and its corresponding time
 for i in "${!model_ids[@]}"; do
     model_id="${model_ids[$i]}"
     time="${times[$i]}"
     job_name="training_${patient_id}_${model_id}_${time}"
-    
-    # Define the data path
-    case "$model_id" in
-        "supervised")
-            data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}/${patient_id}_run1.pt"
-            ;;
-        "relative_positioning")
-            data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}/${patient_id}_run1_12s_90_1.0sr.pt"
-            ;;
-        "temporal_shuffling")
-            data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}/${patient_id}_run1_12s_90_0.22sr.pt"
-            ;;
-        *)
-            echo "Unknown model_id: $model_id"
-            continue
-            ;;
-    esac
-    
-    logdir="${base_dir}/${model_id}/${date_and_time}"
+    run_type="${run_types[$i]}"
+    data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}"
+    logdir="${base_dir}/${model_id}/${datetime_id}"
     mkdir -p "${logdir}"
 
     # Create a job for each model + time
@@ -73,6 +50,6 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${date_and_time}" "${run_type}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}"
 EOT
 done
