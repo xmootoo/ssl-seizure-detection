@@ -315,7 +315,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         print(f"Epoch: {epoch+1}. Test Loss: {test_loss}. Test Accuracy: {test_acc}.")
         wandb.log({"test_loss": test_loss, "test_acc": test_acc})
 
-
+    
     #<----------Save Statistics & Training Information---------->
     save_to_json(train_loss, stats_dir, "train_loss.json")
     save_to_json(val_loss, stats_dir, "val_loss.json")
@@ -341,7 +341,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         'Model parameters': config,
         'Dropout': dropout,
     }
-    if model == "supervised":
+    if test_ratio!=0:
         info_dict['Test examples'] = loader_stats["test_examples"]
         info_dict['Test batches'] = loader_stats["test_batches"]
     
