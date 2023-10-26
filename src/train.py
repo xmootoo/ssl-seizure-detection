@@ -317,7 +317,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         save_to_json(test_loss, stats_dir, "test_loss.json")
         save_to_json(test_acc, stats_dir, "test_acc.json")
         print(f"Epoch: {epoch+1}. Test Loss: {test_loss}. Test Accuracy: {test_acc}.")
-        wandb.log({"test_loss": test_loss, "test_acc": test_acc})
+        wandb.log({"Test Loss": test_loss, "Test Accuracy": test_acc})
 
     
     #<----------Save Statistics & Training Information---------->
