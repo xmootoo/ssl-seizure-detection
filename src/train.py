@@ -72,9 +72,9 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
 
         # Compute forward pass
         outputs = forward_pass(model, batch, model_id, classify, head, dropout)
-        
+
         # Calculate loss
-        loss = criterion(outputs.squeeze().to(device), batch.y.float().to(device))
+        loss = criterion(outputs.squeeze().to(device), batch.y.float())
 
         # Backward pass and optimization
         loss.backward()
@@ -122,8 +122,12 @@ def evaluate_model(model, loader, criterion, device, classify="binary", head="li
             # Compute forward pass
             outputs = forward_pass(model, batch, model_id, classify, head, dropout)
             
+            # Do not reshape output if batch size is 1
+            if outputs.shape[0] > 1:
+                outputs = outputs.squeeze()
+
             # Calculate loss
-            loss = criterion(outputs.squeeze().to(device), batch.y.float().to(device))
+            loss = criterion(outputs.to(device), batch.y.float())
             
             # Evaluation statistics
             epoch_eval_loss += loss.item()
