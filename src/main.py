@@ -22,14 +22,23 @@ if __name__ == '__main__':
     # Run identifier
     run_type = str(sys.argv[6])
 
+    # Node feature dimension configuration (some patients have less node features)
+    if patient_id in {"ummc003", "ummc004", "ummc006"}:
+        num_node_features = 7 
+    elif patient_id in {"ummc001", "ummc002"}:
+        num_node_features = 8
+    else:
+        num_node_features = 9
+
+    
     # Training parameters
     epochs=200
     val_ratio=0.2
     test_ratio=0.1
-
+    
     if model_id == "supervised":
         config = {
-            "num_node_features": 9,
+            "num_node_features": num_node_features,
             "num_edge_features": 3,
             "hidden_channels": 64,
             "out_channels": 32,
@@ -40,7 +49,7 @@ if __name__ == '__main__':
 
     elif model_id == "relative_positioning" or model_id == "temporal_shuffling":
         config = {
-        "num_node_features": 9,
+        "num_node_features": num_node_features,
         "num_edge_features": 3,
         "hidden_channels": [64, 32, 64, 128, 256],
         }
