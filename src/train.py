@@ -328,6 +328,8 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     
     info_dict = {
         'Patient ID': patient_id,
+        'Model ID': model_id,
+        'Date & Time': datetime_id,
         'Data size': data_size,
         'Total examples': loader_stats["total_examples"],
         'Used examples': loader_stats["used_examples"],
