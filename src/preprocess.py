@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import random
 import os
+import copy
 from torch_geometric.data import Data
 from torch.utils.data import random_split
 from torch_geometric.loader import DataLoader
@@ -792,7 +793,7 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
         test_data = [data[i] for i in test_idx]
 
     # Create data loaders
-    if model_id=="supervised":
+    if model_id=="supervised" or model_id=="downstream1":
         train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers)
         val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers)
         if test_ratio != 0:
@@ -828,6 +829,35 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
     
     return loaders, loader_stats
         
+
+
+def extract_layers(model_path, model_dict_path, transfer_id):
+    """
+    Extracts pretrained layers of a model.
+
+    Args:
+        model_path (str): Path to the model.
+        model_dict_path (str): Path to the model state dictionary.
+        transfer_id (str): Model to use. Either "relative_positioning" or "temporal_shuffling".
+    
+    Returns:
+        pretrained_layers (list): List of pretrained layers.
+    
+    """
+    # Load model
+    model = torch.load(model_path)
+    model.eval()
+
+    # Load state dictionary
+    model_dict = torch.load(model_dict_path)
+
+    if transfer_id == "relative_positioning" or transfer_id == "temporal_shuffling":
+        EdgeMLP_pretrained = copy.deepcopy(model.encoder.edge_mlp)
+        NNConv_pretrained = copy.deepcopy(model.encoder.conv1)
+        GATConv_pretrained = copy.deepcopy(model.encoder.conv2)
+        pretrained_layers = [EdgeMLP_pretrained, NNConv_pretrained, GATConv_pretrained]
+        return pretrained_layers
+
 
 
 

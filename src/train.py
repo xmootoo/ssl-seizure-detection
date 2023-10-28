@@ -4,8 +4,8 @@ import os
 import torch
 import random
 import wandb
-from preprocess import run_sorter, combiner, create_data_loaders
-from models import relative_positioning, temporal_shuffling, supervised_model
+from preprocess import run_sorter, combiner, create_data_loaders, extract_layers
+from models import relative_positioning, temporal_shuffling, supervised_model, downstream1
 
 def load_data(data_path, run_type="all", data_size=1.0):
     """
@@ -44,7 +44,7 @@ def load_data(data_path, run_type="all", data_size=1.0):
 
 
 def forward_pass(model, batch, model_id="supervised", classify="binary", head="linear", dropout=0.1):
-    if model_id=="supervised":
+    if model_id=="supervised" or model_id=="downstream1":
         return model(batch, classify, head, dropout)
     elif model_id=="relative_positioning" or model_id=="temporal_shuffling":
         return model(batch, head)
@@ -188,7 +188,8 @@ def save_to_json(data, logdir, file_name):
 
 def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_ratio=0.2, test_ratio=0.1, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id="supervised", timing=True, 
-          classify="binary", head="linear", dropout=True, datetime_id=None, run_type="all"):
+          classify="binary", head="linear", dropout=True, datetime_id=None, run_type="all", frozen=False,
+          model_path=None, model_dict_path=None, transfer_id=None):
     """
     Trains the supervised GNN model, relative positioning model, or temporal shuffling model.
 
@@ -239,11 +240,14 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     # Select model
     if model_id=="supervised":
         model = supervised_model(config).to(device)
-    if model_id=="relative_positioning":
+    elif model_id=="relative_positioning":
         model = relative_positioning(config).to(device)
-    if model_id=="temporal_shuffling":
+    elif model_id=="temporal_shuffling":
         model = temporal_shuffling(config).to(device)
-
+    elif model_id=="downstream1":
+        extracted_layers = extract_layers(model_path, model_dict_path, transfer_id) 
+        model = downstream1(config, extracted_layers, frozen).to(device)
+    
     # Initialize optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
@@ -329,6 +333,8 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     info_dict = {
         'Patient ID': patient_id,
         'Model ID': model_id,
+        'Transfer ID': transfer_id,
+        'Frozen': frozen,
         'Date & Time': datetime_id,
         'Data size': data_size,
         'Total examples': loader_stats["total_examples"],
