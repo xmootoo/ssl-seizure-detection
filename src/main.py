@@ -24,15 +24,17 @@ if __name__ == '__main__':
 
     # Transfer learning (optional arguments)
     # Initialize variables to None
-    model_path = None
-    model_dict_path = None
-    transfer_id = None
+    model_path=None
+    model_dict_path=None
+    transfer_id=None
+    frozen=None
 
     # Check the number of arguments and set variables accordingly
     if len(sys.argv) > 7:
         model_path = str(sys.argv[7])
         model_dict_path = str(sys.argv[8])
         transfer_id = str(sys.argv[9])
+        frozen = bool(int(sys.argv[10]))
 
 
     # Node feature dimension configuration (some patients have less node features)
@@ -73,13 +75,9 @@ if __name__ == '__main__':
         "hidden_channels": [64, 64, 32],
         "dropout": 0.1,
         }
-        data_size=1.0    
-
-    # train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
-    #       batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id=model_id, timing=True, 
-    #       classify="binary", head="linear", dropout=True, datetime_id=datetime_id, run_type=run_type)
+        data_size=1.0
     
     train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id=model_id, timing=True, 
           classify="binary", head="linear", dropout=True, datetime_id=datetime_id, run_type=run_type, 
-          frozen=False, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id)
+          frozen=frozen, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id)

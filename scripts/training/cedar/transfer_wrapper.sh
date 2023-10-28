@@ -9,34 +9,38 @@ fi
 # The patient ID (e.g., jh101)
 patient_id="$1"
 
-# SSL Parameters
-tau_pos="$2"
-tau_neg="$3"
-
 # Date and time ID
-datetime_id="$4"
+datetime_id="$2"
+
+# Model datetime ID of the pretrained model
+pretrained_datetime_id="$3"
+
+# Model ID of using the pretrained layers (i.e. new untrained model)
+model_id="$4"
+
+# Freezes or unfreezes pretrained layers
+frozen="$5"
 
 # Training arguments
-run_types=("combined" "all" "all")
-model_ids=("supervised" "relative_positioning" "temporal_shuffling")
-times=("00:45:00" "20:00:00" "20:00:00")
+run_types="combined"
+time="00:45:00"
+transfer_ids=("relative_positioning" "temporal_shuffling")
+
 
 # Base directory
 base_dir="${xav}/ssl_epilepsy/models/${patient_id}"
 mkdir -p "${base_dir}" || { echo "Error: Cannot create directory ${base_dir}"; exit 1; }
 
 
+
 # Iterate over each model and its corresponding time
-for i in "${!model_ids[@]}"; do
-    model_id="${model_ids[$i]}"
-    time="${times[$i]}"
-    job_name="training_${patient_id}_${model_id}_${time}"
-    run_type="${run_types[$i]}"
-    data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}"
+for i in "${!transfer_ids[@]}"; do
+    transfer_id="${transfer_ids[$i]}"
+    job_name="transfer_learning_${patient_id}_${model_id}_${transfer_id}_${pretrained_datetime_id}_${datetime_id}"
+    data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/supervised"
     
-    if [ "$model_id" == "relative_positioning" ] || [ "$model_id" == "temporal_shuffling" ]; then
-        data_path="${data_path}/${tau_pos}s_${tau_neg}s" 
-    fi
+    model_path="${xav}/ssl_epilepsy/models/${patient_id}/${transfer_id}/${pretrained_datetime_id}/model/${transfer_id}.pth"
+    model_dict_path="${xav}/ssl_epilepsy/models/${patient_id}/${transfer_id}/${pretrained_datetime_id}/model/${transfer_id}_state_dict.pth"
     
     logdir="${base_dir}/${model_id}/${datetime_id}"
     mkdir -p "${logdir}"
@@ -61,6 +65,6 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${model_path}" "${model_dict_path}" "${transfer_id}" "${frozen}"
 EOT
 done
