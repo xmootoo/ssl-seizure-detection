@@ -26,4 +26,4 @@ datetime_id=$(date "+%Y-%m-%d_%H.%M.%S")
 patient_id=${patients[$SLURM_ARRAY_TASK_ID]}
 
 # Call the original script for each patient
-sbatch transfer_wrapper.sh $patient_id $datetime_id $pretrained_datetime_id $model_id
+sbatch transfer_wrapper.sh $patient_id $datetime_id $pretrained_datetime_id $model_id $frozen
