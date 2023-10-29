@@ -73,8 +73,12 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
         # Compute forward pass
         outputs = forward_pass(model, batch, model_id, classify, head, dropout)
 
+        # Do not reshape output if batch size is 1
+        if outputs.shape[0] > 1:
+            outputs = outputs.squeeze()
+        
         # Calculate loss
-        loss = criterion(outputs.squeeze().to(device), batch.y.float())
+        loss = criterion(outputs.to(device), batch.y.float())
 
         # Backward pass and optimization
         loss.backward()
@@ -209,12 +213,10 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     """
     
     # Initialize Weights & Biases
-    if run_type != "all" and run_type != "combined":
-        wandb.init(project="ssl-seizure-detection", config=config, name=f"{patient_id}_{model_id}_{datetime_id}_{run_type}")
-    else:
-        wandb.init(project="ssl-seizure-detection", config=config, name=f"{patient_id}_{model_id}_{datetime_id}_combined")
+    wandb.init(project="ssl-seizure-detection", config=config, name=f"{patient_id}_{model_id}_{datetime_id}_{run_type}")
+    if transfer_id is not None:
+        wandb.run.name = f"{patient_id}_{model_id}_{datetime_id}_{run_type}_{transfer_id}"
     
-
     # Load data
     data = load_data(data_path, run_type, data_size)
     
