@@ -37,7 +37,7 @@ class gnn_encoder(nn.Module):
         # Encoder
         self.conv1 = NNConv(num_node_features, hidden_channels[0], self.edge_mlp)
         self.conv2 = GATConv(hidden_channels[0], hidden_channels[1], heads=1, concat=False)
-
+        
         # Projector
         self.fc1 = nn.Linear(hidden_channels[1], hidden_channels[2])
         self.fc2 = nn.Linear(hidden_channels[2], hidden_channels[3])
@@ -213,76 +213,20 @@ class supervised_model(nn.Module):
 
 
 class downstream1(nn.Module):
-    def __init__(self, config):
-        super(downstream1, self).__init__()
-        num_node_features = config["num_node_features"]
-        num_edge_features = config["num_edge_features"]
-        hidden_channels = config["hidden_channels"]
-        out_channels = config["out_channels"]
-        dropout = config["dropout"]
-        
-        # Initialize the MLP for NNConv
-        self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels)
-        
-        # NNConv layer
-        self.conv1 = NNConv(num_node_features, hidden_channels, self.edge_mlp)
-        
-        # GATConv layer
-        self.conv2 = GATConv(hidden_channels, hidden_channels, heads=1, concat=False)
-
-        # First fully connected layer
-        self.fc1 = nn.Linear(hidden_channels, out_channels)
-
-        # Dropout
-        self.dropout = nn.Dropout(p=dropout)
-
-        # Last fully connected layer
-        self.fc2 = nn.Linear(out_channels, 1)
-        self.fc3 = nn.Linear(out_channels, 3)
-        
-        # Weight initialization
-        self.apply(init_weights)
-    
-    def forward(self, batch, classify="binary", head="linear", dropout=True):
-
-        # ECC
-        x = self.conv1(batch.x, batch.edge_index, batch.edge_attr)
-        x = F.relu(x)
-
-        # GAT
-        x = self.conv2(x, batch.edge_index)
-        x = F.relu(x)
-
-        # Global average pooling
-        x = global_mean_pool(x, batch.batch)
-
-
-        # Fully connected layers
-        x = self.fc1(x)
-        x = F.relu(x)
-
-        if dropout:
-            x = self.dropout(x)
-        
-        
-        if classify == "binary":
-            x = self.fc2(x)
-            x = x.squeeze(1)
-        if classify == "multiclass":
-            x = self.fc3(x)
-        
-        if head == "linear":
-            return x
-        if head == "sigmoid":
-            return torch.sigmoid(x)
-        if head == "softmax":
-            return torch.softmax(x, dim=1)
-
-        
-
-class downstream1(nn.Module):
     def __init__(self, config, pretrained_layers, frozen=False):
         super(downstream1, self).__init__()
+        """
+        Downstream model for seizure detection (binary or multiclass). Retrains with a GNN encoder and adds additional layers (total: 2x ECC, 2x GAT).
+        
+        Args:
+            config (dict): Dictionary containing the configuration of the model, containing hidden_channels which is a list of values of length 3, and 
+                            the dropout probability.
+            pretrained_layers (tuple): Tuple containing the pretrained layers.
+            frozen (bool): If True, the pretrained layers are frozen. If False, the pretrained layers are unfrozen.
+        
+        """
+        
+        
         hidden_channels = config["hidden_channels"]
         dropout = config["dropout"]
         
@@ -371,6 +315,91 @@ class downstream1(nn.Module):
             return torch.sigmoid(x)
         if head == "softmax":
             return torch.softmax(x, dim=1)
+
+
+class downstream2(nn.Module):    
+    def __init__(self, config, pretrained_layers, frozen=False):
+        """
+        Downstream model for seizure detection (binary or multiclass). Retrains the entire GNN encoder and does not add any additional layers.
+        
+        Args:
+            config (dict): Dictionary containing the configuration of the model, containing hidden_channels which is a single value, and the dropout probability.
+            pretrained_layers (tuple): Tuple containing the pretrained layers.
+            frozen (bool): If True, the pretrained layers are frozen. If False, the pretrained layers are unfrozen.
+        
+        """    
+        super(downstream2, self).__init__()
+        hidden_channels = config["hidden_channels"]
+        dropout = config["dropout"]
+        
+        # Pretrained layers
+        EdgeMLP_pretrained, NNConv_pretrained, GATConv_pretrained = pretrained_layers
+        self.conv1 = NNConv_pretrained
+        self.conv2 = GATConv_pretrained
+
+        # Assign the pretrained MLP to the NNConv1
+        NNConv_pretrained.edge_mlp = EdgeMLP_pretrained
+        
+        # Output feature dimensions of pretrained layers
+        num_node_features = GATConv_pretrained.out_channels
+        num_edge_features = EdgeMLP_pretrained.state_dict()['mlp.0.weight'].size()[1]
+        
+        # Conditionally freeze or unfreeze pretrained layers
+        for param in EdgeMLP_pretrained.parameters():
+            param.requires_grad = not frozen
+        for param in NNConv_pretrained.parameters():
+            param.requires_grad = not frozen
+        for param in GATConv_pretrained.parameters():
+            param.requires_grad = not frozen
+
+        # First fully connected layer
+        self.fc1 = nn.Linear(num_node_features, hidden_channels)
+
+        # Dropout
+        self.dropout = nn.Dropout(p=dropout)
+
+        # Last fully connected layer
+        self.fc2 = nn.Linear(hidden_channels, 1)
+        self.fc3 = nn.Linear(hidden_channels, 3)
+        
+        # Weight initialization
+        self.apply(init_weights)
+    
+    def forward(self, batch, classify="binary", head="linear", dropout=True):
+        
+        # ECC1
+        x = self.conv1(batch.x, batch.edge_index, batch.edge_attr)
+        x = F.relu(x)
+
+        # GAT
+        x = self.conv2(x, batch.edge_index)
+        x = F.relu(x)
+
+        # Global average pooling
+        x = global_mean_pool(x, batch.batch)
+
+        # Fully connected layers
+        x = self.fc1(x)
+        x = F.relu(x)
+
+        if dropout:
+            x = self.dropout(x)
+        
+        # Classification mode
+        if classify=="binary":
+            x = self.fc2(x)
+            x = x.squeeze(1)
+        if classify=="multiclass":
+            x = self.fc3(x)
+
+        # Prediction head
+        if head=="linear":
+            return x
+        if head=="sigmoid":
+            return torch.sigmoid(x)
+        if head=="softmax":
+            return torch.softmax(x, dim=1)
+
 
         
 class CPC(nn.Module):

@@ -429,88 +429,55 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
 
 
 
-def graph_triplets_old(graph_reps, tau_pos=50, tau_neg=170, desired_samples=-1):
+def cpc_tuples(data, K=5, N=5, P=1, data_size=100000):
     """
-    Creates unique sample triplets from a list of samples and their corresponding time indexes.
-    
+    Creates unique CPC tuples from an ordered list of data points for Contrastive Predictive Coding (CPC).
+
     Args:
-        graph_reps (list of [graph_representation, Y]): Ordered list of graph representations each element is a list [graph_representaiton, Y] where
-        Y is its label (ictal or nonictal). The index of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point 
-        is approx 0.12s.
-        tau_pos: Positive context threshold.
-        tau_neg: Negative context threshold.
-        desired_samples: Desired number of samples. Defaults to -1.
+        data (list): Ordered list of data points, where each point is a representation of some observable quantity at a given time.
+        K (int, optional, default=5): Number of past context data points to include in each tuple.
+        N (int, optional, default=5): Number of negative samples to generate for each positive sample.
+        P (int, optional, default=1): Number of future positive samples to include in each tuple.
+        data_size (int, optional, default=100000): The number of CPC tuples to generate.
+
+    Raises:
+        ValueError: If there are not enough data points to generate P * N unique negative samples.
 
     Returns:
-        graph_rep_triplets (list): List of graph representation triplets [gr_1, gr_2, gr_3, Y], where Y corresponds to
-        the pseudolabel of the triplet.
+        cpc_samples (list of tuples): List of CPC tuples where each tuple contains three lists:
+                                    The first list is of K past context data points,
+                                    the second list is of P future positive examples,
+                                    and the third list is of P * N future negative examples.
     """
+
+    data = [[data[i], i] for i in range(len(data))]
     
-    n = len(graph_reps)
-    data = [graph_reps[i][0] for i in range(n)]
-    sample_ratio = get_sample_ratio(n, tau_pos, tau_neg, desired_samples,  mode="temporal_shuffling")
+    cpc_samples = []
+    for i in range(data_size):
+        # Ensure that there are enough unique samples for P * N negative samples
+        if len(data) - (K + P) < P * N:
+            raise ValueError("Not enough data to generate P * N unique negative samples.")
 
-    pos_triplets = []
-    neg_triplets = []
-    seen_triplets = set()
+        # Select a starting index that allows for K context samples and P positive samples
+        start_idx = random.randint(K, len(data) - P - 1)
+        
+        # Generate the context
+        context = [data[start_idx - j][0] for j in range(K, 0, -1)]
+        
+        # Generate P positive samples
+        x_positives = [data[start_idx + p][0] for p in range(P)]
+        
+        # Generate P * N negative samples
+        x_negatives = random.sample([x for x, idx in data if idx < start_idx - K or idx > start_idx + P - 1], P * N)
+        
+        # Compile the sample
+        sample = (context, x_positives, x_negatives)
+        cpc_samples.append(sample)
+    
+    return cpc_samples
 
-    for t1 in range(n):
-        for t3 in random.sample(range(t1 + 1, n), min(int((n - t1 - 1) * sample_ratio), n - t1 - 1)):
-            diff_pos = np.abs(t1 - t3)
 
-            if diff_pos <= tau_pos:
-                available_t2 = [x for x in range(n) if x != t1 and x != t3]
-                for t2 in random.sample(available_t2, min(int(n * sample_ratio), len(available_t2))):
-                    if ((t1, t2, t3) not in seen_triplets) and ((t3, t2, t1) not in seen_triplets):
-                        
-                        # Positive triplet
-                        if (t1 < t2 < t3):
-                            pos_triplets.append([data[t1], data[t2], data[t3], 1])
-                        elif (t3 < t2 < t1):
-                            pos_triplets.append([data[t3], data[t2], data[t1], 1])
-
-                        seen_triplets.add((t1, t2, t3)) # Remove reudundant element or permutation
-                        seen_triplets.add((t3, t2, t1)) 
-
-                        # Negative triplet
-                        L = diff_pos / 2
-                        if t1 < t3:
-                            midpoint = t1 + L
-                        elif t1 > t3:
-                            midpoint = t3 + L
-                        diff_midpoint = np.abs(midpoint - t2)
-
-                        if diff_midpoint > tau_neg / 2:
-                            if not ((t1 < t2 < t3) or (t3 < t2 < t1)):
-                                if t1 < t3:
-                                    neg_triplets.append([data[t1], data[t2], data[t3], 0])
-                                elif t1 > t3:
-                                    neg_triplets.append([data[t3], data[t2], data[t1], 0])
-                                seen_triplets.add((t1, t2, t3)) # Remove redundant element or permutation
-                                seen_triplets.add((t3, t2, t1))
-
-    # Randomly shuffle lists
-    random.shuffle(pos_triplets)
-    random.shuffle(neg_triplets)
-
-    # Balance the dataset by using the minimum of the two class sizes
-    min_size = min(len(pos_triplets), len(neg_triplets))
-
-    # Scale down according to smallest class
-    sample_size = int(min_size)
-
-    # Trim down to the sample size
-    pos_triplets = pos_triplets[:sample_size]
-    neg_triplets = neg_triplets[:sample_size]
-
-    # Concatenate the balanced dataset
-    graph_rep_triplets = pos_triplets + neg_triplets
-
-    # Shuffle the final dataset to ensure randomness
-    random.shuffle(graph_rep_triplets)
-
-    return graph_rep_triplets
-
+  
 
 def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = True, save = True, patientid = "patient", 
                 logdir = None, model = "relative_positioning", sample_ratio=1.0):
@@ -574,6 +541,8 @@ def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = 
         return triplets
 
 
+
+
         
 def convert_to_Data(data_list, save = True, logdir = None):
     """
@@ -631,6 +600,23 @@ class TripletData(Data):
             return self.x3.size(0)
         return super().__inc__(key, value, *args, **kwargs)
 
+
+class TupleData(Data):
+    def __init__(self, M, graphs):
+        super(TupleData, self).__init__()
+        self.M = M
+        assert len(graphs) == M, "Number of graphs must be equal to M."
+        
+        for idx, (edge_index, x, edge_attr) in enumerate(graphs):
+            setattr(self, f'edge_index{idx+1}', edge_index)
+            setattr(self, f'x{idx+1}', x)
+            setattr(self, f'edge_attr{idx+1}', edge_attr)
+            
+    def __inc__(self, key, value, *args, **kwargs):
+        if 'edge_index' in key:
+            idx = int(key.split('_')[-1])  # assuming edge_index is followed by the index 1, 2, ...
+            return getattr(self, f'x{idx}').size(0)
+        return super().__inc__(key, value, *args, **kwargs)
 
 
 def convert_to_PairData(data_list, save = True, logdir = None):
