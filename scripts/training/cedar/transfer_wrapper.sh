@@ -23,8 +23,15 @@ frozen="$5"
 
 # Training arguments
 run_types="combined"
-time="00:45:00"
 transfer_ids=("relative_positioning" "temporal_shuffling")
+if [ "$model_id" == "downstream1" ]; then
+  time="00:45:00"
+elif [ "$model_id" == "downstream2" ]; then
+  time="00:25:00"
+else
+  echo "Invalid model_id"
+fi
+
 
 
 # Base directory
