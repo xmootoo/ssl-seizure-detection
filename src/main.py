@@ -76,6 +76,13 @@ if __name__ == '__main__':
         "dropout": 0.1,
         }
         data_size=1.0
+        
+    elif model_id == "downstream2":
+        config = {
+        "hidden_channels": 32,
+        "dropout": 0.1,
+        }
+        data_size=1.0
     
     train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id=model_id, timing=True, 
