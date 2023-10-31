@@ -5,7 +5,7 @@ import torch
 import random
 import wandb
 from preprocess import run_sorter, combiner, create_data_loaders, extract_layers
-from models import relative_positioning, temporal_shuffling, supervised_model, downstream1
+from models import relative_positioning, temporal_shuffling, supervised_model, downstream1, downstream2
 
 def load_data(data_path, run_type="all", data_size=1.0):
     """
@@ -15,6 +15,9 @@ def load_data(data_path, run_type="all", data_size=1.0):
         data_path (str): Path to the data folder.
         run_type (str): Specifies which runs to load. Options are "all", "combined", or "runx" where x is the run number.
         data_size (float or int): The proportion of the full dataset to use.
+    
+    Returns:
+        data (list): A list of graph representations for a certain number of runs, where the runs included depend on run_type.
     """
     
     data = run_sorter(data_path, run_type)
@@ -44,7 +47,7 @@ def load_data(data_path, run_type="all", data_size=1.0):
 
 
 def forward_pass(model, batch, model_id="supervised", classify="binary", head="linear", dropout=0.1):
-    if model_id=="supervised" or model_id=="downstream1":
+    if model_id=="supervised" or model_id=="downstream1" or model_id=="downstream2":
         return model(batch, classify, head, dropout)
     elif model_id=="relative_positioning" or model_id=="temporal_shuffling":
         return model(batch, head)
@@ -249,6 +252,9 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     elif model_id=="downstream1":
         extracted_layers = extract_layers(model_path, model_dict_path, transfer_id) 
         model = downstream1(config, extracted_layers, frozen).to(device)
+    elif model_id=="downstream2":
+        extracted_layers = extract_layers(model_path, model_dict_path, transfer_id) 
+        model = downstream2(config, extracted_layers, frozen).to(device)
     
     # Initialize optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)

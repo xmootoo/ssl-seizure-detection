@@ -10,7 +10,7 @@
 # The date and time ID fo the pretrained model, which we will extract the pretrained layers from.
 pretrained_datetime_id="$1"
 
-# Name of model to be trained using the pretrained layers. Options: downstream1.
+# Name of model to be trained using the pretrained layers. Options: downstream1, downstream2.
 model_id="$2"
 
 # Freezes or unfreezes the weights of the pretrained layers. Options: 0 (False) or 1 (True).

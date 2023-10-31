@@ -747,15 +747,13 @@ def combiner(all_lists, desired_samples):
 
 
 
-def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batch_size=32, num_workers=4, model_id="supervised"):
+def create_data_loaders(data, val_ratio=0.2, test_ratio=0.1, batch_size=32, num_workers=4, model_id="supervised"):
     # Shuffle data
     """
     Create train and validation data loaders.
 
     Args:
         data (list): List of PyG Data, PairData, or TripletData objects.
-        data_size (float): Proportion of the data to be used if 0 <= data_size <= 1. If data_size > 1, indicates exact number of 
-        examples in data to be used. Defaults to 1.0.
         val_ratio (float): Proportion of the data to be used for validation. Defaults to 0.2.
         test_ratio (float): Proportion of the data to be used for testing. Defaults to 0.1. Set to 0 if no testing data is required.
         batch_size (int): Batch size. Defaults to 32.
@@ -779,7 +777,7 @@ def create_data_loaders(data, data_size=1.0, val_ratio=0.2, test_ratio=0.1, batc
         test_data = [data[i] for i in test_idx]
 
     # Create data loaders
-    if model_id=="supervised" or model_id=="downstream1":
+    if model_id=="supervised" or model_id=="downstream1" or model_id=="downstream2":
         train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers)
         val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers)
         if test_ratio != 0:
