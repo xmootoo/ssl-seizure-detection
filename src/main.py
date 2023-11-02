@@ -22,7 +22,7 @@ if __name__ == '__main__':
     # Run identifier
     run_type = sys.argv[6]
 
-    # Train, val, test split (number of samples per). Must be in the format "train,val,test" in the command line.
+    # Train, val, test split. Must formatted as "train,val,test" in the command line.
     split = [float(x) for x in sys.argv[7].split(",")]
     
     if len(split) == 3:

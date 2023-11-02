@@ -16,6 +16,9 @@ tau_neg="$3"
 # Date and time ID
 datetime_id="$4"
 
+# Train, val, test split
+split="$5"
+
 # Training arguments
 run_types=("combined" "all" "all")
 model_ids=("supervised" "relative_positioning" "temporal_shuffling")
@@ -61,6 +64,6 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${split}"
 EOT
 done

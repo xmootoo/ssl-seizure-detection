@@ -21,6 +21,9 @@ model_id="$4"
 # Freezes or unfreezes pretrained layers
 frozen="$5"
 
+# Train,val,test split
+split="$6"
+
 # Training arguments
 run_types="combined"
 transfer_ids=("relative_positioning" "temporal_shuffling")
@@ -72,6 +75,6 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${model_path}" "${model_dict_path}" "${transfer_id}" "${frozen}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${model_path}" "${model_dict_path}" "${transfer_id}" "${frozen}" "${split}"
 EOT
 done
