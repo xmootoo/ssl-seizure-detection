@@ -5,7 +5,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# Define the MLP for NNConv
 class EdgeMLP(nn.Module):
     def __init__(self, num_edge_features, input_node_features, output_node_features):
         super(EdgeMLP, self).__init__()
@@ -27,14 +26,14 @@ class EdgeMLP(nn.Module):
         return x
 
 
-class gnn_encoder(nn.Module):
+class gnn_embedder(nn.Module):
     def __init__(self, num_node_features, num_edge_features, hidden_channels):
-        super(gnn_encoder, self).__init__()
+        super(gnn_embedder, self).__init__()
         
         # Initialize the MLP for NNConv
         self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels[0])
         
-        # Encoder
+        # embedder
         self.conv1 = NNConv(num_node_features, hidden_channels[0], self.edge_mlp)
         self.conv2 = GATConv(hidden_channels[0], hidden_channels[1], heads=1, concat=False)
         
@@ -72,8 +71,8 @@ class relative_positioning(nn.Module):
         num_edge_features = config["num_edge_features"]
         hidden_channels = config["hidden_channels"]
         
-        # GNN encoder
-        self.encoder = gnn_encoder(num_node_features, num_edge_features, hidden_channels)
+        # GNN embedder
+        self.embedder = gnn_embedder(num_node_features, num_edge_features, hidden_channels)
 
         # Fully connected layers
         self.fc = nn.Linear(hidden_channels[4], 1)
@@ -84,8 +83,8 @@ class relative_positioning(nn.Module):
     
     def forward(self, batch, head="linear"):
         # Graph embeddings
-        z1 = self.encoder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
-        z2 = self.encoder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
+        z1 = self.embedder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
+        z2 = self.embedder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
         
         # Contrast the embeddings
         z = torch.abs(z1 - z2)
@@ -112,8 +111,8 @@ class temporal_shuffling(nn.Module):
         num_edge_features = config["num_edge_features"]
         hidden_channels = config["hidden_channels"]
         
-        # GNN Encoder
-        self.encoder = gnn_encoder(num_node_features, num_edge_features, hidden_channels)
+        # GNN embedder
+        self.embedder = gnn_embedder(num_node_features, num_edge_features, hidden_channels)
         
         # Fully connected layer
         self.fc = nn.Linear(2 * hidden_channels[4], 1)
@@ -123,10 +122,10 @@ class temporal_shuffling(nn.Module):
 
 
     def forward(self, batch, head="linear"):
-        # Encoding for each graph
-        z1 = self.encoder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
-        z2 = self.encoder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
-        z3 = self.encoder(batch.x3, batch.edge_index3, batch.edge_attr3, batch.x3_batch)
+        # embedding for each graph
+        z1 = self.embedder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
+        z2 = self.embedder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
+        z3 = self.embedder(batch.x3, batch.edge_index3, batch.edge_attr3, batch.x3_batch)
         
         # Contrast the embeddings
         diff1 = torch.abs(z1 - z2)
@@ -216,7 +215,7 @@ class downstream1(nn.Module):
     def __init__(self, config, pretrained_layers, frozen=False):
         super(downstream1, self).__init__()
         """
-        Downstream model for seizure detection (binary or multiclass). Retrains with a GNN encoder and adds additional layers (total: 2x ECC, 2x GAT).
+        Downstream model for seizure detection (binary or multiclass). Retrains with a GNN embedder and adds additional layers (total: 2x ECC, 2x GAT).
         
         Args:
             config (dict): Dictionary containing the configuration of the model, containing hidden_channels which is a list of values of length 3, and 
@@ -320,7 +319,7 @@ class downstream1(nn.Module):
 class downstream2(nn.Module):    
     def __init__(self, config, pretrained_layers, frozen=False):
         """
-        Downstream model for seizure detection (binary or multiclass). Retrains the entire GNN encoder and does not add any additional layers.
+        Downstream model for seizure detection (binary or multiclass). Retrains the entire GNN embedder and does not add any additional layers.
         
         Args:
             config (dict): Dictionary containing the configuration of the model, containing hidden_channels which is a single value, and the dropout probability.
