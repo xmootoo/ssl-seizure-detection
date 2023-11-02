@@ -11,30 +11,37 @@ if __name__ == '__main__':
     logdir = sys.argv[2]
     
     # Patient identifier
-    patient_id = str(sys.argv[3])
+    patient_id = sys.argv[3]
     
     # Model identifier
-    model_id = str(sys.argv[4])
+    model_id = sys.argv[4]
 
     # Date and time identifier
-    datetime_id = str(sys.argv[5])
+    datetime_id = sys.argv[5]
 
     # Run identifier
-    run_type = str(sys.argv[6])
+    run_type = sys.argv[6]
 
+    # Train, val, test split (number of samples per). Must be in the format "train,val,test" in the command line.
+    split = [float(x) for x in sys.argv[7].split(",")]
+    
+    if len(split) == 3:
+        train_ratio, val_ratio, test_ratio = split[0], split[1], split[2]
+    elif len(split) == 2:
+        val_ratio, test_ratio = split[0], split[1]
+        train_ratio=None
+    
     # Transfer learning (optional arguments)
-    # Initialize variables to None
     model_path=None
     model_dict_path=None
     transfer_id=None
     frozen=None
 
-    # Check the number of arguments and set variables accordingly
-    if len(sys.argv) > 7:
-        model_path = str(sys.argv[7])
-        model_dict_path = str(sys.argv[8])
-        transfer_id = str(sys.argv[9])
-        frozen = bool(int(sys.argv[10]))
+    if len(sys.argv) > 8:
+        model_path = str(sys.argv[8])
+        model_dict_path = str(sys.argv[9])
+        transfer_id = str(sys.argv[10])
+        frozen = bool(int(sys.argv[11]))
 
 
     # Node feature dimension configuration (some patients have less node features)
@@ -48,8 +55,6 @@ if __name__ == '__main__':
     
     # Training parameters
     epochs=200
-    val_ratio=0.2
-    test_ratio=0.1
     
     if model_id == "supervised":
         config = {
@@ -60,7 +65,6 @@ if __name__ == '__main__':
             "dropout": 0.1,
         }
         data_size=1.0
-        test_ratio=0.1
 
     elif model_id == "relative_positioning" or model_id == "temporal_shuffling":
         config = {
@@ -87,4 +91,5 @@ if __name__ == '__main__':
     train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id=model_id, timing=True, 
           classify="binary", head="linear", dropout=True, datetime_id=datetime_id, run_type=run_type, 
-          frozen=frozen, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id)
+          frozen=frozen, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id
+          train_ratio=train_ratio)

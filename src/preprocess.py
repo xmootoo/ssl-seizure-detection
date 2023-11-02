@@ -747,7 +747,97 @@ def combiner(all_lists, desired_samples):
 
 
 
-def create_data_loaders(data, val_ratio=0.2, test_ratio=0.1, batch_size=32, num_workers=4, model_id="supervised"):
+def create_data_loaders(data,val_ratio=0.2, test_ratio=0.1, batch_size=32, num_workers=4, model_id="supervised", train_ratio=None):
+    # Shuffle data
+    """
+    Create train and validation data loaders.
+
+    Args:
+        data (list): List of PyG Data, PairData, or TripletData objects.
+        val_ratio (float): Proportion or fixed number of samples for validation. Defaults to 0.2.
+        test_ratio (float): Proportion or fixed number of samples for testing. Defaults to 0.1. If no testing required set to 0.
+        batch_size (int): Batch size. Defaults to 32.
+        num_workers (int): Number of workers. Defaults to 4.
+        model_id (str): Model to use. Either "supervised", "relative_positioning", or "temporal_shuffling". Defaults to "supervised".
+        train_ratio (float or int, optional): Proportion or fixed number of samples for training. If None, uses the remaining samples after validation and testing.
+
+    Returns:
+        train_loader (PyG DataLoader): Training data loader.
+        val_loader (PyG DataLoader): Validation data loader.
+        test_loader (PyG DataLoader): Test data loader (optional). No test data loader is returned if test_ratio is set to 0.
+    """
+    
+    # Take the random subset of the data
+    n = len(data)
+    indices = list(range(n))
+    
+    # Check for fixed sample sizes
+    val_size = int(val_ratio) if val_ratio > 1 else int(n * val_ratio)
+    test_size = int(test_ratio) if test_ratio > 1 else int(n * test_ratio)
+
+    # If train_ratio is specified, compute train_size. Otherwise, compute based on remaining samples.
+    if train_ratio:
+        train_size = int(train_ratio) if train_ratio > 1 else int(n * train_ratio)
+    else:
+        train_size = n - val_size - test_size
+
+    # Ensure there's no overlap in sample sizes
+    assert (train_size + val_size + test_size) <= n, "The sum of train, validation, and test sizes should not exceed the total number of samples."
+
+    # Split data
+    train_idx, rest_idx = train_test_split(indices, train_size=train_size, shuffle=True)
+    if test_ratio == 0:  # If no test data is required
+        val_idx = rest_idx
+        test_idx = []
+    else:
+        val_idx, test_idx = train_test_split(rest_idx, test_size=test_size, shuffle=True)
+
+    train_data = [data[i] for i in train_idx]
+    val_data = [data[i] for i in val_idx]
+    test_data = [data[i] for i in test_idx] if test_ratio != 0 else []
+        
+        
+    # Create data loaders
+    if model_id=="supervised" or model_id=="downstream1" or model_id=="downstream2":
+        train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers)
+        val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers)
+        if test_ratio != 0:
+            test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
+    elif model_id=="relative_positioning":
+        train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+        val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+        if test_ratio != 0:    
+            test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
+    elif model_id=="temporal_shuffling":
+        train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
+        val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
+        if test_ratio != 0:    
+            test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
+
+    # Print Stats
+    print(f"Total number of examples in dataset: {n}.")
+    print(f"Total number of examples used: {len(indices)}.")
+    print(f"Number of training examples: {len(train_data)}. Number of training batches: {len(train_loader)}.")
+    print(f"Number of validation examples: {len(val_data)}. Number of validation batches: {len(val_loader)}.")
+    if test_ratio != 0:
+        test_data = [data[i] for i in test_idx]
+        print(f"Number of test examples: {len(test_data)}. Number of test batches: {len(test_loader)}.")
+
+    # Organize loaders and stats
+    if test_ratio != 0:
+        loaders = (train_loader, val_loader, test_loader)
+        loader_stats = {"total_examples": len(data), "used_examples": len(indices), "train_examples": len(train_data), "val_examples": len(val_data), 
+                        "test_examples": len(test_data), "train_batches": len(train_loader), "val_batches": len(val_loader), "test_batches": len(test_loader)}
+    else:
+        loaders = (train_loader, val_loader)
+        loader_stats = {"total_examples": len(data), "used_examples": len(indices), "train_examples": len(train_data), "val_examples": len(val_data), "train_batches": len(train_loader), "val_batches": len(val_loader)}
+    
+    return loaders, loader_stats
+
+
+
+
+def old_create_data_loaders(data, val_ratio=0.2, test_ratio=0.1, batch_size=32, num_workers=4, model_id="supervised"):
     # Shuffle data
     """
     Create train and validation data loaders.
@@ -769,7 +859,7 @@ def create_data_loaders(data, val_ratio=0.2, test_ratio=0.1, batch_size=32, num_
     # Take the random subset of the data
     n = len(data)
     indices = list(range(n))
-
+    
     train_idx, val_idx = train_test_split(indices, test_size=val_ratio, shuffle=True)
     train_data, val_data = [data[i] for i in train_idx], [data[i] for i in val_idx]
     if test_ratio != 0:

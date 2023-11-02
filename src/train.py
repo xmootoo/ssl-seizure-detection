@@ -196,7 +196,7 @@ def save_to_json(data, logdir, file_name):
 def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_ratio=0.2, test_ratio=0.1, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id="supervised", timing=True, 
           classify="binary", head="linear", dropout=True, datetime_id=None, run_type="all", frozen=False,
-          model_path=None, model_dict_path=None, transfer_id=None):
+          model_path=None, model_dict_path=None, transfer_id=None, train_ratio=None):
     """
     Trains the supervised GNN model, relative positioning model, or temporal shuffling model.
 
@@ -235,7 +235,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     
     # Initialize loaders, scaler, model, optimizer, and loss
     loaders, loader_stats = create_data_loaders(data, val_ratio=val_ratio, test_ratio=test_ratio, batch_size=batch_size, 
-                                                num_workers=num_workers, model_id=model_id)
+                                                num_workers=num_workers, model_id=model_id, train_ratio=train_ratio)
     if test_ratio != 0:
         train_loader, val_loader, test_loader = loaders
     else:
