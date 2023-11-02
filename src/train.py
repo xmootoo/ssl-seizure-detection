@@ -373,7 +373,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
 
     info = '\n'.join([f"{key}: {value}" for key, value in info_dict.items()])
     info_path = os.path.join(stats_dir, "info.txt")
-
+    
     with open(info_path, "w") as f:
         f.write(info)
     
