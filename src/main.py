@@ -89,7 +89,7 @@ if __name__ == '__main__':
         data_size=1.0
     
     train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
-          batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id=model_id, timing=True, 
-          classify="binary", head="linear", dropout=True, datetime_id=datetime_id, run_type=run_type, 
-          frozen=frozen, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id
-          train_ratio=train_ratio)
+        batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id=model_id, timing=True, 
+        classify="binary", head="linear", dropout=True, datetime_id=datetime_id, run_type=run_type, 
+        frozen=frozen, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id,
+        train_ratio=train_ratio)
