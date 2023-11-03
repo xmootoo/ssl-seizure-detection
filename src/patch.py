@@ -2,10 +2,10 @@ import os
 import pickle
 import torch
 import re
-from preprocess import new_grs, create_tensordata_new, convert_to_Data, pseudo_data, convert_to_PairData, convert_to_TripletData
+from preprocess import new_grs, create_tensordata_new, convert_to_Data, pseudo_data, convert_to_PairData, convert_to_TripletData, cpc_tuples
 
 def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_neg=60//0.12, 
-          model="supervised", stats=True, save=True, sample_ratio=1.0):
+          model="supervised", stats=True, save=True, sample_ratio=1.0, K=5, N=5, P=1, data_size=100000):
     """
     Preprocesses and convert various types of graph representations (GRs) to PyTorch Geometric data format.
 
@@ -15,7 +15,8 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_n
 
     Args:
         graphrep_dir (tuple): Paths to the preictal, ictal, and postictal pickle files. 
-                              Format: (path_preictal, path_ictal, path_postictal).
+                              Format: (path_preictal, path_ictal, path_postictal). If model_id == "CPC", graphrep_dir is the path to the supervised data
+                              in the form of a .pt file, i.e. the list of Data objects.
         logdir (str, optional): Directory where the processed PyTorch Geometric data will be saved.
         file_name (str, optional): Name of the saved PyTorch Geometric data file (no extension, e.g., "jh101").
         tau_pos (float, optional): Positive time constant for the relative positioning or temporal shuffling model. 
@@ -38,29 +39,35 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_n
     if save:
         logdir = os.path.join(logdir, file_name + ".pt")
 
-    # Load pickle data of standard graph representations (GRs) corresponding to Alan's dictionary
-    path_preictal, path_ictal, path_postictal = graphrep_dir
-
-    with open(path_preictal, 'rb') as f:
-        data_preictal = pickle.load(f)
-    with open(path_ictal, 'rb') as f:
-        data_ictal = pickle.load(f)
-    with open(path_postictal, 'rb') as f:
-        data_postictal = pickle.load(f)
-
-    # Select graph representation (GR) type from Alan's dictionary of GRs
-    new_data_preictal = new_grs(data_preictal, type="preictal", mode="binary")
-    new_data_ictal = new_grs(data_ictal, type="ictal", mode="binary")
-    new_data_postictal = new_grs(data_postictal, type="postictal", mode="binary")
-
-    # Concatenate all data temporally
-    new_data = new_data_preictal + new_data_ictal + new_data_postictal
-
-    # Get number of electrodes
-    num_electrodes = new_data[0][0][0].shape[0]
+    if model == "CPC":
+        data = torch.load(graphrep_dir)
+        cpc_data = cpc_tuples(data, K=K, N=N, P=P, data_size=data_size)
+        return cpc_data
     
-    # Convert standard graph representations to Pytorch Geometric data
-    pyg_grs = create_tensordata_new(num_nodes=num_electrodes, data_list=new_data, complete=True, save=False, logdir=None)
+    else:
+        # Load pickle data of standard graph representations (GRs) corresponding to Alan's dictionary
+        path_preictal, path_ictal, path_postictal = graphrep_dir
+
+        with open(path_preictal, 'rb') as f:
+            data_preictal = pickle.load(f)
+        with open(path_ictal, 'rb') as f:
+            data_ictal = pickle.load(f)
+        with open(path_postictal, 'rb') as f:
+            data_postictal = pickle.load(f)
+        
+        # Select graph representation (GR) type from Alan's dictionary of GRs
+        new_data_preictal = new_grs(data_preictal, type="preictal")
+        new_data_ictal = new_grs(data_ictal, type="ictal")
+        new_data_postictal = new_grs(data_postictal, type="postictal")
+
+        # Concatenate all data temporally
+        new_data = new_data_preictal + new_data_ictal + new_data_postictal
+
+        # Get number of electrodes
+        num_electrodes = new_data[0][0][0].shape[0]
+        
+        # Convert standard graph representations to Pytorch Geometric data
+        pyg_grs = create_tensordata_new(num_nodes=num_electrodes, data_list=new_data, complete=True, save=False, logdir=None)
     
     if model == "supervised":
         Data_list = convert_to_Data(pyg_grs, save=save, logdir=logdir)
@@ -79,82 +86,9 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_n
         return Triplet_Data
 
 
-#FIXME: Needs to be aligned with single_patient_patcher() using it as a helper function, this function is out of date.
-def full_patcher(user="xmootoo", patient_dir=None, logdir=None, tau_pos=12//0.12, tau_neg=60//0.12, 
-             model="supervised", stats=True, save=True, sample_ratio=1.0):
-    """
-    
-    Automates the patch() across all patients.
-
-    """
-
-    # String IDs for each patient
-    patient_ids = {
-        "jh101", "jh103", "jh108",
-        "pt01", "pt2", "pt3", "pt6", "pt7", "pt8", "pt10", "pt11", "pt12", 
-        "pt13", "pt14", "pt15", "pt16",
-        "umf001", "ummc001", "ummc002", "ummc003", "ummc004", "ummc005", 
-        "ummc006", "ummc007", "ummc008", "ummc009"
-    }
-
-    # Assign directory of patient folders
-    if patient_dir==None:
-        directory = os.path.join("/home", user, "projects/def-milad777/gr_research/brain-greg/data/ds003029-processed/graph_representation_elements")
-    else:
-        directory=patient_dir
-    
-    try:
-        # Iterate through each patient in the directory
-        for patient in os.listdir(directory):
-            if patient not in patient_ids:
-                continue
-            
-            # Create a patient folder in the log directory
-            patient_logdir = os.path.join(logdir, patient)
-            if not os.path.exists(patient_logdir):
-                os.mkdir(patient_logdir)
-            
-            # Create model-specific directory within patient_logdir
-            model_logdir = os.path.join(patient_logdir, model)
-            if not os.path.exists(model_logdir):
-                os.mkdir(model_logdir)
-
-            # Form a path for the patient folder
-            full_path = os.path.join(directory, patient)
-            if os.path.isdir(full_path):
-                
-                # Count how many runs there are
-                runs = 0
-                for file in os.listdir(full_path):
-                    if file.startswith("preictal"):
-                        runs += 1
-                
-                # Iterate through all runs in the patient folder
-                for i in range(1, runs+1):
-                    path_preictal = os.path.join(full_path, f"preictal_{i}.pickle")
-                    path_ictal = os.path.join(full_path, f"ictal_{i}.pickle")
-                    path_postictal = os.path.join(full_path, f"postictal_{i}.pickle")
-
-                    # Create the graphrep_dir
-                    graphrep_dir = (path_preictal, path_ictal, path_postictal)
-
-                    # Supervised
-                    if os.path.exists(path_preictal) and os.path.exists(path_ictal) and os.path.exists(path_postictal):
-                        if model == "supervised":
-                            file_name = patient + "_run" + str(i)
-                        if model == "relative_positioning" or model == "temporal_shuffling":
-                            file_name = patient + "_run" + str(i) + "_" + str(int(tau_pos * 0.12)) + "s_" + str(int(tau_neg * 0.12)) + "s_" + str(sample_ratio) + "sr"
-                        patched_data = patch(graphrep_dir=graphrep_dir,  logdir=model_logdir, file_name=file_name, tau_pos=tau_pos, 
-                                             tau_neg=tau_neg, model=model, stats=stats, save=save, sample_ratio=sample_ratio)
-                        
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
-
 
 def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdir=None, tau_pos=12//0.12, tau_neg=60//0.12, 
-             model="supervised", stats=True, save=True, sample_ratio=1.0):
+             model="supervised", stats=True, save=True, sample_ratio=1.0, K=5, N=5, P=1, data_size=100000):
     """
     
     Automates the patch() function for a single patient.
@@ -168,7 +102,7 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
                                       Default is 12//0.12.
         tau_neg (float, optional): Negative time constant for the relative positioning or temporal shuffling model.
                                         Default is 60//0.12.
-        model (str, optional): Type of PyTorch model to be used. Options: "supervised", "relative_positioning", "temporal_shuffling".
+        model (str, optional): Type of PyTorch model to be used. Options: "supervised", "relative_positioning", "temporal_shuffling", "CPC".
                                  Default is "supervised".
         stats (bool, optional): Whether to display statistics about the pseudolabeled data. Default is True.
         save (bool, optional): Whether to save the processed PyTorch Geometric data. Default is True.
@@ -202,6 +136,15 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
             sp_model_logdir = os.path.join(model_logdir, str(int(tau_pos * 0.12)) + "s_" + str(int(tau_neg * 0.12)) + "s_" + str(sample_ratio) + "sr")
             os.makedirs(sp_model_logdir, exist_ok=True)
         
+        if model == "CPC":
+            sp_model_logdir = os.path.join(model_logdir, str(K) + "K_" + str(N) + "N_" + str(P) + "P_" + str(data_size) + "ds")
+            os.makedirs(sp_model_logdir, exist_ok=True)
+            graphrep_dir = os.path.join(directory, patient, "supervised", patient + "_combined.pt")
+            patched_data = patch(graphrep_dir=graphrep_dir, logdir=sp_model_logdir, file_name=file_name, tau_pos=tau_pos, tau_neg=tau_neg, 
+                                 model=model, stats=stats, save=False, sample_ratio=sample_ratio, K=K, N=N, P=P, data_size=data_size)
+            if save:
+                torch.save(patched_data, os.path.join(sp_model_logdir, patient + ".pt"))
+                
         
         # Form a path for the patient folder
         full_path = os.path.join(directory, patient)
@@ -272,11 +215,21 @@ if __name__ == "__main__":
     patient = str(sys.argv[2])
     logdir = str(sys.argv[3])
     model = str(sys.argv[4])
-    sample_ratio = float(sys.argv[5])
+    
+    if model == "CPC":
+        K = int(sys.argv[5])
+        N = int(sys.argv[6])
+        P = int(sys.argv[7])
+        data_size = int(sys.argv[8])
+        sample_ratio=1.0
+    else:
+        tau_pos = float(sys.argv[5])
+        tau_neg = float(sys.argv[6])
+        sample_ratio = float(sys.argv[7])
+        K, N, P, data_size = 0, 0, 0, 0
 
-    single_patient_patcher(user="xmootoo", patient_dir=patient_dir, patient=patient, logdir=logdir, tau_pos=12//0.12, tau_neg=90//0.12, 
-                           model=model, stats=True, save=True, sample_ratio=sample_ratio)
-
+    single_patient_patcher(user="xmootoo", patient_dir=patient_dir, patient=patient, logdir=logdir, tau_pos=tau_pos, tau_neg=tau_neg, 
+             model=model, stats=True, save=True, sample_ratio=sample_ratio K=K, N=N, P=P, data_size=data_size)
 
 
 

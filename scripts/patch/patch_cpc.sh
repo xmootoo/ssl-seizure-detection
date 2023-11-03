@@ -6,6 +6,12 @@
 #SBATCH --mail-user=xmootoo@gmail.com
 #SBATCH --mail-type=ALL
 
+# CPC arguments
+K="$1"
+N="$2"
+P="$3"
+data_size="$4"
+
 # Define an array of patients
 patients=("jh101" "jh103" "jh108" "pt01" "pt2" "pt3" "pt6" "pt7" "pt8" "pt10" "pt11" "pt12" "pt13" "pt14" "pt15" "pt16" "umf001" "ummc001" "ummc002" "ummc003" "ummc004" "ummc005" "ummc006" "ummc007" "ummc008" "ummc009")
 
@@ -13,4 +19,4 @@ patients=("jh101" "jh103" "jh108" "pt01" "pt2" "pt3" "pt6" "pt7" "pt8" "pt10" "p
 patient="${patients[$SLURM_ARRAY_TASK_ID]}"
 
 # Call the wrapper script
-sbatch "train_wrapper.sh" "${patient}"
+sbatch "patch_wrapper.sh" "${patient}"

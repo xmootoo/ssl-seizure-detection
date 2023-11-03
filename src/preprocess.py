@@ -41,26 +41,15 @@ def build_K_n(num_nodes):
 
 
 
-def new_grs(data, type="preictal", mode="binary"):
+def new_grs(data, type="preictal"):
     
-    # Encode labels
-    # Binary encoding
-    if mode == "binary":
-        if type == "ictal":
-            Y = 1
-        if type == "preictal":
-            Y = 0
-        if type == "postictal":
-            Y = 0
-
-    # Multiclass encoding
-    if mode == "multiclass":
-        if type == "ictal":
-            Y = 0
-        if type == "preictal":
-            Y = 1
-        if type == "postictal":
-            Y = 2
+    # Label data by Y = [Y_1, Y_2] where Y_1 is the binary encoding and Y_2 is the multiclass encoding.
+    if type=="preictal":
+        Y = [0, 0]
+    if type=="ictal":
+        Y = [1, 1]
+    if type=="postictal":
+        Y = [0, 2]
     
     new_grs = []
     for i in range(len(data)):
@@ -111,6 +100,7 @@ def ef_to_edge_attr(edge_index, ef=None):
     return edge_attr
 
 
+
 def adj_to_edge_attr(A, edge_index, edge_attr=None, mode=None):
     """
     Stacks the weights of the adjacency matrix A as edge attributes to the edge_attr of a the graph.
@@ -156,6 +146,7 @@ def adj_to_edge_attr(A, edge_index, edge_attr=None, mode=None):
         return "Error: Mode not specified, must be either None, FCN, or PyG."
 
     return edge_attr_new
+
 
 
 # Version of create_tensordata() but only for lists with entries [[NF, EF], Y] (no Adjacency matrix)
@@ -204,7 +195,6 @@ def create_tensordata_new(num_nodes, data_list, complete=True, save=True, logdir
 
 
 
-
 def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=None, mode=None):
     """
     Converts the graph data from the pickle file containing the list of graph representations of with entries of the form [[A, NF, EF], Y]
@@ -248,41 +238,6 @@ def create_tensordata(num_nodes, data_list, complete=True, save=True, logdir=Non
         torch.save(pyg_data, logdir)
         
     return pyg_data
-
-
-def get_sample_ratio(n, tau_pos, tau_neg, desired_samples=-1,  mode="temporal_shuffling"):
-    """
-    Gives an estimate for the required sample ratio to fit the number of desired samples of maximum of 400,000 and 300,000
-    samples for temporal shuffling and relative positioning respectively, as a function of the length of the input list n.
-
-    Args:
-        n (int): Length of the input list.
-        desired_samples (int): Desired number of samples. Defaults to -1 for suggested value and -2 for sample ratio=1.0.
-        mode (str): Either "temporal_shuffling" or "relative_positioning". Defaults to "temporal_shuffling".
-    """
-    if 0 < desired_samples < 1:
-        return desired_samples
-
-    if mode=="temporal_shuffling":
-        if desired_samples==-1:
-            desired_samples = 400000
-        elif desired_samples==-2:
-            return 1.0
-        total_samples = (tau_pos ** 2) * n + tau_neg * n * (n-tau_neg)
-        sample_ratio = np.sqrt(desired_samples / total_samples)
-
-    if mode=="relative_positioning":
-        if desired_samples==-1:
-            desired_samples = 300000
-        elif desired_samples==-2:
-            return 1.0
-        total_samples = tau_pos * n + n * (n - 2 * tau_neg) / 2
-        sample_ratio = np.sqrt(desired_samples / total_samples)
-
-    if sample_ratio > 1.0:
-        return 1.0
-
-    return sample_ratio
 
 
 
@@ -432,6 +387,7 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
 def cpc_tuples(data, K=5, N=5, P=1, data_size=100000):
     """
     Creates unique CPC tuples from an ordered list of data points for Contrastive Predictive Coding (CPC).
+    Ideally you want to feed in the list of torch_geometric.data.Data objects saved in the .pt file.
 
     Args:
         data (list): Ordered list of data points, where each point is a representation of some observable quantity at a given time.
@@ -479,11 +435,10 @@ def cpc_tuples(data, K=5, N=5, P=1, data_size=100000):
 
   
 
-def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = True, save = True, patientid = "patient", 
-                logdir = None, model = "relative_positioning", sample_ratio=1.0):
+def pseudo_data(data, tau_pos=12 // 0.12, tau_neg=(9 * 60) // 0.12, stats=True, save=True, patientid="patient", 
+                logdir=None, model="relative_positioning", sample_ratio=1.0, K=5, N=5, P=1, data_size=100000):
     """
-    Creates a pseudolabeled dataset of graph pairs.
-    
+    Creates a pseudolabeled dataset of graph pairs, graph triplets, or CPC tuples from a list of graph representations.
 
     Args:
         data (list): Graph representations with labels of the form [[edge_index, x, edge_attr], y]
@@ -493,8 +448,7 @@ def pseudo_data(data, tau_pos = 12 // 0.12, tau_neg = (7 * 60) // 0.12, stats = 
         save (bool): Whether to save as pickle file or not. Defaults to True.
         patientid (str): Patient identification code. Defaults to "patient".
         logdir (str): Directory to save the pickle file. Defaults to None.
-        model (str): Model to use. Either "relative_positioning" or "temporal_shuffling". Defaults to "relative_positioning".
-        desired_samples (int): Desired number of samples. Defaults to -1.
+        model (str): Model to use. Options: "relative_positioning", "temporal_shuffling", or "CPC". Defaults to "relative_positioning".
 
     Returns:
         pairs (list): List of the form [[edge_index, x, edge_attr], [edge_index', x', edge_attr'], Y], where Y is the pseudolabel.
@@ -931,83 +885,3 @@ def extract_layers(model_path, model_dict_path, transfer_id):
         GATConv_pretrained = copy.deepcopy(model.encoder.conv2)
         pretrained_layers = [EdgeMLP_pretrained, NNConv_pretrained, GATConv_pretrained]
         return pretrained_layers
-
-
-
-
-def adj(A, thres):
-    """Converts functional connectivity matrix to binary adjacency matrix.
-
-    Args:
-        A (numpy array): Functional connectivity matrix.
-        thres (float): Threshold value.
-    """
-    
-    
-    n = A.shape[0]
-    x = np.zeros((n,n))
-    
-    for i in range(n):
-        for j in range(n):
-            if A[i,j] > thres:
-                x[i,j] = 1
-    
-    return x
-
-
-
-
-
-
-
-
-
-# # Old version of graph triplets
-# def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
-#     """
-#     Creates unique sample triplets from a list of samples and their corresponding time indexes.
-    
-#     Args:
-#         graph_reps (list of [graph_representation, Y]): Ordered list of graph representations each element is a list [graph_representaiton, Y] where
-#         Y is its label (ictal or nonictal). The index of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point 
-#         is approx 0.12s.
-#         tau_pos: Positive context threshold.
-#         tau_neg: Negative context threshold.
-#         sample_ratio: Proportion of the psuedodata to be sampled from the entire dataset. Defaults to 1.0.
-
-#     Returns:
-#         graph_rep_triplets (list): List of graph representation triplets [gr_1, gr_2, gr_3, Y], where Y corresponds to
-#         the pseudolabel of the triplet.
-
-    
-#     """
-#     n = len(graph_reps)
-#     data = [graph_reps[i][0] for i in range(n)]
-    
-#     graph_rep_triplets = []
-#     seen_triplets = set()
-
-#     for t1 in range(n):
-#         for t3 in random.sample(range(t1 + 1, n), min(int((n - t1 - 1) * sample_ratio), n - t1 - 1)):
-#             diff_pos = np.abs(t1 - t3)
-            
-#             if diff_pos <= tau_pos:
-#                 available_t2 = [x for x in range(n) if x != t1 and x != t3]
-#                 for t2 in random.sample(available_t2, min(int(n * sample_ratio), len(available_t2))):
-#                     if (t1, t2, t3) not in seen_triplets:
-                        
-#                         M = diff_pos / 2
-#                         diff_third = np.abs(M - t2)
-
-#                         # Checking the condition for label=1
-#                         if (t1 < t2 < t3) or (t3 < t2 < t1):
-#                             graph_rep_triplets.append([data[t1], data[t2], data[t3], 1])
-#                             seen_triplets.add((t1, t2, t3))
-                        
-#                         # Checking the condition for label=0
-#                         if diff_third > tau_neg // 2:
-#                             if not ((t1 < t2 < t3) or (t3 < t2 < t1)):
-#                                 graph_rep_triplets.append([data[t1], data[t2], data[t3], 0])
-#                                 seen_triplets.add((t1, t2, t3))
-                            
-#     return graph_rep_triplets
