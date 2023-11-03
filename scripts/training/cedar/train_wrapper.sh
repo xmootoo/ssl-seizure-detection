@@ -33,32 +33,28 @@ base_dir="${xav}/ssl_epilepsy/models/${patient_id}"
 mkdir -p "${base_dir}" || { echo "Error: Cannot create directory ${base_dir}"; exit 1; }
 
 
-# Function to remove elements by index
-remove_by_indices() {
-    local indices=($1)
+# Function to keep elements by index
+keep_by_indices() {
+    local indices_to_keep=($1)
     local -n _arr=$2
     local -a new_arr=()
-    for index in "${!_arr[@]}"; do
-        if [[ ! " ${indices[@]} " =~ " ${index} " ]]; then
-            new_arr+=( "${_arr[index]}" )
-        fi
+    for index in "${indices_to_keep[@]}"; do
+        new_arr+=( "${_arr[index]}" )
     done
-    echo "${new_arr[@]}"
+    _arr=("${new_arr[@]}") # Assign the filtered array back to the original array variable
 }
 
 if [ -n "$model_selection" ]; then
-    # Convert model_selection string to an array of indices to remove
-    indices_to_remove=()
+    # Convert model_selection string to an array of indices to keep
+    indices_to_keep=()
     for (( i=0; i<${#model_selection}; i++ )); do
-        index=${model_selection:$i:1}
-        ((index--)) # Decrease index by 1 to match zero indexing of arrays
-        indices_to_remove+=($index)
+        indices_to_keep+=(${model_selection:$i:1})
     done
 
-    # Keep only the models, run_types, and times that are not in indices_to_remove
-    model_ids=($(remove_by_indices "${indices_to_remove[*]}" model_ids))
-    run_types=($(remove_by_indices "${indices_to_remove[*]}" run_types))
-    times=($(remove_by_indices "${indices_to_remove[*]}" times))
+    # Keep only the models, run_types, and times that are in indices_to_keep
+    keep_by_indices "${indices_to_keep[*]}" model_ids
+    keep_by_indices "${indices_to_keep[*]}" run_types
+    keep_by_indices "${indices_to_keep[*]}" times
     
 else
     echo "Model selection is not set. Running all models..."
