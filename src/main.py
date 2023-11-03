@@ -32,16 +32,16 @@ if __name__ == '__main__':
         train_ratio=None
     
     # Transfer learning (optional arguments)
-    model_path=None
-    model_dict_path=None
-    transfer_id=None
-    frozen=None
-
     if len(sys.argv) > 8:
         model_path = str(sys.argv[8])
         model_dict_path = str(sys.argv[9])
         transfer_id = str(sys.argv[10])
         frozen = bool(int(sys.argv[11]))
+    else:
+        model_path=None
+        model_dict_path=None
+        transfer_id=None
+        frozen=None
 
 
     # Node feature dimension configuration (some patients have less node features)

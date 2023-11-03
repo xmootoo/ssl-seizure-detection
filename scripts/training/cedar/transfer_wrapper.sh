@@ -75,6 +75,6 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${model_path}" "${split}" "${model_dict_path}" "${transfer_id}" "${frozen}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${split}" "${model_path}" "${model_dict_path}" "${transfer_id}" "${frozen}"
 EOT
 done

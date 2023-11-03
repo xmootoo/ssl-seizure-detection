@@ -355,6 +355,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         'Validation batches': loader_stats["val_batches"],
         'Validation ratio': val_ratio,
         'Test ratio': test_ratio,
+        'Train ratio': train_ratio,
         'Batch size': batch_size,
         'Number of workers': num_workers,
         'Learning rate': lr,
