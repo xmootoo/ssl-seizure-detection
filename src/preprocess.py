@@ -726,25 +726,35 @@ def create_data_loaders(data,val_ratio=0.2, test_ratio=0.1, batch_size=32, num_w
     indices = list(range(n))
     
     # Check for fixed sample sizes
-    val_size = int(val_ratio) if val_ratio > 1 else int(n * val_ratio)
-    test_size = int(test_ratio) if test_ratio > 1 else int(n * test_ratio)
+    val_size = int(val_ratio) if val_ratio >= 1 else int(n * val_ratio)
+    test_size = int(test_ratio) if test_ratio >= 1 else int(n * test_ratio)
     
     # If train_ratio is specified, compute train_size. Otherwise, compute based on remaining samples.
+    print(train_ratio)
     if train_ratio:
-        train_size = int(train_ratio) if train_ratio > 1 else int(n * train_ratio)
+        train_size = int(train_ratio) if train_ratio >= 1 else int(n * train_ratio)
     else:
         train_size = n - val_size - test_size
 
     # Ensure there's no overlap in sample sizes
     assert (train_size + val_size + test_size) <= n, "The sum of train, validation, and test sizes should not exceed the total number of samples."
 
-    # Split data
-    train_idx, rest_idx = train_test_split(indices, train_size=train_size, shuffle=True)
-    if test_ratio == 0:  # If no test data is required
-        val_idx = rest_idx
-        test_idx = []
+    # Randomly sample indices for train, validation, and test sets without replacement
+    all_indices = set(indices)
+    val_indices = set(random.sample(all_indices, val_size))
+    all_indices -= val_indices
+    if test_ratio!=0:
+        test_indices = set(random.sample(all_indices, test_size))
+        all_indices -= test_indices
+    if train_ratio:
+        train_indices = set(random.sample(all_indices, train_size))
     else:
-        val_idx, test_idx = train_test_split(rest_idx, test_size=test_size, shuffle=True)
+        train_indices = all_indices
+    
+    # Convert to lists
+    train_idx = list(train_indices)
+    val_idx = list(val_indices)
+    test_idx = list(test_indices) if test_ratio != 0 else []
 
     train_data = [data[i] for i in train_idx]
     val_data = [data[i] for i in val_idx]
