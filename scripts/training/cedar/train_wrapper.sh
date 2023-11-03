@@ -36,28 +36,27 @@ mkdir -p "${base_dir}" || { echo "Error: Cannot create directory ${base_dir}"; e
 # Function to keep elements by index
 keep_by_indices() {
     local indices_to_keep=($1)
-    local -n _arr=$2
+    local -a _arr=("${!2}")
     local -a new_arr=()
     for index in "${indices_to_keep[@]}"; do
-        new_arr+=( "${_arr[index]}" )
+        new_arr+=("${_arr[index]}")
     done
-    _arr=("${new_arr[@]}") # Assign the filtered array back to the original array variable
+    echo "${new_arr[@]}"
 }
 
 if [ -n "$model_selection" ]; then
-    # Convert model_selection string to an array of indices to keep
     indices_to_keep=()
     for (( i=0; i<${#model_selection}; i++ )); do
         indices_to_keep+=(${model_selection:$i:1})
     done
 
-    # Keep only the models, run_types, and times that are in indices_to_keep
-    keep_by_indices "${indices_to_keep[*]}" model_ids
-    keep_by_indices "${indices_to_keep[*]}" run_types
-    keep_by_indices "${indices_to_keep[*]}" times
-    
+    # Now capture the output of keep_by_indices into the arrays
+    model_ids=($(keep_by_indices "${indices_to_keep[*]}" "model_ids[@]"))
+    run_types=($(keep_by_indices "${indices_to_keep[*]}" "run_types[@]"))
+    times=($(keep_by_indices "${indices_to_keep[*]}" "times[@]"))
+    echo "Running model(s): ${model_ids[@]}"
 else
-    echo "Model selection is not set. Running all models..."
+    echo "No specific model selection set. Running all models..."
 fi
 
 
@@ -66,7 +65,7 @@ fi
 for i in "${!model_ids[@]}"; do
     model_id="${model_ids[$i]}"
     time="${times[$i]}"
-    job_name="training_${patient_id}_${model_id}_${time}"
+    job_name="training_${patient_id}_${model_id}_${time}_${datetime_id}"
     run_type="${run_types[$i]}"
     data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}"
     
