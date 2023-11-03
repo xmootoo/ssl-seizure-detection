@@ -19,6 +19,10 @@ datetime_id="$4"
 # Train, val, test split
 split="$5"
 
+# Model selection. It is 1-3 digits, where a 0 indicates supervised, 1 indicates relative positioning, and 2 indicates temporal shuffling.
+# For example, model_selection=01 means that only the supervised and relative positioning models will be trained.
+model_selection=${6:-}
+
 # Training arguments
 run_types=("combined" "all" "all")
 model_ids=("supervised" "relative_positioning" "temporal_shuffling")
@@ -27,6 +31,39 @@ times=("00:45:00" "20:00:00" "20:00:00")
 # Base directory
 base_dir="${xav}/ssl_epilepsy/models/${patient_id}"
 mkdir -p "${base_dir}" || { echo "Error: Cannot create directory ${base_dir}"; exit 1; }
+
+
+# Function to remove elements by index
+remove_by_indices() {
+    local indices=($1)
+    local -n _arr=$2
+    local -a new_arr=()
+    for index in "${!_arr[@]}"; do
+        if [[ ! " ${indices[@]} " =~ " ${index} " ]]; then
+            new_arr+=( "${_arr[index]}" )
+        fi
+    done
+    echo "${new_arr[@]}"
+}
+
+if [ -n "$model_selection" ]; then
+    # Convert model_selection string to an array of indices to remove
+    indices_to_remove=()
+    for (( i=0; i<${#model_selection}; i++ )); do
+        index=${model_selection:$i:1}
+        ((index--)) # Decrease index by 1 to match zero indexing of arrays
+        indices_to_remove+=($index)
+    done
+
+    # Keep only the models, run_types, and times that are not in indices_to_remove
+    model_ids=($(remove_by_indices "${indices_to_remove[*]}" model_ids))
+    run_types=($(remove_by_indices "${indices_to_remove[*]}" run_types))
+    times=($(remove_by_indices "${indices_to_remove[*]}" times))
+    
+else
+    echo "Model selection is not set. Running all models..."
+fi
+
 
 
 # Iterate over each model and its corresponding time
