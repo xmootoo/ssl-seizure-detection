@@ -1,7 +1,7 @@
 import sys
 from train import train
 
-
+    
 if __name__ == '__main__':
 
     # The path to .pt file of Data, PairData, or TripletData objects list
@@ -65,7 +65,7 @@ if __name__ == '__main__':
             "dropout": 0.1,
         }
         data_size=1.0
-
+    
     elif model_id == "relative_positioning" or model_id == "temporal_shuffling":
         config = {
         "num_node_features": num_node_features,

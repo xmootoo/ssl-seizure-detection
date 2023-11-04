@@ -20,51 +20,91 @@ This research project adapts several self-supervised learning (SSL) techniques w
 > - Variance-Invariance-Covariance Regularization (VICreg) [(Bardes et al., 2022)](https://arxiv.org/abs/2105.04906)
 
 ## Table of Contents
-1. [Usage](#usage)
-2. [File Descriptions](#file-descriptions)
-3. [License](#license)
-4. [Contact](#contact)
+1. [Installation](#installation)
+2. [Data](#data)
+3. [Usage](#usage)
+4. [File Descriptions](#file-descriptions)
+5. [License](#license)
+6. [Contact](#contact)
 
 ## Installation
 
-### Prerequisites
-- Python 3.8-3.11
-- PyTorch 2.0.1+
-- PyTorch Geometric (PyG)
-- scikit-learn
-- Pandas
-- Weights & Biases
+Ensure you have `conda` installed on your system. If not, install from [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual).
+
+#### Step 1: Clone the Repository
+```bash
+git clone https://github.com/yourusername/ssl-seizure-detection.git
+cd ssl-seizure-detection
+```
+
+#### Step 2: Create Conda Environment
+```bash
+conda create --name seizure-detect python=3.8
+conda activate seizure-detect
+```
+
+#### Step 3: Install PyTorch
+```bash
+conda install pytorch==2.0.1 torchvision -c pytorch
+```
+
+#### Step 4: Install PyTorch Geometric
+```bash
+pip install torch-geometric
+```
+
+#### Step 5: Install Additional Packages
+```bash
+pip install scikit-learn pandas wandb
+```
+
+#### Step 6: Login to Weights & Biases
+```bash
+wandb login
+```
+
+## Data
+Processed data formatted as PyTorch Geometric Data objects is not yet available for release but will be provided soon. Meanwhile, the initial intracranial EEG (iEEG) dataset utilized for this project is publicly accessible on OpenNeuro, identified by Accession Number [ds003029](https://openneuro.org/datasets/ds003029/versions/1.0.6). From ds003029, we selected 26 patients out of the 88 available in the dataset. For each patient iEEG signal, we divided the signal into windows of equal length, and for each windows we constructed an initial graph representation. This initial graph representations were fully connected graphs, with the nodes corresponding to indiviudal electrodes. To construct the edge features, for each electrode pair, we computed the Pearson correlation, phase-lock value (PLV), and the coherence, giving us edge features in $\R^{3}$. To construct the node features, we used the average energy of the elctrode, and the average energies at various frequency bands; due to variability in the iEEG data format, there may have been more or less frequency bands available for certain patients, thus node features resided in either $\R^{7}, \R^{8}$, or $\R^{9}$. From this, we converted the data to the standard [PyTorch Geometric Data format](https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.data.Data.html#torch_geometric.data.Data) of `[edge_index, x, edge_attr, y]` where `edge_index` is a tensor defining the graph structure (similar to a binary adjacency matrix), `x` is the node feature tensor, `edge_attr` is the edge feature tensor, and `y` is the target label tensor taking on values $0$ or $1$ for binary classification of ictal (seizure) or nonictal (no seizure); and took on values $0,1,$ or $2$ for preictal (before seizure), ictal (seizure), and postictal (after seizure) respectively for multiclass classification.
 
 
 ## Usage
-
-To run the main program, use the following command (which we optimized for GPU usage on the Graham cluster in Digital Research Alliance of Canada (Canada Compute).
-
-```bash
-python $data_path $model_path $stats_path $model_name $num_workers main.py
-```
-
-- For information on preprocessing, please see: `preprocess.ipynb`.
-
-- For an introductory tutorial to graph pair classification with PyG, please see `tutorial.ipynb`.
+To run the entire pipeline, please refer to the `train()` function in `train.py` and the relevant docstring. The `main.py` script is optimized for HPC on the Cledar cluster (Digital Research Alliance of Canada), and is not recommended for general use. For a guided tutorial on how to use PyTorch Geometric and graph pair GNN models, please refer to `tutorial.ipynb`. To see how the initial graph representations were created, please refer to `preprocess.ipynb`. For a information on how to apply transfer learning from self-supervised to supervised models and fine-tuning them, please refer to `transfer.ipynb`. 
 
 ## File Descriptions
 
-- **models.py**: Contains both self-supervised and supervised models, including the GNN architecture with ECC and GAT layers.
-- **train.py**: Implements the main training loop for both self-supervised and supervised models. Also includes automatic mixed precision, which provides faster training without sacrificing accuracy.
-- **tutorial.ipynb**: A Jupyter notebook tutorial on how to use PyTorch Geometric (PyG) in the context of the project.
-- **main.py**: The primary script to run the entire pipeline, optimized for Graham cluster resources.
-- **preprocess.py**: Includes helper functions for all preprocessing tasks, such as converting initial graph representations to PyG-compatible structures.
-- **preprocess.ipynb**: A guided notebook that demonstrates how to use preprocessing functions for both supervised and self-supervised learning.
-- **transfer.ipynb**: A notebook illustrating how to apply transfer learning from self-supervised to supervised models and fine-tuning them.
+- **`models.py`**: Contains both self-supervised models: relative_positioning, temporal_shuffling, CPC (to be added), and VICReg (to be added); and supervised models: supervised (basem model), downstream1, and downstream2.
+- **`train.py`**: Implements the training loop for both self-supervised and supervised models. Includes logging with Weights and Biases (highly recomended).
+- **`main.py`**: The primary script to run the entire pipeline, optimized for Cedar cluster resources. Please see the `scripts` folder for more details on how this is implemented, for parallelization of training multiple patients.
+- **`preprocess.py`**: Includes helper functions for all preprocessing tasks, such as converting initial graph representations to PyG-compatible structures.
+- **`patch.py`**: Patches pre-existing Numpy data from our lab to the PyG-compatible format, not recommended for general use unless your existing data fits the specifications as outlined in `preprocessing.ipynb`.
 
 ## License
 
-This project is licensed under the MIT License.
+Until the release of the paper, code within this repository are proprietary and for viewing and educational purposes only. Any use, reproduction, or distribution of the contents of this repository without the express written consent of the author(s) is strictly prohibited. For any requests or inquiries regarding the use or licensing of the work contained herein, please see [Contact](#contact). 
+
+Please note that while this repository contains original data from OpenNeuro with Accession Number ds003029, the restrictions mentioned above do not apply to that dataset, which is governed by its own terms and conditions as provided by [OpenNeuro](https://openneuro.org/).
+
+## Acknowledgements
+I would to sincerely thank both [Dr. Alan A. Díaz-Montiel](https://github.com/adiazmont) and [Dr. Milad Lankarany](https://www.uhnresearch.ca/researcher/milad-lankarany) for their continued support throught this research endeavour, and for their expert guidance. 
+
+We also extend our gratitude to the researchers and institutions for their generosity in sharing iEEG data through OpenNeuro [ds003029](https://openneuro.org/datasets/ds003029/versions/1.0.6). Special thanks to:
+
+- Department of Biomedical Engineering, Johns Hopkins University, Baltimore, United States
+- Epilepsy Center, Cleveland Clinic, Cleveland, United States
+- Department of Neurosurgery, University of Miami Miller School of Medicine, Miami, United States
+- Department of Neurology, University of Miami Miller School of Medicine, Miami, United States
+- Neurology, University of Maryland Medical Center, Baltimore, United States
+- Neurology, Johns Hopkins Hospital, Baltimore, United States
+- Surgical Neurology Branch, NINDS, NIH, Bethesda MD
+- Neurosurgery, and Epilepsy Center, University of Pittsburgh Medical Center, Pittsburgh, United States
+- Institute for Computational Medicine, Johns Hopkins University, Baltimore, United States
+
+The original paper can be found at: [Neural Fragility as an EEG Marker of the Seizure Onset Zone
+](https://www.biorxiv.org/content/10.1101/862797v3).
 
 ## Contact
 
-For any queries, please contact [xmotoo at gmail dot com](mailto:xmootoo@gmail.com).
+For any queries, please contact [xmootoo at gmail dot com](mailto:xmootoo@gmail.com).
 
 
 [def]: https://openreview.net/pdf?id=BZ5a1r-kVsf
