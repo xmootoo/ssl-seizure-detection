@@ -11,7 +11,7 @@
 
 This research project adapts several self-supervised learning (SSL) techniques with Graph Neural Network (GNN) encoders to domain of seizure detection. We appy our GNN encoder to the following SSL methods and evaluate their performance downstream on seizure detection: Relative Positioning, Temporal Shuffling, Contrastive Predictive Coding (CPC), and Variance-Invariance-Covariance Regularization (VICReg). The GNN architecture comprises of Edge-Conditioned Convolution (ECC) and Graph Attention Network (GAT) layers, utilizing PyTorch and PyTorch Geometric libraries for standard deep learning and GNN implementation. For a more detailed description of our research, see [projects/ssl-seizure-detection](https://www.xaviermootoo.com/projects/ssl-seizure-detection).
 
-> Please refer to the relevant papers:
+Please refer to the relevant papers:
 > - A Path Towards Autonomous Machine Intelligence [(Lecun, 2022)][def]
 > - Edge-Conditioned Convolution (ECC): [(Simonovsky & Komodakis, 2017)](https://arxiv.org/abs/1704.02901)
 > - Graph Attention Layer (GAT): [(Veličković et al., 2018)](https://arxiv.org/abs/1710.10903)
@@ -39,14 +39,20 @@ cd ssl-seizure-detection
 
 #### Step 2: Create Conda Environment
 ```bash
-conda create --name seizure-detect python=3.8
-conda activate seizure-detect
+conda create --name ssl-seizure-detection python=3.10
+conda activate ssl-seizure-detection
 ```
 
 #### Step 3: Install PyTorch
+For PC or Linux:
 ```bash
-conda install pytorch==2.0.1 torchvision -c pytorch
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 ```
+For Mac:
+```bash
+conda install pytorch::pytorch torchvision torchaudio -c pytorch
+```
+
 
 #### Step 4: Install PyTorch Geometric
 ```bash
@@ -80,7 +86,7 @@ To run the entire pipeline, please refer to the `train()` function in `train.py`
 
 ## License
 
-Until the release of the paper, code within this repository are proprietary and for viewing and educational purposes only. Any use, reproduction, or distribution of the contents of this repository without the express written consent of the author(s) is strictly prohibited. For any requests or inquiries regarding the use or licensing of the work contained herein, please see [Contact](#contact). 
+Until the release of the paper, code within this repository is proprietary and for viewing and educational purposes only. Any use, reproduction, or distribution of the contents of this repository without the express written consent of the author(s) is strictly prohibited. For any requests or inquiries regarding the use or licensing of the work contained herein, please see [Contact](#contact). 
 
 Please note that while this repository contains original data from OpenNeuro with Accession Number ds003029, the restrictions mentioned above do not apply to that dataset, which is governed by its own terms and conditions as provided by [OpenNeuro](https://openneuro.org/).
 
