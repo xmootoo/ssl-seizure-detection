@@ -9,7 +9,7 @@
 
 ## Introduction
 
-This research project adapts several self-supervised learning (SSL) techniques with Graph Neural Network (GNN) encoders to domain of seizure detection. We appy our GNN encoder to the following SSL methods and evaluate performance downstream on seizure detection: Relative Positioning, Temporal Shuffling, Contrastive Predictive Coding (CPC), and Variance-Invariance-Covariance Regularization (VICReg). The GNN architecture comprises of Edge-Conditioned Convolution (ECC) and Graph Attention Network (GAT) layers, utilizing PyTorch and PyTorch Geometric libraries for standard deep learning and GNN implementation. For a detailed description of this research, see [projects/ssl-seizure-detection](https://www.xaviermootoo.com/projects/ssl-seizure-detection).
+This research project adapts several self-supervised learning (SSL) techniques with Graph Neural Network (GNN) encoders to domain of seizure detection. We appy our GNN encoder to the following SSL methods and evaluate their performance downstream on seizure detection: Relative Positioning, Temporal Shuffling, Contrastive Predictive Coding (CPC), and Variance-Invariance-Covariance Regularization (VICReg). The GNN architecture comprises of Edge-Conditioned Convolution (ECC) and Graph Attention Network (GAT) layers, utilizing PyTorch and PyTorch Geometric libraries for standard deep learning and GNN implementation. For a more detailed description of our research, see [projects/ssl-seizure-detection](https://www.xaviermootoo.com/projects/ssl-seizure-detection).
 
 > Please refer to the relevant papers:
 > - A Path Towards Autonomous Machine Intelligence [(Lecun, 2022)][def]
@@ -20,11 +20,10 @@ This research project adapts several self-supervised learning (SSL) techniques w
 > - Variance-Invariance-Covariance Regularization (VICreg) [(Bardes et al., 2022)](https://arxiv.org/abs/2105.04906)
 
 ## Table of Contents
-1. [Installation](#installation)
-2. [Usage](#usage)
-3. [File Descriptions](#file-descriptions)
-4. [License](#license)
-5. [Contact](#contact)
+1. [Usage](#usage)
+2. [File Descriptions](#file-descriptions)
+3. [License](#license)
+4. [Contact](#contact)
 
 ## Installation
 
@@ -32,9 +31,10 @@ This research project adapts several self-supervised learning (SSL) techniques w
 - Python 3.8-3.11
 - PyTorch 2.0.1+
 - PyTorch Geometric (PyG)
+- scikit-learn
+- Pandas
+- Weights & Biases
 
-### Steps
-Clone the repository: `git clone https://github.com/yourusername/seizure-detection-gnn.git`
 
 ## Usage
 
