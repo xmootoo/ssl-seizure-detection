@@ -28,61 +28,22 @@ Please refer to the relevant papers:
 6. [Contact](#contact)
 
 ## Installation
-
-Ensure you have `conda` installed on your system. If not, install from [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual).
-
-#### Step 1: Clone the Repository
-```bash
-git clone https://github.com/yourusername/ssl-seizure-detection.git
-cd ssl-seizure-detection
-```
-
-#### Step 2: Create Conda Environment
-```bash
-conda create --name ssl-seizure-detection python=3.10
-conda activate ssl-seizure-detection
-```
-
-#### Step 3: Install PyTorch
-For PC or Linux:
-```bash
-conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
-```
-For Mac:
-```bash
-conda install pytorch::pytorch torchvision torchaudio -c pytorch
-```
-
-
-#### Step 4: Install PyTorch Geometric
-```bash
-pip install torch-geometric
-```
-
-#### Step 5: Install Additional Packages
-```bash
-pip install scikit-learn pandas wandb
-```
-
-#### Step 6: Login to Weights & Biases
-```bash
-wandb login
-```
+For detailed setup instructions and environment configuration, please see our [installation guide](./INSTALL.md).
 
 ## Data
-Processed data formatted as PyTorch Geometric Data objects is not yet available for release but will be provided soon. Meanwhile, the initial intracranial EEG (iEEG) dataset utilized for this project is publicly accessible on OpenNeuro, identified by Accession Number [ds003029](https://openneuro.org/datasets/ds003029/versions/1.0.6). From ds003029, we selected 26 patients out of the 88 available in the dataset. For each patient iEEG signal, we divided the signal into windows of equal length, and for each windows we constructed an initial graph representation. This initial graph representations were fully connected graphs, with the nodes corresponding to indiviudal electrodes. To construct the edge features, for each electrode pair, we computed the Pearson correlation, phase-lock value (PLV), and the coherence, giving us edge features in of dimension 3. To construct the node features, we used the average energy of the elctrode, and the average energies at various frequency bands; due to variability in the iEEG data format, there may have been more or less frequency bands available for certain patients, thus node features were of dimension $7,8$ or $9$ (dependent on the patient). From this, we converted the data to the standard [PyTorch Geometric Data format](https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.data.Data.html#torch_geometric.data.Data) of `[edge_index, x, edge_attr, y]` where `edge_index` is a tensor defining the graph structure (similar to a binary adjacency matrix), `x` is the node feature tensor, `edge_attr` is the edge feature tensor, and `y` is the target label tensor taking on values $0$ or $1$ for binary classification of ictal (seizure) or nonictal (no seizure); and took on values $0,1,$ or $2$ for preictal (before seizure), ictal (seizure), and postictal (after seizure) respectively for multiclass classification.
+Processed data formatted as PyTorch Geometric Data objects is not yet available for release but will be provided soon. Meanwhile, the initial intracranial EEG (iEEG) dataset utilized for this project is publicly accessible on OpenNeuro, identified by Accession Number [ds003029](https://openneuro.org/datasets/ds003029/versions/1.0.6). From ds003029, we selected 26 patients out of the 88 available in the dataset. For each patient iEEG signal, we divided the signal into windows of equal length, and for each windows we constructed an initial graph representation. This initial graph representations were fully connected graphs, with the nodes corresponding to indiviudal electrodes. To construct the edge features, for each electrode pair, we computed the Pearson correlation, phase-lock value (PLV), and the coherence, giving us edge features in of dimension 3. To construct the node features, we used the average energy of the elctrode, and the average energies at various frequency bands; due to variability in the iEEG data format, there may have been more or less frequency bands available for certain patients, thus node features were of dimension $7,8$ or $9$ (dependent on the patient). From this, we converted the data to the standard [PyTorch Geometric Data format](https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.data.Data.html#torch_geometric.data.Data) of `[edge_index, x, edge_attr, y]` where `edge_index` is a tensor defining the graph structure (similar to a binary adjacency matrix), `x` is the node feature tensor, `edge_attr` is the edge feature tensor, and `y` is the target label tensor taking on values $0$ or $1$ for binary classification of ictal (seizure) or nonictal (no seizure); and took on values $0,1,$ or $2$ for preictal (before seizure), ictal (seizure), and postictal (after seizure) respectively for multiclass classification. Note that because of the heterogeneity of the iEEG data from patient to patient (e.g., different number of electrodes, different placement of electrodes) model training and evaluation was conducted intra-patient, thus separate models were created for each individual patient.
 
 
 ## Usage
-To run the entire pipeline, please refer to the `train()` function in `train.py` and the relevant docstring. The `main.py` script is optimized for HPC on the Cledar cluster (Digital Research Alliance of Canada), and is not recommended for general use. For a guided tutorial on how to use PyTorch Geometric and graph pair GNN models, please refer to `tutorial.ipynb`. To see how the initial graph representations were created, please refer to `preprocess.ipynb`. For a information on how to apply transfer learning from self-supervised to supervised models and fine-tuning them, please refer to `transfer.ipynb`. 
+To run the entire pipeline, please refer to the `train()` function in [`train.py`](/src/train.py) and the relevant docstring. Please see the notebook [`train.ipynb`](/notebooks/train.ipynb) for guidance on how to train each model. The [`main.py`](/src/main.py) script is optimized for HPC on the Cledar cluster (Digital Research Alliance of Canada), and is not recommended for general use. For a tutorial on using PyTorch Geometric and customized GNN models, please refer to [`tutorial.ipynb`](/notebooks/tutorial.ipynb). To see how the initial graph representations were created, please refer to [`preprocess.ipynb`](/notebooks/preprocess.ipynb). For a information on the transfer learning process (implemented in [`train.py`](/src/train.py)), please refer to [`transfer.ipynb`](/notebooks/transfer.ipynb). 
 
 ## File Descriptions
 
-- **`models.py`**: Contains both self-supervised models: relative_positioning, temporal_shuffling, CPC (to be added), and VICReg (to be added); and supervised models: supervised (basem model), downstream1, and downstream2.
-- **`train.py`**: Implements the training loop for both self-supervised and supervised models. Includes logging with Weights and Biases (highly recomended).
-- **`main.py`**: The primary script to run the entire pipeline, optimized for Cedar cluster resources. Please see the `scripts` folder for more details on how this is implemented, for parallelization of training multiple patients.
-- **`preprocess.py`**: Includes helper functions for all preprocessing tasks, such as converting initial graph representations to PyG-compatible structures.
-- **`patch.py`**: Patches pre-existing Numpy data from our lab to the PyG-compatible format, not recommended for general use unless your existing data fits the specifications as outlined in `preprocessing.ipynb`.
+- **[`models.py`](/src/models.py)**: Contains self-supervised models: relative_positioning, temporal_shuffling, CPC (to be added), and VICReg (to be added); and supervised models: supervised (base model), downstream1, and downstream2.
+- **[`train.py`](/src/train.py)**: Implements the training loop for both self-supervised and supervised models. Includes logging with Weights and Biases (highly recomended). For a guide on how to train each model please see [`train.ipynb`](/notebooks/train.ipynb).
+- **[`main.py`](/src/main.py)**: The primary script to run the training pipeline in parallel on multiple patients, optimized for Cedar cluster resources. Please see the [`scripts`](/scripts/) folder for more details on how this is implemented.
+- **[`preprocess.py`](/src/preprocess.py)**: Includes helper functions for all preprocessing tasks, such as converting initial graph representations to PyG-compatible structures.
+- **[`patch.py`](/src/patch.py)**: Patches pre-existing Numpy data from our lab to the PyG-compatible format, not recommended for general use unless your existing data fits the specifications as outlined in [`preprocess.ipynb`](/notebooks/preprocess.ipynb).
 
 ## License
 
