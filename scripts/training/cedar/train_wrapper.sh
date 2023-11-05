@@ -26,7 +26,7 @@ model_selection=${6:-}
 # Training arguments
 run_types=("combined" "all" "all")
 model_ids=("supervised" "relative_positioning" "temporal_shuffling")
-times=("00:45:00" "20:00:00" "20:00:00")
+times=("01:00:00" "20:00:00" "20:00:00")
 
 # Base directory
 base_dir="${xav}/ssl_epilepsy/models/${patient_id}"

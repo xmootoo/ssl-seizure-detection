@@ -26,14 +26,14 @@ class EdgeMLP(nn.Module):
         return x
 
 
-class gnn_embedder(nn.Module):
+class gnn_encoder(nn.Module):
     def __init__(self, num_node_features, num_edge_features, hidden_channels):
-        super(gnn_embedder, self).__init__()
+        super(gnn_encoder, self).__init__()
         
         # Initialize the MLP for NNConv
         self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels[0])
         
-        # Encoder
+        # embedder
         self.conv1 = NNConv(num_node_features, hidden_channels[0], self.edge_mlp)
         self.conv2 = GATConv(hidden_channels[0], hidden_channels[1], heads=1, concat=False)
         
@@ -72,7 +72,7 @@ class relative_positioning(nn.Module):
         hidden_channels = config["hidden_channels"]
         
         # GNN embedder
-        self.embedder = gnn_embedder(num_node_features, num_edge_features, hidden_channels)
+        self.embedder = gnn_encoder(num_node_features, num_edge_features, hidden_channels)
 
         # Fully connected layers
         self.fc = nn.Linear(hidden_channels[4], 1)
@@ -112,7 +112,7 @@ class temporal_shuffling(nn.Module):
         hidden_channels = config["hidden_channels"]
         
         # GNN embedder
-        self.embedder = gnn_embedder(num_node_features, num_edge_features, hidden_channels)
+        self.embedder = gnn_encoder(num_node_features, num_edge_features, hidden_channels)
         
         # Fully connected layer
         self.fc = nn.Linear(2 * hidden_channels[4], 1)

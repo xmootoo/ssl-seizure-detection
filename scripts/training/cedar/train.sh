@@ -11,6 +11,9 @@
 tau_pos="$1"
 tau_neg="$2"
 split="$3"
+
+# Model selection. It is 1-3 digits, where a 0 indicates supervised, 1 indicates relative positioning, and 2 indicates temporal shuffling.
+# For example, model_selection=01 means that only the supervised and relative positioning models will be trained.
 model_selection="$4"
 
 # Define the list of patients (26 patients).

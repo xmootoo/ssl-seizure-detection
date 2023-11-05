@@ -1,0 +1,44 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.10.12",
+    "heartbeatAt": "2023-11-05T21:39:15.915700",
+    "startedAt": "2023-11-05T21:39:15.285485",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "<python with no main file>",
+    "codePathLocal": null,
+    "git": {
+        "remote": "git@github.com:xmootoo/ssl-seizure-detection.git",
+        "commit": "c175d4e009ffbea0163dbfe0b6c9bc8170cd3b9b"
+    },
+    "email": "xmootoo@gmail.com",
+    "root": "/Users/xaviermootoo/Documents/VScode/ssl-seizure-detection",
+    "host": "Xavs-MacBook-Air.local",
+    "username": "xaviermootoo",
+    "executable": "/Users/xaviermootoo/opt/anaconda3/envs/torch2_mps/bin/python",
+    "cpu_count": 8,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 2400,
+        "min": 2400,
+        "max": 2400
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2400,
+            "min": 2400,
+            "max": 2400
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 460.4317207336426,
+            "used": 201.03977966308594
+        }
+    },
+    "memory": {
+        "total": 8.0
+    }
+}

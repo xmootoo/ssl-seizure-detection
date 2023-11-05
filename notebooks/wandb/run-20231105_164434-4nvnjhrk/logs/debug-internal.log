@@ -1,0 +1,39 @@
+2023-11-05 16:44:39,949 INFO    StreamThr :26410 [internal.py:wandb_internal():86] W&B internal server running at pid: 26410, started at: 2023-11-05 16:44:39.942767
+2023-11-05 16:44:39,952 DEBUG   HandlerThread:26410 [handler.py:handle_request():146] handle_request: status
+2023-11-05 16:44:39,953 INFO    WriterThread:26410 [datastore.py:open_for_write():85] open: /Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/notebooks/wandb/run-20231105_164434-4nvnjhrk/run-4nvnjhrk.wandb
+2023-11-05 16:44:39,956 DEBUG   SenderThread:26410 [sender.py:send():380] send: header
+2023-11-05 16:44:39,956 DEBUG   SenderThread:26410 [sender.py:send():380] send: run
+2023-11-05 16:44:40,958 INFO    SenderThread:26410 [dir_watcher.py:__init__():211] watching files in: /Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/notebooks/wandb/run-20231105_164434-4nvnjhrk/files
+2023-11-05 16:44:40,959 INFO    SenderThread:26410 [sender.py:_start_run_threads():1122] run started: 4nvnjhrk with start time 1699220679.139247
+2023-11-05 16:44:40,974 DEBUG   HandlerThread:26410 [handler.py:handle_request():146] handle_request: check_version
+2023-11-05 16:44:40,974 DEBUG   SenderThread:26410 [sender.py:send_request():407] send_request: check_version
+2023-11-05 16:44:41,099 DEBUG   HandlerThread:26410 [handler.py:handle_request():146] handle_request: run_start
+2023-11-05 16:44:41,104 DEBUG   HandlerThread:26410 [system_info.py:__init__():32] System info init
+2023-11-05 16:44:41,104 DEBUG   HandlerThread:26410 [system_info.py:__init__():47] System info init done
+2023-11-05 16:44:41,104 INFO    HandlerThread:26410 [system_monitor.py:start():194] Starting system monitor
+2023-11-05 16:44:41,104 INFO    SystemMonitor:26410 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2023-11-05 16:44:41,104 INFO    HandlerThread:26410 [system_monitor.py:probe():214] Collecting system info
+2023-11-05 16:44:41,104 INFO    SystemMonitor:26410 [interfaces.py:start():190] Started cpu monitoring
+2023-11-05 16:44:41,105 DEBUG   HandlerThread:26410 [system_info.py:probe():196] Probing system
+2023-11-05 16:44:41,105 INFO    SystemMonitor:26410 [interfaces.py:start():190] Started disk monitoring
+2023-11-05 16:44:41,106 INFO    SystemMonitor:26410 [interfaces.py:start():190] Started memory monitoring
+2023-11-05 16:44:41,107 INFO    SystemMonitor:26410 [interfaces.py:start():190] Started network monitoring
+2023-11-05 16:44:41,108 DEBUG   HandlerThread:26410 [system_info.py:_probe_git():181] Probing git
+2023-11-05 16:44:41,140 DEBUG   HandlerThread:26410 [system_info.py:_probe_git():189] Probing git done
+2023-11-05 16:44:41,140 DEBUG   HandlerThread:26410 [system_info.py:probe():244] Probing system done
+2023-11-05 16:44:41,140 DEBUG   HandlerThread:26410 [system_monitor.py:probe():223] {'os': 'macOS-10.16-x86_64-i386-64bit', 'python': '3.10.12', 'heartbeatAt': '2023-11-05T21:44:41.105097', 'startedAt': '2023-11-05T21:44:34.723877', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '<python with no main file>', 'codePathLocal': None, 'git': {'remote': 'git@github.com:xmootoo/ssl-seizure-detection.git', 'commit': 'c175d4e009ffbea0163dbfe0b6c9bc8170cd3b9b'}, 'email': 'xmootoo@gmail.com', 'root': '/Users/xaviermootoo/Documents/VScode/ssl-seizure-detection', 'host': 'Xavs-MacBook-Air.local', 'username': 'xaviermootoo', 'executable': '/Users/xaviermootoo/opt/anaconda3/envs/torch2_mps/bin/python', 'cpu_count': 8, 'cpu_count_logical': 8, 'cpu_freq': {'current': 2400, 'min': 2400, 'max': 2400}, 'cpu_freq_per_core': [{'current': 2400, 'min': 2400, 'max': 2400}], 'disk': {'/': {'total': 460.4317207336426, 'used': 204.02472305297852}}, 'memory': {'total': 8.0}}
+2023-11-05 16:44:41,140 INFO    HandlerThread:26410 [system_monitor.py:probe():224] Finished collecting system info
+2023-11-05 16:44:41,140 INFO    HandlerThread:26410 [system_monitor.py:probe():227] Publishing system info
+2023-11-05 16:44:41,140 DEBUG   HandlerThread:26410 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-11-05 16:44:41,141 DEBUG   HandlerThread:26410 [system_info.py:_save_pip():68] Saving pip packages done
+2023-11-05 16:44:41,141 DEBUG   HandlerThread:26410 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-11-05 16:44:41,964 INFO    Thread-25 :26410 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/notebooks/wandb/run-20231105_164434-4nvnjhrk/files/conda-environment.yaml
+2023-11-05 16:44:41,964 INFO    Thread-25 :26410 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/notebooks/wandb/run-20231105_164434-4nvnjhrk/files/requirements.txt
+2023-11-05 16:44:44,383 DEBUG   HandlerThread:26410 [system_info.py:_save_conda():87] Saving conda packages done
+2023-11-05 16:44:44,384 INFO    HandlerThread:26410 [system_monitor.py:probe():229] Finished publishing system info
+2023-11-05 16:44:44,385 DEBUG   SenderThread:26410 [sender.py:send():380] send: files
+2023-11-05 16:44:44,385 INFO    SenderThread:26410 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-11-05 16:44:44,826 INFO    wandb-upload_0:26410 [upload_job.py:push():131] Uploaded file /var/folders/vc/2cgy1_wn1z3fx52llvy0szgw0000gn/T/tmpqldxjx7mwandb/1lic9ocy-wandb-metadata.json
+2023-11-05 16:44:44,974 INFO    Thread-25 :26410 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/notebooks/wandb/run-20231105_164434-4nvnjhrk/files/conda-environment.yaml
+2023-11-05 16:44:44,974 INFO    Thread-25 :26410 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/notebooks/wandb/run-20231105_164434-4nvnjhrk/files/wandb-metadata.json
+2023-11-05 16:44:45,390 DEBUG   HandlerThread:26410 [handler.py:handle_request():146] handle_request: status_report
