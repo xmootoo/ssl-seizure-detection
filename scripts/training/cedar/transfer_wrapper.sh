@@ -15,7 +15,7 @@ datetime_id="$2"
 # Model datetime ID of the pretrained model
 pretrained_datetime_id="$3"
 
-# Model ID of using the pretrained layers (i.e. new untrained model)
+# Model ID using the pretrained layers (i.e. new untrained model)
 model_id="$4"
 
 # Freezes or unfreezes pretrained layers
