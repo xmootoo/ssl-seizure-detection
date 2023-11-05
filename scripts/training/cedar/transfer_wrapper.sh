@@ -25,7 +25,7 @@ frozen="$5"
 split="$6"
 
 # Training arguments
-run_types="combined"
+run_type="combined"
 transfer_ids=("relative_positioning" "temporal_shuffling")
 if [ "$model_id" == "downstream1" ]; then
   time="00:45:00"
