@@ -91,7 +91,7 @@ for i in "${!model_ids[@]}"; do
 #SBATCH --mail-type=ALL
 
 cd "${xav}/ssl_epilepsy/ssl-seizure-detection/src"
-module load cuda/11.7 cudnn python/3.10
+module load cuda/11.7 cudnn/8.9.5.29 python/3.10
 source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"

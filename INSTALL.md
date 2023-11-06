@@ -27,12 +27,12 @@ conda install pytorch::pytorch torchvision torchaudio -c pytorch
 
 ### Step 4: Install PyTorch Geometric
 ```bash
-pip install torch-geometric
+pip install torch_geometric
 ```
 
 ### Step 5: Install Additional Packages
 ```bash
-pip install scikit-learn pandas wandb
+conda install scikit-learn pandas wandb
 ```
 
 ### Step 6: Login to Weights & Biases
