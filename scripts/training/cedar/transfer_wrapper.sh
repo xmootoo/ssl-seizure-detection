@@ -28,9 +28,9 @@ split="$6"
 run_type="combined"
 transfer_ids=("relative_positioning" "temporal_shuffling")
 if [ "$model_id" == "downstream1" ]; then
-  time="00:45:00"
+  time="00:50:00"
 elif [ "$model_id" == "downstream2" ]; then
-  time="00:25:00"
+  time="00:35:00"
 else
   echo "Invalid model_id"
 fi
