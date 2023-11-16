@@ -35,7 +35,7 @@ Processed data formatted as PyTorch Geometric Data objects is not yet available 
 
 
 ## Usage
-To run the entire pipeline, please refer to the `train()` function in [`train.py`](/src/train.py) and the relevant docstring. Please see the notebook [`train.ipynb`](/notebooks/train.ipynb) for guidance on how to train each model. The [`main.py`](/src/main.py) script is optimized for HPC on the Cledar cluster (Digital Research Alliance of Canada), and is not recommended for general use. For a tutorial on using PyTorch Geometric and customized GNN models, please refer to [`tutorial.ipynb`](/notebooks/tutorial.ipynb). To see how the initial graph representations are created, please refer to [`preprocess.ipynb`](/notebooks/preprocess.ipynb). For a information on the transfer learning process (implemented in [`train.py`](/src/train.py)), please refer to [`transfer.ipynb`](/notebooks/transfer.ipynb). 
+To run the entire pipeline, please refer to the `train()` function in [`train.py`](/src/train.py) and the relevant docstring. Please see the notebook [`train.ipynb`](/notebooks/train.ipynb) for guidance on how to train each model. The [`main.py`](/src/main.py) script is optimized for HPC on the Cledar cluster (Digital Research Alliance of Canada), and is not recommended for general use. For a tutorial on PyTorch Geometric and customized GNN models, please refer to [`tutorial.ipynb`](/notebooks/tutorial.ipynb). To see how the initial graph representations are created, please refer to [`preprocess.ipynb`](/notebooks/preprocess.ipynb). For a information on the transfer learning process (implemented in [`train.py`](/src/train.py)), please refer to [`transfer.ipynb`](/notebooks/transfer.ipynb). 
 
 ## File Descriptions
 
@@ -49,10 +49,10 @@ To run the entire pipeline, please refer to the `train()` function in [`train.py
 
 Until the release of the paper, code within this repository is proprietary and for viewing and educational purposes only. Any use, reproduction, or distribution of the contents of this repository without the express written consent of the author(s) is strictly prohibited. For any requests or inquiries regarding the use or licensing of the work contained herein, please see [Contact](#contact). 
 
-Please note that while this repository contains original data from OpenNeuro with Accession Number ds003029, the restrictions mentioned above do not apply to that dataset, which is governed by its own terms and conditions as provided by [OpenNeuro](https://openneuro.org/).
+Please note that while this repository uses the original data from OpenNeuro with Accession Number ds003029, the restrictions mentioned above do not apply to that dataset, which is governed by its own terms and conditions as provided by [OpenNeuro](https://openneuro.org/).
 
 ## Acknowledgements
-I would like to sincerely thank both [Dr. Alan A. Díaz-Montiel](https://github.com/adiazmont) and [Dr. Milad Lankarany](https://www.uhnresearch.ca/researcher/milad-lankarany) for their continued support throughout this research endeavour and for their expert guidance. 
+I would like to sincerely thank both [Dr. Alan A. Díaz-Montiel](https://github.com/adiazmont) and [Dr. Milad Lankarany](https://www.uhnresearch.ca/researcher/milad-lankarany) for their continued support throughout this research endeavour and for their expert guidance. I am also extremely grateful for the support from the [Temerty Faculty of Medicine, University of Toronto](https://temertymedicine.utoronto.ca/) through the esteemed [T-CAIREM](https://tcairem.utoronto.ca/) Summer Studentship, which allowed me to focus on this work.
 
 I'd also like to extend my gratitude to the researchers and institutions for their generosity in sharing their iEEG data through OpenNeuro [ds003029](https://openneuro.org/datasets/ds003029/versions/1.0.6). Special thanks to:
 
