@@ -27,6 +27,7 @@ split="$6"
 # Training arguments
 run_type="combined"
 transfer_ids=("relative_positioning" "temporal_shuffling")
+
 if [ "$model_id" == "downstream1" ]; then
   time="00:50:00"
 elif [ "$model_id" == "downstream2" ]; then

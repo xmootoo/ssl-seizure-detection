@@ -16,7 +16,10 @@ model_id="$2"
 # Freezes or unfreezes the weights of the pretrained layers. Options: 0 (False) or 1 (True).
 frozen="$3"
 
-# Train,val,test split
+# "train,val,test" split. Please put values in quotations
+# Option 1: Fix number of examples: "500,300,400"
+# Option 2: Ratios: "0.7,0.2,0.1"
+# Option 3: If only two values are indicated, it only corresponds to val and test: "0.2,0.1" gives 0.7 for train
 split="$4"
 
 # Define the list of patients (26 patients).
