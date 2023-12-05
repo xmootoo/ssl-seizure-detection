@@ -9,24 +9,26 @@ fi
 # The patient ID (e.g., jh101)
 patient_id="$1"
 
-# Date and time ID
+# Date and time ID (e.g., 2023-12-04_09.32.51)
 datetime_id="$2"
 
-# Model datetime ID of the pretrained model
+# Model datetime ID of the pretrained model (e.g., 2023-11-27_16.12.00)
 pretrained_datetime_id="$3"
 
-# Model ID using the pretrained layers (i.e. new untrained model)
+# Model ID using the pretrained layers (downstream1, downstream2)
 model_id="$4"
 
-# Freezes or unfreezes pretrained layers
+# Freezes (1) or unfreezes (0) pretrained layers
 frozen="$5"
 
-# Train,val,test split
+# Train,val,test split written as "train,val,test"
 split="$6"
 
 # Training arguments
 run_type="combined"
+
 transfer_ids=("relative_positioning" "temporal_shuffling")
+# transer_ids=("relative_positioning")
 
 if [ "$model_id" == "downstream1" ]; then
   time="00:50:00"
@@ -41,7 +43,6 @@ fi
 # Base directory
 base_dir="${xav}/ssl_epilepsy/models/${patient_id}"
 mkdir -p "${base_dir}" || { echo "Error: Cannot create directory ${base_dir}"; exit 1; }
-
 
 
 # Iterate over each model and its corresponding time
@@ -59,6 +60,7 @@ for i in "${!transfer_ids[@]}"; do
     # Create a job for each model + time
     sbatch <<EOT
 #!/bin/bash
+#SBATCH --account="def-milad777"       # Specify the account to charge
 #SBATCH --ntasks=1              # Number of tasks
 #SBATCH --gres=gpu:v100l:1      # Number of Volta 100 GPUs
 #SBATCH --cpus-per-task=8       # CPU cores/threads, AKA number of workers (num_workers)
