@@ -1,9 +1,10 @@
 #!/bin/bash
 
 #SBATCH --array=0-25 # Array index from 0 to 25 (for 26 patients)
-#SBATCH --job-name=training_array
+#SBATCH --job-name=transfer_array
 #SBATCH --output="${xav}/ssl_epilepsy/jobs/%A_%a.out"
-#SBATCH --error=train_wrapper_%A_%a.err
+#SBATCH --error=transfer_wrapper_%A_%a.err
+#SBATCH --account="def-milad777"       # Specify the account to charge
 #SBATCH --mail-user=xmootoo@gmail.com
 #SBATCH --mail-type=ALL
 
@@ -17,8 +18,8 @@ model_id="$2"
 frozen="$3"
 
 # "train,val,test" split. Please put values in quotations
-# Option 1: Fix number of examples: "500,300,400"
-# Option 2: Ratios: "0.7,0.2,0.1"
+# Option 1: Fix number of examples: "500,300,400" for "train,val,test"
+# Option 2: Ratios: "0.7,0.2,0.1" for "train,val,test"
 # Option 3: If only two values are indicated, it only corresponds to val and test: "0.2,0.1" gives 0.7 for train
 split="$4"
 

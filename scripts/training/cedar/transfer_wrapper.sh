@@ -60,7 +60,6 @@ for i in "${!transfer_ids[@]}"; do
     # Create a job for each model + time
     sbatch <<EOT
 #!/bin/bash
-#SBATCH --account="def-milad777"       # Specify the account to charge
 #SBATCH --ntasks=1              # Number of tasks
 #SBATCH --gres=gpu:v100l:1      # Number of Volta 100 GPUs
 #SBATCH --cpus-per-task=8       # CPU cores/threads, AKA number of workers (num_workers)
