@@ -70,6 +70,7 @@ for i in "${!transfer_ids[@]}"; do
 #SBATCH --error="${xav}/ssl_epilepsy/jobs/training/${job_name}.err"
 #SBATCH --mail-user=xmootoo@gmail.com
 #SBATCH --mail-type=ALL
+#SBATCH --account="def-milad777"       # Specify the account to charge
 
 cd "${xav}/ssl_epilepsy/ssl-seizure-detection/src"
 module load cuda/11.7 cudnn/8.9.5.29 python/3.10
