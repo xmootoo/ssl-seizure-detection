@@ -1,14 +1,6 @@
 #!/bin/bash
 
-#SBATCH --array=0-25 # Array index from 0 to 25 (for 26 patients)
-#SBATCH --job-name=transfer_array
-#SBATCH --output="${xav}/ssl_epilepsy/jobs/%A_%a.out"
-#SBATCH --error=transfer_wrapper_%A_%a.err
-#SBATCH --account="def-milad777"       # Specify the account to charge
-#SBATCH --mail-user=xmootoo@gmail.com
-#SBATCH --mail-type=ALL
-
-# The date and time ID fo the pretrained model, which we will extract the pretrained layers from.
+# The date and time ID for the pretrained model, which we will extract the pretrained layers from.
 pretrained_datetime_id="$1"
 
 # Name of model to be trained using the pretrained layers. Options: downstream1, downstream2.
@@ -29,8 +21,7 @@ declare -a patients=("jh101" "jh103" "jh108" "pt01" "pt2" "pt3" "pt6" "pt7" "pt8
 # Get date time id
 datetime_id=$(date "+%Y-%m-%d_%H.%M.%S")
 
-# Get the patient_id using the array index
-patient_id=${patients[$SLURM_ARRAY_TASK_ID]}
-
-# Call the original script for each patient
-sbatch transfer_wrapper.sh $patient_id $datetime_id $pretrained_datetime_id $model_id $frozen $split
+# Loop over each patient and call the original script
+for patient_id in "${patients[@]}"; do
+    bash transfer_wrapper.sh "$patient_id" "$datetime_id" "$pretrained_datetime_id" "$model_id" "$frozen" "$split"
+done
