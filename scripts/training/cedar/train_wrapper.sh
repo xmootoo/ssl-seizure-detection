@@ -23,6 +23,9 @@ split="$5"
 # For example, model_selection=01 means that only the supervised and relative positioning models will be trained.
 model_selection=${6:-}
 
+# Classification task (binary or multiclass)
+classify="$7"
+
 # Training arguments
 run_types=("combined" "all" "all")
 model_ids=("supervised" "relative_positioning" "temporal_shuffling")
@@ -96,6 +99,6 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${split}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${split}" "${classify}"
 EOT
 done

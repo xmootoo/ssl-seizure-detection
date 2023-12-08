@@ -22,8 +22,11 @@ if __name__ == '__main__':
     # Run identifier
     run_type = sys.argv[6]
 
+    # Task (binary, multiclass)
+    classify = sys.argv[7]
+
     # Train, val, test split. Must formatted as "train,val,test" in the command line.
-    split = [float(x) for x in sys.argv[7].split(",")]
+    split = [float(x) for x in sys.argv[8].split(",")]
     
     if len(split) == 3:
         train_ratio, val_ratio, test_ratio = split[0], split[1], split[2]
@@ -32,17 +35,16 @@ if __name__ == '__main__':
         train_ratio=None
     
     # Transfer learning (optional arguments)
-    if len(sys.argv) > 8:
-        model_path = str(sys.argv[8])
-        model_dict_path = str(sys.argv[9])
-        transfer_id = str(sys.argv[10])
-        frozen = bool(int(sys.argv[11]))
+    if len(sys.argv) > 9:
+        model_path = str(sys.argv[9])
+        model_dict_path = str(sys.argv[10])
+        transfer_id = str(sys.argv[11])
+        frozen = bool(int(sys.argv[12])) # convert 0 or 1 to False or True
     else:
         model_path=None
         model_dict_path=None
         transfer_id=None
         frozen=None
-
 
     # Node feature dimension configuration (some patients have less node features)
     if patient_id in {"ummc003", "ummc004", "ummc006"}:
@@ -73,7 +75,7 @@ if __name__ == '__main__':
         "hidden_channels": [64, 32, 64, 128, 256],
         }
         data_size=115000
-
+    
     elif model_id == "downstream1":
         config = {
         "hidden_channels": [64, 64, 32],
@@ -90,6 +92,6 @@ if __name__ == '__main__':
     
     train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
         batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id=model_id, timing=True, 
-        classify="binary", head="linear", dropout=True, datetime_id=datetime_id, run_type=run_type, 
+        classify=classify, head="linear", dropout=True, datetime_id=datetime_id, run_type=run_type, 
         frozen=frozen, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id,
         train_ratio=train_ratio)

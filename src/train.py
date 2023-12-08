@@ -394,6 +394,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         'Model parameters': config,
         'Dropout': dropout,
     }
+    
     if test_ratio!=0:
         info_dict['Test examples'] = loader_stats["test_examples"]
         info_dict['Test batches'] = loader_stats["test_batches"]
