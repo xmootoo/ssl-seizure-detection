@@ -23,7 +23,7 @@ if __name__ == '__main__':
     run_type = sys.argv[6]
 
     # Task (binary, multiclass)
-    classify = sys.argv[7]
+    classify = str(sys.argv[7])
 
     # Train, val, test split. Must formatted as "train,val,test" in the command line.
     split = [float(x) for x in sys.argv[8].split(",")]
