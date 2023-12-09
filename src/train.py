@@ -2,6 +2,7 @@ import time
 import json
 import os
 import torch
+import torch.nn.functional as F
 import random
 import wandb
 from preprocess import run_sorter, combiner, create_data_loaders, extract_layers
@@ -80,8 +81,17 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
         if outputs.shape[0] > 1:
             outputs = outputs.squeeze()
         
+        # Select the correct label column based on classification type
+        supervised_models = {"supervised", "downstream1", "downstream2"}
+        if classify=="binary" and model_id in supervised_models:
+            labels = batch.y[:, 0].float()  # Select the first column for binary classification
+        elif classify=="multiclass" and model_id in supervised_models:
+            labels = batch.y[:, 1].long().squeeze()  # Select the second column and ensure it's 1D
+        else:
+            labels = batch.y.float()
+        
         # Calculate loss
-        loss = criterion(outputs.to(device), batch.y.float())
+        loss = criterion(outputs.to(device), labels.to(device))
 
         # Backward pass and optimization
         loss.backward()
@@ -90,18 +100,26 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
         # Training statistics
         epoch_train_loss += loss.item()
         
-        predictions = torch.sigmoid(outputs).squeeze().to(device)
-        predictions = (predictions > 0.5).float()
+        # Compute predictions for binary or multiclass classification
+        if classify == "binary":
+            probabilities = torch.sigmoid(outputs).squeeze()
+            predictions = (probabilities > 0.5).float().to(device)
+        elif classify == "multiclass":
+            probabilities = torch.softmax(outputs, dim=1)
+            predictions = torch.argmax(probabilities, dim=1)
 
-        correct_train += (predictions == batch.y.float().to(device)).sum().item()
-        total_train += len(batch.y)
+        # Sum total correct predictions
+        correct_train += (predictions == labels).sum().item()
+        total_train += labels.size(0)
         
+        # Compute 100 batch timing seconds
         if timing:
             if batch_idx % 100 == 0:
                 end_time = time.time()
                 print("Time elapsed after 100 batches (training):", end_time - start_time)
                 start_time = time.time()
 
+    # Compute average loss and accuracy
     avg_loss = epoch_train_loss / len(train_loader)
     accuracy = 100.0 * correct_train / total_train
 
@@ -133,17 +151,30 @@ def evaluate_model(model, loader, criterion, device, classify="binary", head="li
             if outputs.shape[0] > 1:
                 outputs = outputs.squeeze()
 
+            # Select the correct label column based on classification type
+            supervised_models = {"supervised", "downstream1", "downstream2"}
+            if classify == "binary" and model_id in supervised_models:
+                labels = batch.y[:, 0].float()  # Select the first column for binary classification
+            elif classify == "multiclass" and model_id in supervised_models:
+                labels = batch.y[:, 1].long().squeeze()  # Select the second column and ensure it's 1D
+            else:
+                labels = batch.y.float()
+ 
             # Calculate loss
-            loss = criterion(outputs.to(device), batch.y.float())
-            
-            # Evaluation statistics
+            loss = criterion(outputs.to(device), labels.to(device))
             epoch_eval_loss += loss.item()
             
-            predictions = torch.sigmoid(outputs).squeeze().to(device)
-            predictions = (predictions > 0.5).float()
+            # Compute predictions for binary or multiclass classification
+            if classify == "binary":
+                probabilities = torch.sigmoid(outputs).squeeze()
+                predictions = (probabilities > 0.5).float()
+            elif classify == "multiclass":
+                probabilities = torch.softmax(outputs, dim=1)
+                predictions = torch.argmax(probabilities, dim=1)
 
-            correct_eval += (predictions == batch.y.float().to(device)).sum().item()
-            total_eval += len(batch.y)
+            # Sum total correct predictions
+            correct_eval += (predictions == labels).sum().item()
+            total_eval += labels.size(0)
             
             if timing:
                 if batch_idx % 100 == 0:
@@ -358,7 +389,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
                                              timing=timing)
         save_to_json(test_loss, stats_dir, "test_loss.json")
         save_to_json(test_acc, stats_dir, "test_acc.json")
-        print(f"Epoch: {epoch+1}. Test Loss: {test_loss}. Test Accuracy: {test_acc}.")
+        print(f"Training complete. Test Loss: {test_loss}. Test Accuracy: {test_acc}.")
         wandb.log({"Test Loss": test_loss, "Test Accuracy": test_acc})
 
     

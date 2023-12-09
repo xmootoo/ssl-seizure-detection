@@ -46,9 +46,9 @@ def new_grs(data, type="preictal"):
     # Label data by Y = [Y_1, Y_2] where Y_1 is the binary encoding and Y_2 is the multiclass encoding.
     if type=="preictal":
         Y = [0, 0]
-    if type=="ictal":
+    elif type=="ictal":
         Y = [1, 1]
-    if type=="postictal":
+    elif type=="postictal":
         Y = [0, 2]
     
     new_grs = []
@@ -183,7 +183,8 @@ def create_tensordata_new(num_nodes, data_list, complete=True, save=True, logdir
 
             # Convert to tensors
             x = torch.from_numpy(x).to(torch.float32)
-            y = torch.tensor(y, dtype=torch.long)
+            # y = torch.tensor(y, dtype=torch.long)
+            y = torch.tensor(y).view(1, -1).to(torch.long)
             edge_attr = torch.from_numpy(edge_attr).to(torch.float32)
             
             pyg_data.append([[edge_index, x, edge_attr], y])

@@ -107,7 +107,7 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
         stats (bool, optional): Whether to display statistics about the pseudolabeled data. Default is True.
         save (bool, optional): Whether to save the processed PyTorch Geometric data. Default is True.
         sample_ratio (int, optional): Proportion of samples to be used in relative positioning or temporal shuffling. Defaults to 1.0.
-    
+
     Saves:
         list of PyTorch Geometric Data: If model is "supervised", returns a list of PyTorch Geometric Data objects.
         list of PyTorch Geometric PairData: If model is "relative_positioning", returns a list of PyTorch Geometric PairData objects.
@@ -227,10 +227,9 @@ if __name__ == "__main__":
         tau_neg = float(sys.argv[6])
         sample_ratio = float(sys.argv[7])
         K, N, P, data_size = 0, 0, 0, 0
-
+    
     single_patient_patcher(user="xmootoo", patient_dir=patient_dir, patient=patient, logdir=logdir, tau_pos=tau_pos, tau_neg=tau_neg, 
-             model=model, stats=True, save=True, sample_ratio=sample_ratio K=K, N=N, P=P, data_size=data_size)
-
+             model=model, stats=True, save=True, sample_ratio=sample_ratio, K=K, N=N, P=P, data_size=data_size)
 
 
 
