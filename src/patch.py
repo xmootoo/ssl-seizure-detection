@@ -222,7 +222,7 @@ if __name__ == "__main__":
         P = int(sys.argv[7])
         data_size = int(sys.argv[8])
         sample_ratio=1.0
-    else:
+    elif model in {"relative_positioning", "temporal_shuffling"}:
         tau_pos = float(sys.argv[5])
         tau_neg = float(sys.argv[6])
         sample_ratio = float(sys.argv[7])
