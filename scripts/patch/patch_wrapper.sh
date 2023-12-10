@@ -8,7 +8,8 @@ patient_dir="/home/xmootoo/projects/def-milad777/gr_research/brain-greg/data/ds0
 logdir="${xav}/ssl_epilepsy/data/patient_pyg"
 
 # Define arrays for different models, sample_ratios, and times
-models=("supervised" "relative_positioning" "temporal_shuffling")
+# models=("supervised" "relative_positioning" "temporal_shuffling")
+models=("supervised")
 sample_ratios=("1.0" "0.9" "0.22")
 times=("00:30:00" "00:35:00" "00:45:00")
 
