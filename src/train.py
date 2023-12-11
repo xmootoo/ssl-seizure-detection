@@ -5,8 +5,9 @@ import torch
 import torch.nn.functional as F
 import random
 import wandb
+from loss import VICRegT1Loss
 from preprocess import run_sorter, combiner, create_data_loaders, extract_layers
-from models import relative_positioning, temporal_shuffling, supervised_model, downstream1, downstream2
+from models import relative_positioning, temporal_shuffling, supervised_model, downstream1, downstream2, VICRegT1
 
 def load_data(data_path, run_type="all", data_size=1.0):
     """
@@ -52,6 +53,8 @@ def forward_pass(model, batch, model_id="supervised", classify="binary", head="l
         return model(batch, classify, head, dropout)
     elif model_id=="relative_positioning" or model_id=="temporal_shuffling":
         return model(batch, head)
+    elif model_id=="VICRegT1":
+        return model(batch)
 
 
 def train_model(model, train_loader, optimizer, criterion, device, classify="binary", head="linear", dropout=True, 
@@ -78,8 +81,10 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
         outputs = forward_pass(model, batch, model_id, classify, head, dropout)
 
         # Do not reshape output if batch size is 1
-        if outputs.shape[0] > 1:
-            outputs = outputs.squeeze()
+
+        if model_id != "VICRegT1":
+            if outputs.shape[0] > 1:
+                outputs = outputs.squeeze()
         
         # Select the correct label column based on classification type
         supervised_models = {"supervised", "downstream1", "downstream2"}
@@ -91,14 +96,15 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
             labels = batch.y.float()
         
         # Calculate loss
-        loss = criterion(outputs.to(device), labels.to(device))
-
+        if model_id=="VICRegT1":
+            loss = criterion(outputs[0].to(device), outputs[1].to(device), labels.to(device))
+        else:
+            loss = criterion(outputs.to(device), labels.to(device))
+        epoch_train_loss += loss.item()
+        
         # Backward pass and optimization
         loss.backward()
         optimizer.step()
-        
-        # Training statistics
-        epoch_train_loss += loss.item()
         
         # Compute predictions for binary or multiclass classification
         if classify == "binary":
@@ -109,8 +115,9 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
             predictions = torch.argmax(probabilities, dim=1)
 
         # Sum total correct predictions
-        correct_train += (predictions == labels).sum().item()
-        total_train += labels.size(0)
+        if model_id!="VICRegT1":
+            correct_train += (predictions == labels).sum().item()
+            total_train += labels.size(0)
         
         # Compute 100 batch timing seconds
         if timing:
@@ -121,9 +128,12 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
 
     # Compute average loss and accuracy
     avg_loss = epoch_train_loss / len(train_loader)
-    accuracy = 100.0 * correct_train / total_train
-
-    return avg_loss, accuracy
+    
+    if model_id!="VICRegT1":
+        accuracy = 100.0 * correct_train / total_train
+        return avg_loss, accuracy
+    else:
+        return avg_loss, None
 
 
 def evaluate_model(model, loader, criterion, device, classify="binary", head="linear", dropout=False, 
@@ -148,8 +158,9 @@ def evaluate_model(model, loader, criterion, device, classify="binary", head="li
             outputs = forward_pass(model, batch, model_id, classify, head, dropout)
             
             # Do not reshape output if batch size is 1
-            if outputs.shape[0] > 1:
-                outputs = outputs.squeeze()
+            if model_id != "VICRegT1":
+                if outputs.shape[0] > 1:
+                    outputs = outputs.squeeze()
 
             # Select the correct label column based on classification type
             supervised_models = {"supervised", "downstream1", "downstream2"}
@@ -161,7 +172,10 @@ def evaluate_model(model, loader, criterion, device, classify="binary", head="li
                 labels = batch.y.float()
  
             # Calculate loss
-            loss = criterion(outputs.to(device), labels.to(device))
+            if model_id=="VICRegT1":
+                loss = criterion(outputs[0].to(device), outputs[1].to(device), labels.to(device))
+            else:
+                loss = criterion(outputs.to(device), labels.to(device))
             epoch_eval_loss += loss.item()
             
             # Compute predictions for binary or multiclass classification
@@ -172,9 +186,11 @@ def evaluate_model(model, loader, criterion, device, classify="binary", head="li
                 probabilities = torch.softmax(outputs, dim=1)
                 predictions = torch.argmax(probabilities, dim=1)
 
+
             # Sum total correct predictions
-            correct_eval += (predictions == labels).sum().item()
-            total_eval += labels.size(0)
+            if model_id!="VICRegT1":
+                correct_eval += (predictions == labels).sum().item()
+                total_eval += labels.size(0)
             
             if timing:
                 if batch_idx % 100 == 0:
@@ -183,9 +199,12 @@ def evaluate_model(model, loader, criterion, device, classify="binary", head="li
                     start_time = time.time()
 
     avg_loss = epoch_eval_loss / len(loader)
-    accuracy = 100.0 * correct_eval / total_eval
-
-    return avg_loss, accuracy
+    
+    if model_id!="VICRegT1":
+        accuracy = 100.0 * correct_eval / total_eval
+        return avg_loss, accuracy
+    else:
+        return avg_loss, None
 
 
 def save_model(model, logdir, model_name):
@@ -227,7 +246,7 @@ def save_to_json(data, logdir, file_name):
 def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_ratio=0.2, test_ratio=0.1, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id="supervised", timing=True, 
           classify="binary", head="linear", dropout=True, datetime_id=None, run_type="all", frozen=False,
-          model_path=None, model_dict_path=None, transfer_id=None, train_ratio=None):
+          model_path=None, model_dict_path=None, transfer_id=None, train_ratio=None, loss_config=None):
     """
     Trains the supervised GNN model, relative positioning model, or temporal shuffling model.
 
@@ -316,6 +335,9 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     elif model_id=="downstream2":
         extracted_layers = extract_layers(model_path, model_dict_path, transfer_id) 
         model = downstream2(config, extracted_layers, frozen).to(device)
+    elif model_id=="VICRegT1":
+        model = VICRegT1(config).to(device)
+        
     
     # Initialize optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
@@ -323,12 +345,14 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     # Initialize loss based on classification method and head
     if classify=="binary" and head=="linear":
         criterion = torch.nn.BCEWithLogitsLoss()
-    if classify=="binary" and head=="sigmoid":
+    elif classify=="binary" and head=="sigmoid":
         criterion = torch.nn.BCELoss()
-    if classify=="multiclass" and head=="linear":
+    elif classify=="multiclass" and head=="linear":
         criterion = torch.nn.CrossEntropyLoss()
-    if classify=="multiclass" and head=="softmax":
+    elif classify=="multiclass" and head=="softmax":
         criterion = torch.nn.NLLLoss()
+    if model_id=="VICRegT1":
+        criterion = VICRegT1Loss(loss_config)
 
     # Training statistics
     best_val_loss = float('inf')

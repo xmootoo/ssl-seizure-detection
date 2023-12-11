@@ -419,7 +419,7 @@ class VICRegT1(nn.Module):
         z1 = self.embedder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
         z2 = self.embedder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
 
-        return z1, z2
+        return (z1, z2)
 
 class CPC(nn.Module):
     def __init__(self):

@@ -844,10 +844,10 @@ def create_data_loaders(data,val_ratio=0.2, test_ratio=0.1, batch_size=32, num_w
         val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers)
         if test_ratio != 0:
             test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
-    elif model_id=="relative_positioning":
+    elif model_id in {"relative_positioning", "VICRegT1"}:
         train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
         val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
-        if test_ratio != 0:    
+        if test_ratio != 0:
             test_loader = DataLoader(test_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2'])
     elif model_id=="temporal_shuffling":
         train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers, follow_batch=['x1', 'x2', 'x3'])
