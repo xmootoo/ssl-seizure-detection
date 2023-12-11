@@ -6,7 +6,7 @@ sys.path.append("../src")
 import numpy as np
 import torch
 # OR to import specific functions:
-from preprocess import graph_triplets, pseudo_data, convert_to_TripletData, create_tensordata, graph_triplets_sampled, adj_to_edge_attr, build_K_n
+from preprocess import graph_triplets, pseudo_data, convert_to_TripletData, create_tensordata, graph_triplets_sampled, adj_to_edge_attr, build_K_n, vicreg1_pairs
 from torch_geometric.data import Data
 
 
@@ -187,3 +187,13 @@ def test_adj_to_edge_attr():
     for k in range(12):
         print(f"New edge_attr[{k}]: {edge_attr_new[k]}")
         print(f"Old edge_attr[{k}]: {case3_edge_attr[k]}")
+        
+        
+def test_vicregt1_pairs():
+    # Test case
+    graph_reps = [["a",0], ["b",0], ["c",0], ["d", 0], ["e", 0]]
+    sigma = 4
+    tau = 0.68
+    sample_ratio = 1.0
+
+    print(f"Pairs: {vicreg1_pairs(graph_reps, sigma, tau, sample_ratio)}")

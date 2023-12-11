@@ -400,12 +400,29 @@ class downstream2(nn.Module):
             return torch.softmax(x, dim=1)
 
 
+
+class VICRegT1(nn.Module):
+    def __init__(self, config):
+        super(VICRegT1, self).__init__()
+        num_node_features = config["num_node_features"]
+        num_edge_features = config["num_edge_features"]
+        hidden_channels = config["hidden_channels"]
+
+        # GNN embedder
+        self.embedder = gnn_embedder(num_node_features, num_edge_features, hidden_channels)
+
+        # Weight initialization
+        self.apply(init_weights)
         
+    def forward(self, batch):
+        # Graph embeddings
+        z1 = self.embedder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
+        z2 = self.embedder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
+
+        return z1, z2
+
 class CPC(nn.Module):
     def __init__(self):
         super(CPC, self).__init__()
     
 
-class VICReg(nn.Module):
-    def __init__(self):
-        super(VICReg, self).__init__()

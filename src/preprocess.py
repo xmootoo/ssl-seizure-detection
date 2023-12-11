@@ -384,6 +384,66 @@ def graph_triplets(graph_reps, tau_pos=50, tau_neg=170, sample_ratio=1.0):
     return graph_rep_triplets
 
 
+def gaussian_kernel(t1, t2, sigma):
+    """
+    Computes the Gaussian kernel value of two time points t1 and t2.
+
+    Args:
+        t1 (int): First time point.
+        t2 (int): Second time point.
+        sigma (float): Variance parameter of the Gaussian kernel.
+
+    Returns:
+        float: Gaussian kernel value of the two time points.
+    """
+    return np.exp(-np.square(t1 - t2) / (2 * np.square(sigma)))
+
+
+def vicregt1_pairs(graph_reps, sigma=5, tau=0.68, sample_ratio=1.0):
+    """ 
+    Creates unique sample pairs from a list of samples and their corresponding time indexes.
+
+    Args:
+        graph_reps (list of [gr1, gr2, Y]): Ordered list of graph representations each element is a list [gr1, gr2, Y] where
+        Y is its label (ictal or nonictal). The index of graph_reps corresponds to the discrete time point of the entire iEEG recording, where one time point 
+        is approx 0.12s.
+        sigma: The variance parameter of the Gaussian kernel.
+        tau: The threshold parameter for the Gaussian kernel values.
+        sample_ratio: Proportion of desired samples. Defaults to 1.0.
+
+    Returns:
+        graph_rep_pairs (list): List of graph representation pairs [gr1, gr2, y], where y=K(t1, t2) is the Guassian kernel value of the pair where each gr
+                                is a list [x, edge_attr, edge_index] where x, edge_attr, and edge_index are the standard PyG tensors and y is a float32 tensor.
+    """
+    n = len(graph_reps)
+
+    time_indices = random.sample(range(n), int(n * sample_ratio))
+
+    graph_rep_pairs = []
+    seen_pairs = set()
+
+    # Get rid of original labels
+    data = [graph_reps[i][0] for i in range(n)]
+
+    for i in time_indices:
+        for j in time_indices:
+            
+            # Compute kernel value
+            y = gaussian_kernel(i, j, sigma)
+            
+            # Threshold and keep pair if it passes the threshold
+            if y >= tau and i!=j and ((j, i) not in seen_pairs) and ((i, j) not in seen_pairs):
+                graph_rep_pairs.append([data[i], data[j], torch.tensor(y, dtype=torch.float32)])
+                seen_pairs.add((i, j))
+                seen_pairs.add((j, i))
+    
+    # Randomly shuffle both lists to ensure randomness
+    random.shuffle(graph_rep_pairs)
+
+    return graph_rep_pairs
+
+
+
 
 def cpc_tuples(data, K=5, N=5, P=1, data_size=100000):
     """
@@ -437,7 +497,8 @@ def cpc_tuples(data, K=5, N=5, P=1, data_size=100000):
   
 
 def pseudo_data(data, tau_pos=12 // 0.12, tau_neg=(9 * 60) // 0.12, stats=True, save=True, patientid="patient", 
-                logdir=None, model="relative_positioning", sample_ratio=1.0, K=5, N=5, P=1, data_size=100000):
+                logdir=None, model="relative_positioning", sample_ratio=1.0, K=5, N=5, P=1, data_size=100000,
+                sigma=5, tau=0.68):
     """
     Creates a pseudolabeled dataset of graph pairs, graph triplets, or CPC tuples from a list of graph representations.
 
@@ -449,7 +510,7 @@ def pseudo_data(data, tau_pos=12 // 0.12, tau_neg=(9 * 60) // 0.12, stats=True, 
         save (bool): Whether to save as pickle file or not. Defaults to True.
         patientid (str): Patient identification code. Defaults to "patient".
         logdir (str): Directory to save the pickle file. Defaults to None.
-        model (str): Model to use. Options: "relative_positioning", "temporal_shuffling", or "CPC". Defaults to "relative_positioning".
+        model (str): Model to use. Options: "relative_positioning", "temporal_shuffling", "CPC", "VICRegT1". Defaults to "relative_positioning".
 
     Returns:
         pairs (list): List of the form [[edge_index, x, edge_attr], [edge_index', x', edge_attr'], Y], where Y is the pseudolabel.
@@ -471,13 +532,13 @@ def pseudo_data(data, tau_pos=12 // 0.12, tau_neg=(9 * 60) // 0.12, stats=True, 
             counts = df['y'].value_counts()
             print(counts)
         
-        # Save as a pickle file
+        # Save as a .pt file
         if save:
             torch.save(pairs, logdir + patientid + ".pt")
         
         return pairs
     
-    if model == "temporal_shuffling":
+    elif model == "temporal_shuffling":
         triplets = graph_triplets(data, tau_pos, tau_neg, sample_ratio)
         
         # Descriptive statistics    
@@ -490,13 +551,25 @@ def pseudo_data(data, tau_pos=12 // 0.12, tau_neg=(9 * 60) // 0.12, stats=True, 
             counts = df['y'].value_counts()
             print(counts)
         
+        # Save as a .pt file
         if save:
             torch.save(triplets, logdir + patientid + ".pt")
         
         return triplets
-
-
-
+    
+    elif model == "VICRegT1":
+        pairs = vicregt1_pairs(data, sigma, tau, sample_ratio)
+        
+        # Save as a .pt file
+        if save:
+            torch.save(pairs, logdir + patientid + ".pt")
+            
+        return pairs
+    
+    #TODO: Implement CPC.
+    elif model == "CPC":
+        pass
+    
 
         
 def convert_to_Data(data_list, save = True, logdir = None):
@@ -572,6 +645,9 @@ class TupleData(Data):
             idx = int(key.split('_')[-1])  # assuming edge_index is followed by the index 1, 2, ...
             return getattr(self, f'x{idx}').size(0)
         return super().__inc__(key, value, *args, **kwargs)
+
+
+
 
 
 def convert_to_PairData(data_list, save = True, logdir = None):

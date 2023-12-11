@@ -5,13 +5,14 @@ import re
 from preprocess import new_grs, create_tensordata_new, convert_to_Data, pseudo_data, convert_to_PairData, convert_to_TripletData, cpc_tuples
 
 def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_neg=60//0.12, 
-          model="supervised", stats=True, save=True, sample_ratio=1.0, K=5, N=5, P=1, data_size=100000):
+          model="supervised", stats=True, save=True, sample_ratio=1.0, K=5, N=5, P=1, data_size=100000,
+          sigma=5, tau=0.68):
     """
     Preprocesses and convert various types of graph representations (GRs) to PyTorch Geometric data format.
 
     The function takes in pickled graph representation data found in '/User/projects/def-milad777/gr_research/brain-greg/data/ds003029-processed/graph_representation_elements', 
     preprocesses it according to the specified model type, and then converts the data into a PyTorch Geometric-friendly format. The function
-    supports supervised, relative positioning, and temporal shuffling models. It saves the converted data to the given log directory.
+    supports supervised, relative_positioning, temporal_shuffling, and VICRegT1 models. It saves the converted data to the given log directory.
 
     Args:
         graphrep_dir (tuple): Paths to the preictal, ictal, and postictal pickle files. 
@@ -28,6 +29,8 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_n
         stats (bool, optional): Whether to display statistics about the pseudolabeled data. Default is True.
         save (bool, optional): Whether to save the processed PyTorch Geometric data. Default is True.
         sample_ratio (int, optional): Proportion of samples to be used in relative positioning or temporal shuffling. Defaults to 1.0.
+        sigma (int, optional): Standard deviation of the Gaussian kernel used in VICRegT1. Default is 5.
+        tau (float, optional): Threshold for the Gaussian kernel used in VICRegT1. Default is 0.68.
     
     Returns:
         list of PyTorch Geometric Data: If model is "supervised", returns a list of PyTorch Geometric Data objects.
@@ -73,22 +76,29 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_n
         Data_list = convert_to_Data(pyg_grs, save=save, logdir=logdir)
         return Data_list
     
-    if model == "relative_positioning":
+    elif model == "relative_positioning":
         pdata = pseudo_data(pyg_grs, tau_pos=tau_pos, tau_neg=tau_neg, stats=stats, save=False, patientid="", 
                             logdir=None, model="relative_positioning", sample_ratio=sample_ratio)
         Pair_Data = convert_to_PairData(pdata, save=save, logdir=logdir)
         return Pair_Data
 
-    if model == "temporal_shuffling":
+    elif model == "temporal_shuffling":
         pdata = pseudo_data(pyg_grs, tau_pos=tau_pos, tau_neg=tau_neg, stats=stats, save=False, patientid="", 
                             logdir=None, model="temporal_shuffling", sample_ratio=sample_ratio)
         Triplet_Data = convert_to_TripletData(pdata, save=save, logdir=logdir)
         return Triplet_Data
 
+    elif model == "VICRegT1":
+        pdata = pseudo_data(pyg_grs, tau_pos=None, tau_neg=None, stats=False, save=False, patientid="", 
+                logdir=None, model="VICRegT1", sample_ratio=sample_ratio, K=None, N=None, P=None, data_size=None,
+                sigma=sigma, tau=tau)
+        Pair_Data = convert_to_PairData(pdata, save=save, logdir=logdir)
+        return Pair_Data
+        
 
 
 def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdir=None, tau_pos=12//0.12, tau_neg=60//0.12, 
-             model="supervised", stats=True, save=True, sample_ratio=1.0, K=5, N=5, P=1, data_size=100000):
+             model="supervised", stats=True, save=True, sample_ratio=1.0, K=5, N=5, P=1, data_size=100000, sigma=5, tau=0.68):
     """
     
     Automates the patch() function for a single patient.
@@ -136,14 +146,21 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
             sp_model_logdir = os.path.join(model_logdir, str(int(tau_pos * 0.12)) + "s_" + str(int(tau_neg * 0.12)) + "s_" + str(sample_ratio) + "sr")
             os.makedirs(sp_model_logdir, exist_ok=True)
         
-        if model == "CPC":
-            sp_model_logdir = os.path.join(model_logdir, str(K) + "K_" + str(N) + "N_" + str(P) + "P_" + str(data_size) + "ds")
+        #TODO: Check if this is functional.
+        # elif model == "CPC":
+        #     sp_model_logdir = os.path.join(model_logdir, str(K) + "K_" + str(N) + "N_" + str(P) + "P_" + str(data_size) + "ds")
+        #     os.makedirs(sp_model_logdir, exist_ok=True)
+        #     graphrep_dir = os.path.join(directory, patient, "supervised", patient + "_combined.pt")
+        #     patched_data = patch(graphrep_dir=graphrep_dir, logdir=sp_model_logdir, file_name=file_name, tau_pos=tau_pos, tau_neg=tau_neg, 
+        #                          model=model, stats=stats, save=False, sample_ratio=sample_ratio, K=K, N=N, P=P, data_size=data_size)
+        #     if save:
+                # torch.save(patched_data, os.path.join(sp_model_logdir, patient + ".pt"))
+        
+        elif model == "VICregT1":
+            sp_model_logdir = os.path.join(model_logdir, str(sigma) + "var_" + str(tau) + "tau" + str(sample_ratio) + "sr")
             os.makedirs(sp_model_logdir, exist_ok=True)
-            graphrep_dir = os.path.join(directory, patient, "supervised", patient + "_combined.pt")
-            patched_data = patch(graphrep_dir=graphrep_dir, logdir=sp_model_logdir, file_name=file_name, tau_pos=tau_pos, tau_neg=tau_neg, 
-                                 model=model, stats=stats, save=False, sample_ratio=sample_ratio, K=K, N=N, P=P, data_size=data_size)
-            if save:
-                torch.save(patched_data, os.path.join(sp_model_logdir, patient + ".pt"))
+        else:
+            sp_model_logdir = model_logdir
                 
         
         # Form a path for the patient folder
@@ -180,13 +197,14 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
 
                 if os.path.exists(path_preictal) and os.path.exists(path_ictal) and os.path.exists(path_postictal):
                     file_name = patient + "_run" + str(i)
-                    if model == "relative_positioning" or model == "temporal_shuffling":
+                    if model in {"relative_positioning", "temporal_shuffling", "VICRegT1"}:
                         save_dir = sp_model_logdir
                     else:
                         save_dir = model_logdir
                         
                     patched_data = patch(graphrep_dir=graphrep_dir,  logdir=save_dir, file_name=file_name, tau_pos=tau_pos, 
-                                         tau_neg=tau_neg, model=model, stats=stats, save=save, sample_ratio=sample_ratio)
+                                         tau_neg=tau_neg, model=model, stats=stats, save=save, sample_ratio=sample_ratio,
+                                         tau=tau, sigma=sigma)
                     
                     patched_data_list.append(patched_data)
             
@@ -215,21 +233,25 @@ if __name__ == "__main__":
     patient = str(sys.argv[2])
     logdir = str(sys.argv[3])
     model = str(sys.argv[4])
+    sample_ratio = str(sys.argv[5])
+    K, N, P, data_size, tau_pos, tau_neg, sigma, tau = range(8)
     
     if model == "CPC":
-        K = int(sys.argv[5])
-        N = int(sys.argv[6])
-        P = int(sys.argv[7])
-        data_size = int(sys.argv[8])
-        sample_ratio=1.0
+        K = int(sys.argv[6])
+        N = int(sys.argv[7])
+        P = int(sys.argv[8])
+        data_size = int(sys.argv[9])
+        
     elif model in {"relative_positioning", "temporal_shuffling"}:
-        tau_pos = float(sys.argv[5])
-        tau_neg = float(sys.argv[6])
-        sample_ratio = float(sys.argv[7])
-        K, N, P, data_size = 0, 0, 0, 0
+        tau_pos = float(sys.argv[6])
+        tau_neg = float(sys.argv[7])
+        
+    elif model == "VICRegT1":
+        sigma = int(sys.argv[5])
+        tau = float(sys.argv[6])
     
-    single_patient_patcher(user="xmootoo", patient_dir=patient_dir, patient=patient, logdir=logdir, tau_pos=tau_pos, tau_neg=tau_neg, 
-             model=model, stats=True, save=True, sample_ratio=sample_ratio, K=K, N=N, P=P, data_size=data_size)
+    single_patient_patcher(patient_dir=patient_dir, patient=patient, logdir=logdir, tau_pos=tau_pos, tau_neg=tau_neg, 
+                           model=model, sample_ratio=sample_ratio, K=K, N=N, P=P, data_size=data_size, sigma=sigma, tau=tau)
 
 
 
