@@ -1,21 +1,18 @@
 #!/bin/bash
 
-# Takes the patient as an argument
-patient="$1"
-
-# Other arguments
-K="$2"
-N="$3"
-P="$4"
-data_size="$5"
+# Takes the patient, sample_ratio, and time as arguments
+model="$1"
+patient="$2"
+sample_ratio="$3"
+time="$4"
+K="$5"
+N="$6"
+P="$7"
+data_size="$8"
 
 # Directories
 patient_dir="${xav}/ssl_epilepsy/data/patient_pyg"
 logdir="${xav}/ssl_epilepsy/data/patient_pyg"
-
-# Define arrays for different models, sample_ratios, and times
-model="CPC"
-time="01:00:00"
 job_name="patient_gr_conversion_${patient}_${model}"
 
 # Create a job for each model + sample_ratio + time

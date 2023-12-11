@@ -37,6 +37,7 @@ for i in "${!models[@]}"; do
 #SBATCH --output="${xav}/ssl_epilepsy/jobs/${job_name}.out"
 #SBATCH --mail-user=xmootoo@gmail.com
 #SBATCH --mail-type=ALL
+#SBATCH --account="def-milad777"
 
 cd "${xav}/ssl_epilepsy/ssl-seizure-detection/src"
 module load cuda/11.7 cudnn python/3.10
