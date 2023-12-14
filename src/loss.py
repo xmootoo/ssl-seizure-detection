@@ -1,6 +1,7 @@
 # Model
 from torch_geometric.nn import NNConv, GATConv, global_mean_pool
 from torch_geometric.graphgym.init import init_weights
+import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,7 +16,7 @@ def off_diagonal(x):
     return x.flatten()[:-1].view(n - 1, n + 1)[:, 1:].flatten()
 
 class VICRegT1Loss(nn.Module):
-    def __init__(self, loss_config = {"loss_coeffs":(1, 1, 1), "y_scale":True, "gamma":1, "epsilon":1e-4}):
+    def __init__(self, loss_config = {"loss_coeffs":(25, 25, 1), "y_scale":True, "gamma":1, "epsilon":1e-4}):
         # loss_coeffs=(1, 1, 1), y_scale=True, gamma=1, epsilon=1e-4
         super(VICRegT1Loss, self).__init__()
         
@@ -25,6 +26,9 @@ class VICRegT1Loss(nn.Module):
         self.epsilon = loss_config["epsilon"]
 
     def forward(self, z1, z2, labels):
+
+        # Number of features
+        d = z1.shape[-1]
         
         # Temporal Invariance Loss
         sqr_diff = torch.norm(z1 - z2, p=2, dim=-1)**2
@@ -36,7 +40,6 @@ class VICRegT1Loss(nn.Module):
         
         inv_loss = torch.mean(inv_terms)
         
-        
         # Variance Loss
         # Compute the variance along the batch dimension (dim=0)
         var1 = z1.var(dim=0, unbiased=True)  # Set unbiased=False for population variance
@@ -47,21 +50,18 @@ class VICRegT1Loss(nn.Module):
         std2 = torch.sqrt(var2 + self.epsilon)
 
         # Ensure each S(z^j) is at least gamma: the target standard deviation
-        var_loss1 = torch.sum(torch.relu(self.gamma - std1))
-        var_loss2 = torch.sum(torch.relu(self.gamma - std2))
-        var_loss = (var_loss1 + var_loss2) / 2
-
+        var_loss1 = torch.relu(self.gamma - std1).sum().div(d)
+        var_loss2 = torch.relu(self.gamma - std2).sum().div(d)
+        var_loss = (var_loss1 + var_loss2).div(2)
         
         # Covariance Loss
         # Compute the sample covariance matrices for z1 and z2
         z1_cov = torch.cov(z1.T, correction=1)
         z2_cov = torch.cov(z2.T, correction=1)
         
-        # Number of features
-        d = z1_cov.shape[0] 
-        
         # Sum the off diagonal elements
-        covar_loss = ((off_diagonal(z1_cov)**2).sum() + (off_diagonal(z2_cov)**2).sum()).div(d)
-        
+        covar_loss1 = (off_diagonal(z1_cov)**2).sum().div(d)
+        covar_loss2 = (off_diagonal(z2_cov)**2).sum().div(d)
+        covar_loss =  covar_loss1 + covar_loss2
         
         return self.inv_coeff * inv_loss + self.covar_coeff * covar_loss + self.var_coeff * var_loss

@@ -1,9 +1,11 @@
 # Model
 from torch_geometric.nn import NNConv, GATConv, global_mean_pool
+from torch_geometric.nn.norm import BatchNorm as GraphBatchNorm
 from torch_geometric.graphgym.init import init_weights
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 
 class EdgeMLP(nn.Module):
     def __init__(self, num_edge_features, input_node_features, output_node_features):
@@ -61,7 +63,65 @@ class gnn_embedder(nn.Module):
         x = F.relu(self.fc3(x))
         
         return x
+
+   
+
+class gnn_embedder2(nn.Module):
+    def __init__(self, num_node_features, num_edge_features, hidden_channels, batch_norm=True):
+        super(gnn_embedder2, self).__init__()
+        """
+        The embedding architecture used in RP, TS, and VICRegT models. Comprised of an encoder module and projector module.
         
+        """
+        
+        # Initialize the MLP for NNConv
+        self.edge_mlp = EdgeMLP(num_edge_features, num_node_features, hidden_channels[0])
+        
+        # Encoder
+        self.conv1 = NNConv(num_node_features, hidden_channels[0], self.edge_mlp)
+        self.conv2 = GATConv(hidden_channels[0], hidden_channels[1], heads=1, concat=False)
+        self.conv3 = GATConv(hidden_channels[1], hidden_channels[2], heads=1, concat=False)
+        
+        # Projector
+        self.fc1 = nn.Linear(hidden_channels[2], hidden_channels[3])
+        self.fc2 = nn.Linear(hidden_channels[3], hidden_channels[4])
+        self.fc3 = nn.Linear(hidden_channels[4], hidden_channels[5])
+        
+        
+        if batch_norm:
+            # Batch Normalization for graph layers
+            self.bn_graph1 = GraphBatchNorm(hidden_channels[0])
+            self.bn_graph2 = GraphBatchNorm(hidden_channels[1])
+            self.bn_graph3 = GraphBatchNorm(hidden_channels[2])
+            
+            # Batch Normalization for fully connected layers
+            self.bn1 = nn.BatchNorm1d(hidden_channels[3])
+            self.bn2 = nn.BatchNorm1d(hidden_channels[4])
+        
+        else:
+            self.bn_graph1 = self.bn_graph2 = self.bn_graph3 = self.bn1 = self.bn2 = nn.Identity()
+            
+        # Weight initialization
+        self.apply(init_weights)
+        
+    def forward(self, x, edge_index, edge_attr, batch):
+        
+        # NNConv layer
+        x = F.relu(self.bn_graph1(self.conv1(x, edge_index, edge_attr)))
+        
+        # GATConv layers
+        x = F.relu(self.bn_graph2(self.conv2(x, edge_index)))
+        x = F.relu(self.bn_graph3(self.conv3(x, edge_index)))
+        
+        # Global average pooling
+        x = global_mean_pool(x, batch) #<-- batch vector to keep track of graphs
+
+        # Fully connected layers
+        x = F.relu(self.bn1(self.fc1(x)))
+        x = F.relu(self.bn2(self.fc2(x)))
+        x = self.fc3(x)
+        
+        return x
 
 
 class relative_positioning(nn.Module):
@@ -143,7 +203,6 @@ class temporal_shuffling(nn.Module):
         return z.squeeze(1)
     
 
-
 class supervised_model(nn.Module):
     def __init__(self, config):
         super(supervised_model, self).__init__()
@@ -178,20 +237,17 @@ class supervised_model(nn.Module):
     def forward(self, batch, classify="binary", head="linear", dropout=True):
 
         # ECC
-        x = self.conv1(batch.x, batch.edge_index, batch.edge_attr)
-        x = F.relu(x)
+        x = F.relu(self.conv1(batch.x, batch.edge_index, batch.edge_attr))
 
         # GAT
-        x = self.conv2(x, batch.edge_index)
-        x = F.relu(x)
+        x = F.relu(self.conv2(x, batch.edge_index))
 
         # Global average pooling
         x = global_mean_pool(x, batch.batch)
 
 
         # Fully connected layers
-        x = self.fc1(x)
-        x = F.relu(x)
+        x = F.relu(self.fc1(x))
 
         if dropout:
             x = self.dropout(x)
@@ -273,29 +329,24 @@ class downstream1(nn.Module):
     
     def forward(self, batch, classify="binary", head="linear", dropout=True):
 
-        # ECC1
-        x = self.conv1(batch.x, batch.edge_index, batch.edge_attr)
-        x = F.relu(x)
+        # ECC 1
+        x = F.relu(self.conv1(batch.x, batch.edge_index, batch.edge_attr))
 
-        # GAT
-        x = self.conv2(x, batch.edge_index)
-        x = F.relu(x)
+        # GAT 1
+        x = F.relu(self.conv2(x, batch.edge_index))
         
-        # ECC
-        x = self.conv3(x, batch.edge_index, batch.edge_attr)
-        x = F.relu(x)
-
-        # GAT
-        x = self.conv4(x, batch.edge_index)
-        x = F.relu(x)
+        # ECC 2
+        x = F.relu(self.conv3(x, batch.edge_index, batch.edge_attr))
+        
+        # GAT 2
+        x = F.relu(self.conv4(x, batch.edge_index))
 
         # Global average pooling
         x = global_mean_pool(x, batch.batch)
 
 
-        # Fully connected layers
-        x = self.fc1(x)
-        x = F.relu(x)
+        # Fully connected layer
+        x = F.relu(self.fc1(x))
 
         if dropout:
             x = self.dropout(x)
@@ -366,20 +417,17 @@ class downstream2(nn.Module):
     
     def forward(self, batch, classify="binary", head="linear", dropout=True):
         
-        # ECC1
-        x = self.conv1(batch.x, batch.edge_index, batch.edge_attr)
-        x = F.relu(x)
+        # ECC
+        x = F.relu(self.conv1(batch.x, batch.edge_index, batch.edge_attr))
 
         # GAT
-        x = self.conv2(x, batch.edge_index)
-        x = F.relu(x)
+        x = F.relu(self.conv2(x, batch.edge_index))
 
         # Global average pooling
         x = global_mean_pool(x, batch.batch)
 
         # Fully connected layers
-        x = self.fc1(x)
-        x = F.relu(x)
+        x = F.relu(self.fc1(x))
 
         if dropout:
             x = self.dropout(x)
@@ -407,10 +455,11 @@ class VICRegT1(nn.Module):
         num_node_features = config["num_node_features"]
         num_edge_features = config["num_edge_features"]
         hidden_channels = config["hidden_channels"]
+        batch_norm = config["batch_norm"]
 
-        # GNN embedder
-        self.embedder = gnn_embedder(num_node_features, num_edge_features, hidden_channels)
-
+        # GNN embedders
+        self.embedder = gnn_embedder2(num_node_features, num_edge_features, hidden_channels, batch_norm)
+        
         # Weight initialization
         self.apply(init_weights)
         

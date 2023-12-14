@@ -6,8 +6,11 @@ import torch.nn.functional as F
 import random
 import wandb
 from loss import VICRegT1Loss
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from preprocess import run_sorter, combiner, create_data_loaders, extract_layers
 from models import relative_positioning, temporal_shuffling, supervised_model, downstream1, downstream2, VICRegT1
+
+os.environ["WANDB_INIT_TIMEOUT"] = "300"
 
 def load_data(data_path, run_type="all", data_size=1.0):
     """
@@ -246,7 +249,8 @@ def save_to_json(data, logdir, file_name):
 def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_ratio=0.2, test_ratio=0.1, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id="supervised", timing=True, 
           classify="binary", head="linear", dropout=True, datetime_id=None, run_type="all", frozen=False,
-          model_path=None, model_dict_path=None, transfer_id=None, train_ratio=None, loss_config=None):
+          model_path=None, model_dict_path=None, transfer_id=None, train_ratio=None, loss_config=None,
+          project_id="Test Bay", patience = 20):
     """
     Trains the supervised GNN model, relative positioning model, or temporal shuffling model.
 
@@ -283,6 +287,9 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         train_ratio (float, optional): Proportion of data_size * len(data) to be used for training if between 0 and 1, if > 1 then it is the exact 
                                         number of examples to use for training. Defaults to None. If set to None, then the remaining data not used in 
                                         validation and testing is used for training.
+        loss_config (dict, optional): Dictionary of loss hyperparameters. Defaults to None.
+        project_id (str, optional): Project ID for Weights & Biases. Defaults to None. Suggested: "ssl-seizure-detection-V2".
+    
     Saves:
         model (pytorch model): PyTorch model architecture and weights.
         model_state_dict (pytorch model): PyTorch model parameters.
@@ -296,7 +303,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     """
     
     # Initialize Weights & Biases
-    wandb.init(project="ssl-seizure-detection", config=config, name=f"{patient_id}_{model_id}_{datetime_id}_{run_type}")
+    wandb.init(project= project_id, config=config, name=f"{patient_id}_{model_id}_{datetime_id}_{run_type}")
     if transfer_id is not None:
         wandb.run.name = f"{patient_id}_{model_id}_{datetime_id}_{run_type}_{transfer_id}"
     
@@ -309,9 +316,6 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         print(f"Using MPS Device Acceleration.")
     else:
          print(f"Using device: {device}")
-
-    # Patience parameter
-    patience = 20
     
     # Initialize loaders, scaler, model, optimizer, and loss
     loaders, loader_stats = create_data_loaders(data, val_ratio=val_ratio, test_ratio=test_ratio, batch_size=batch_size, 
@@ -342,6 +346,9 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     # Initialize optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
+    # Initialize learning rate scheduler
+    scheduler = CosineAnnealingLR(optimizer, T_max=epochs, eta_min=0.002)
+    
     # Initialize loss based on classification method and head
     if classify=="binary" and head=="linear":
         criterion = torch.nn.BCEWithLogitsLoss()
@@ -405,6 +412,8 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
             if counter >= patience:
                 print("Early stopping triggered.")
                 break
+        
+        scheduler.step()
     
            
     #<----------Testing---------->
