@@ -5,5 +5,5 @@ declare -a patients=("jh101" "jh103" "jh108" "pt01" "pt2" "pt3" "pt6" "pt7" "pt8
 
 # Loop over each patient and call the original script
 for patient_id in "${patients[@]}"; do
-    bash supervised_patch.sh "supervised" "$patient_id" "1.0" "01:30:00"
+    bash supervised_patch.sh "supervised" "$patient_id" "1.0" "00:30:00"
 done
