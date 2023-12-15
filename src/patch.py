@@ -156,7 +156,7 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
         #     if save:
                 # torch.save(patched_data, os.path.join(sp_model_logdir, patient + ".pt"))
         
-        elif model == "VICregT1":
+        elif model == "VICRegT1":
             sp_model_logdir = os.path.join(model_logdir, str(sigma) + "var_" + str(tau) + "tau" + str(sample_ratio) + "sr")
             os.makedirs(sp_model_logdir, exist_ok=True)
         else:
