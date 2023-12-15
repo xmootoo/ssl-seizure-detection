@@ -89,7 +89,7 @@ def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_n
         return Triplet_Data
 
     elif model == "VICRegT1":
-        pdata = pseudo_data(pyg_grs, tau_pos=None, tau_neg=None, stats=False, save=False, patientid="", 
+        pdata = pseudo_data(pyg_grs, tau_pos=None, tau_neg=None, stats=stats, save=False, patientid="", 
                 logdir=None, model="VICRegT1", sample_ratio=sample_ratio, K=None, N=None, P=None, data_size=None,
                 sigma=sigma, tau=tau)
         Pair_Data = convert_to_PairData(pdata, save=save, logdir=logdir)
@@ -146,7 +146,7 @@ def single_patient_patcher(user="xmootoo", patient_dir=None, patient=None, logdi
             sp_model_logdir = os.path.join(model_logdir, str(int(tau_pos * 0.12)) + "s_" + str(int(tau_neg * 0.12)) + "s_" + str(sample_ratio) + "sr")
             os.makedirs(sp_model_logdir, exist_ok=True)
         
-        #TODO: Check if this is functional.
+        #TODO: Check if this is functional. If it doesn't create a new class of data using TupleData, then it's not functional.
         # elif model == "CPC":
         #     sp_model_logdir = os.path.join(model_logdir, str(K) + "K_" + str(N) + "N_" + str(P) + "P_" + str(data_size) + "ds")
         #     os.makedirs(sp_model_logdir, exist_ok=True)

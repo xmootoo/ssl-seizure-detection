@@ -560,6 +560,9 @@ def pseudo_data(data, tau_pos=12 // 0.12, tau_neg=(9 * 60) // 0.12, stats=True, 
     elif model == "VICRegT1":
         pairs = vicregt1_pairs(data, sigma, tau, sample_ratio)
         
+        if stats:
+            print(f"Number of examples: {len(pairs)}")
+        
         # Save as a .pt file
         if save:
             torch.save(pairs, logdir + patientid + ".pt")
