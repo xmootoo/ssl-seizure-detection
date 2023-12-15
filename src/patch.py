@@ -233,7 +233,7 @@ if __name__ == "__main__":
     patient = str(sys.argv[2])
     logdir = str(sys.argv[3])
     model = str(sys.argv[4])
-    sample_ratio = str(sys.argv[5])
+    sample_ratio = float(sys.argv[5])
     K, N, P, data_size, tau_pos, tau_neg, sigma, tau = range(8)
     
     if model == "CPC":
@@ -247,8 +247,8 @@ if __name__ == "__main__":
         tau_neg = float(sys.argv[7])
         
     elif model == "VICRegT1":
-        sigma = int(sys.argv[5])
-        tau = float(sys.argv[6])
+        sigma = float(sys.argv[6])
+        tau = float(sys.argv[7])
     
     single_patient_patcher(patient_dir=patient_dir, patient=patient, logdir=logdir, tau_pos=tau_pos, tau_neg=tau_neg, 
                            model=model, sample_ratio=sample_ratio, K=K, N=N, P=P, data_size=data_size, sigma=sigma, tau=tau)
