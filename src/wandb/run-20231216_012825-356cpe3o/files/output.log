@@ -1,0 +1,32 @@
+Using device: cuda
+None
+Total number of examples in dataset: 72912.
+Total number of examples used: 72912.
+Number of training examples: 58330. Number of training batches: 228.
+Number of validation examples: 14582. Number of validation batches: 57.
+Time elapsed after 100 batches (training): 6.545687913894653
+Time elapsed after 100 batches (training): 54.967833518981934
+Time elapsed after 100 batches (training): 54.69690752029419
+Time elapsed after 100 batches (evaluation): 1.312366008758545
+Epoch: 1, Train Loss: 541829.9892064144, Train Accuracy: None, Validation Loss: 137.32524845056366, Validation Accuracy: None
+Time elapsed after 100 batches (training): 1.5936708450317383
+Time elapsed after 100 batches (training): 55.15193319320679
+Time elapsed after 100 batches (training): 55.21180582046509
+Time elapsed after 100 batches (evaluation): 1.5326712131500244
+Epoch: 2, Train Loss: 3000.7738875004284, Train Accuracy: None, Validation Loss: 51.756445232190586, Validation Accuracy: None
+Time elapsed after 100 batches (training): 1.3919677734375
+Time elapsed after 100 batches (training): 55.820286989212036
+Time elapsed after 100 batches (training): 55.35997939109802
+Time elapsed after 100 batches (evaluation): 1.3115313053131104
+Epoch: 3, Train Loss: 996.0455954033032, Train Accuracy: None, Validation Loss: 35.46137481823302, Validation Accuracy: None
+Time elapsed after 100 batches (training): 1.515998125076294
+Time elapsed after 100 batches (training): 55.59048891067505
+Time elapsed after 100 batches (training): 55.45732140541077
+Time elapsed after 100 batches (evaluation): 1.3596467971801758
+Epoch: 4, Train Loss: 543.0662243491724, Train Accuracy: None, Validation Loss: 31.48263074640642, Validation Accuracy: None
+Time elapsed after 100 batches (training): 1.9111993312835693
+Time elapsed after 100 batches (training): 56.0054190158844
+Time elapsed after 100 batches (training): 55.68190407752991
+Time elapsed after 100 batches (evaluation): 1.375056505203247
+Epoch: 5, Train Loss: 390.7414446379009, Train Accuracy: None, Validation Loss: 30.056840361210337, Validation Accuracy: None
+Training complete.

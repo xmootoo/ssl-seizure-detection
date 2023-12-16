@@ -16,7 +16,7 @@ project_id="$8"
 
 # Train, val, test split
 split="$9"
-time="00:30:00"
+time="${10}"
 
 # Directories
 base_dir="${xav}/ssl_epilepsy/models/${patient_id}"
@@ -33,6 +33,7 @@ classify="None"
 
 echo "Preparing to submit VICRegT1 training job..."
 sbatch <<EOT
+#!/bin/bash
 #SBATCH --ntasks=1              # Number of tasks
 #SBATCH --gres=gpu:v100l:1      # Number of Volta 100 GPUs
 #SBATCH --cpus-per-task=8      # CPU cores/threads, AKA number of workers (num_workers)

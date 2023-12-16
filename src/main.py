@@ -114,7 +114,7 @@ if __name__ == '__main__':
             }
         lr=0.2
         patience=float("inf")
-        data_size=1.0
+        data_size=100000
         batch_size=256
         weight_decay=1e-6
         dropout=True
