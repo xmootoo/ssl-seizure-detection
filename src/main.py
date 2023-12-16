@@ -27,19 +27,24 @@ if __name__ == '__main__':
 
     # Train, val, test split. Must formatted as "train,val,test" in the command line.
     split = [float(x) for x in sys.argv[8].split(",")]
-    
     if len(split) == 3:
         train_ratio, val_ratio, test_ratio = split[0], split[1], split[2]
     elif len(split) == 2:
         val_ratio, test_ratio = split[0], split[1]
         train_ratio=None
     
+    # Num of epochs
+    epochs = int(sys.argv[9])
+    
+    # Project id
+    project_id = str(sys.argv[10])
+    
     # Transfer learning (optional arguments)
-    if len(sys.argv) > 9:
-        model_path = str(sys.argv[9])
-        model_dict_path = str(sys.argv[10])
-        transfer_id = str(sys.argv[11])
-        frozen = bool(int(sys.argv[12])) # convert 0 or 1 to False or True
+    if len(sys.argv) > 11:
+        model_path = str(sys.argv[11])
+        model_dict_path = str(sys.argv[12])
+        transfer_id = str(sys.argv[13])
+        frozen = bool(int(sys.argv[14])) # convert 0 or 1 to False or True
     else:
         model_path=None
         model_dict_path=None
@@ -48,7 +53,7 @@ if __name__ == '__main__':
 
     # Node feature dimension configuration (some patients have less node features)
     if patient_id in {"ummc003", "ummc004", "ummc006"}:
-        num_node_features = 7 
+        num_node_features = 7
     elif patient_id in {"ummc001", "ummc002"}:
         num_node_features = 8
     else:
@@ -56,8 +61,6 @@ if __name__ == '__main__':
 
     
     # Training parameters
-    epochs=200
-    
     if model_id == "supervised":
         config = {
             "num_node_features": num_node_features,
@@ -98,19 +101,27 @@ if __name__ == '__main__':
             "num_edge_features": 3,
             "hidden_channels": [64, 128, 128, 512, 512, 512],
             "batch_norm": True,
+            "dropout": True,
+            "p": 0.1,
             }
         
         # Data size
         loss_config = {
-            "loss_coeffs":(25, 25, 1), 
+            "loss_coeffs": (25, 25, 1), 
             "y_scale": True, 
             "gamma": 1, 
             "epsilon": 1e-4,
             }
+        lr=0.2
+        patience=float("inf")
+        data_size=1.0
+        batch_size=256
+        weight_decay=1e-6
+        dropout=True
 
-
-    train(data_path, logdir, patient_id, epochs, config, data_size, val_ratio, test_ratio, 
-        batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id=model_id, timing=True, 
-        classify=classify, head="linear", dropout=True, datetime_id=datetime_id, run_type=run_type, 
-        frozen=frozen, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id,
-        train_ratio=train_ratio)
+    
+    train(data_path=data_path, logdir=logdir, patient_id=patient_id, epochs=epochs, config=config, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
+          batch_size=batch_size, num_workers=4, lr=lr, weight_decay=weight_decay, model_id=model_id, timing=True, 
+          classify=classify, head="linear", dropout=dropout, datetime_id=datetime_id, run_type=run_type, frozen=frozen,
+          model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id, train_ratio=train_ratio, loss_config=loss_config,
+          project_id=project_id, patience = patience)
