@@ -73,7 +73,7 @@ def train_model(model, train_loader, optimizer, criterion, device, classify="bin
         start_time = time.time()
     
     for batch_idx, batch in enumerate(train_loader):
-        
+
         # Zero the parameter gradients
         optimizer.zero_grad()
 
@@ -325,7 +325,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     else:
         train_loader, val_loader = loaders
     
-
+    
     # Select model
     if model_id=="supervised":
         model = supervised_model(config).to(device)
@@ -360,7 +360,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         criterion = torch.nn.NLLLoss()
     if model_id=="VICRegT1":
         criterion = VICRegT1Loss(loss_config)
-
+    
     # Training statistics
     best_val_loss = float('inf')
     counter = 0

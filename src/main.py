@@ -94,7 +94,7 @@ if __name__ == '__main__':
         
         # Model and loss parameters
         config = {
-            "num_node_features": 9,
+            "num_node_features": num_node_features,
             "num_edge_features": 3,
             "hidden_channels": [64, 128, 128, 512, 512, 512],
             "batch_norm": True,
@@ -103,9 +103,9 @@ if __name__ == '__main__':
         # Data size
         loss_config = {
             "loss_coeffs":(25, 25, 1), 
-            "y_scale":True, 
-            "gamma":1, 
-            "epsilon":1e-4,
+            "y_scale": True, 
+            "gamma": 1, 
+            "epsilon": 1e-4,
             }
 
 

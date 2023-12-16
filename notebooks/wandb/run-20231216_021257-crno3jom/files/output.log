@@ -1,0 +1,19 @@
+Using device: cuda
+None
+Total number of examples in dataset: 920.
+Total number of examples used: 920.
+Number of training examples: 736. Number of training batches: 23.
+Number of validation examples: 184. Number of validation batches: 6.
+Time elapsed after 100 batches (training): 18.397002696990967
+Time elapsed after 100 batches (evaluation): 13.31800103187561
+Epoch: 1, Train Loss: 600620.8817934783, Train Accuracy: None, Validation Loss: 9059338.685872396, Validation Accuracy: None
+Time elapsed after 100 batches (training): 13.504997968673706
+Time elapsed after 100 batches (evaluation): 12.856500625610352
+Epoch: 2, Train Loss: 30924.090714164402, Train Accuracy: None, Validation Loss: 118136.9766438802, Validation Accuracy: None
+Time elapsed after 100 batches (training): 13.601000785827637
+Time elapsed after 100 batches (evaluation): 12.989501953125
+Epoch: 3, Train Loss: 20439.514712126358, Train Accuracy: None, Validation Loss: 4583.79170481364, Validation Accuracy: None
+Time elapsed after 100 batches (training): 13.341499090194702
+Time elapsed after 100 batches (evaluation): 12.65350079536438
+Epoch: 4, Train Loss: 13053.034285835598, Train Accuracy: None, Validation Loss: 2814.1495463053384, Validation Accuracy: None
+Training complete.

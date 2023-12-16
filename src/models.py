@@ -67,7 +67,7 @@ class gnn_embedder(nn.Module):
    
 
 class gnn_embedder2(nn.Module):
-    def __init__(self, num_node_features, num_edge_features, hidden_channels, batch_norm=True):
+    def __init__(self, num_node_features, num_edge_features, hidden_channels, batch_norm=True, dropout=True, p=0.1):
         super(gnn_embedder2, self).__init__()
         """
         The embedding architecture used in RP, TS, and VICRegT models. Comprised of an encoder module and projector module.
@@ -81,6 +81,13 @@ class gnn_embedder2(nn.Module):
         self.conv1 = NNConv(num_node_features, hidden_channels[0], self.edge_mlp)
         self.conv2 = GATConv(hidden_channels[0], hidden_channels[1], heads=1, concat=False)
         self.conv3 = GATConv(hidden_channels[1], hidden_channels[2], heads=1, concat=False)
+        
+        # Dropout
+        self.dropout = dropout
+        if self.dropout:
+            self.net_dropout = nn.Dropout(p=p)
+        else:
+            self.net_dropout = nn.Identity()
         
         # Projector
         self.fc1 = nn.Linear(hidden_channels[2], hidden_channels[3])
@@ -118,7 +125,10 @@ class gnn_embedder2(nn.Module):
 
         # Fully connected layers
         x = F.relu(self.bn1(self.fc1(x)))
+        x = self.net_dropout(x)
         x = F.relu(self.bn2(self.fc2(x)))
+        x = self.net_dropout(x)
+        
         x = self.fc3(x)
         
         return x
@@ -454,11 +464,13 @@ class VICRegT1(nn.Module):
         super(VICRegT1, self).__init__()
         num_node_features = config["num_node_features"]
         num_edge_features = config["num_edge_features"]
-        hidden_channels = config["hidden_channels"]
-        batch_norm = config["batch_norm"]
+        hidden_channels = config.get("hidden_channels", [64, 128, 128, 512, 512, 512])
+        batch_norm = config.get("batch_norm", True)
+        dropout = config.get("dropout", True)
+        p = config.get("p", 0.1)
 
         # GNN embedders
-        self.embedder = gnn_embedder2(num_node_features, num_edge_features, hidden_channels, batch_norm)
+        self.embedder = gnn_embedder2(num_node_features, num_edge_features, hidden_channels, batch_norm, dropout, p)
         
         # Weight initialization
         self.apply(init_weights)
