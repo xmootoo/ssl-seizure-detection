@@ -119,9 +119,8 @@ if __name__ == '__main__':
         weight_decay=1e-6
         dropout=True
 
-    
+
     train(data_path=data_path, logdir=logdir, patient_id=patient_id, epochs=epochs, config=config, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
-          batch_size=batch_size, num_workers=4, lr=lr, weight_decay=weight_decay, model_id=model_id, timing=True, 
-          classify=classify, head="linear", dropout=dropout, datetime_id=datetime_id, run_type=run_type, frozen=frozen,
-          model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id, train_ratio=train_ratio, loss_config=loss_config,
-          project_id=project_id, patience = patience)
+          batch_size=batch_size, num_workers=10, lr=lr, weight_decay=weight_decay, model_id=model_id, timing=True, classify=classify, head="linear", dropout=dropout, 
+          datetime_id=datetime_id, run_type=run_type, frozen=frozen, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id, train_ratio=train_ratio, 
+          loss_config=loss_config, project_id=project_id, patience = patience)

@@ -32,8 +32,8 @@ classify="None"
 
 #SBATCH --ntasks=1              # Number of tasks
 #SBATCH --gres=gpu:v100l:1      # Number of Volta 100 GPUs
-#SBATCH --cpus-per-task=8       # CPU cores/threads, AKA number of workers (num_workers)
-#SBATCH --mem-per-cpu=12G       # memory per CPU core
+#SBATCH --cpus-per-task=10       # CPU cores/threads, AKA number of workers (num_workers)
+#SBATCH --mem-per-cpu=16G       # memory per CPU core
 #SBATCH --time="${time}"        # Time limit for the job  
 #SBATCH --job-name="${job_name}"
 #SBATCH --output="${xav}/ssl_epilepsy/jobs/training/${job_name}.out"
