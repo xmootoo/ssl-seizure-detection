@@ -30,10 +30,13 @@ job_name="training_${patient_id}_${model_id}_${time}_${datetime_id}"
 run_type="all"
 classify="None"
 
+
+echo "Preparing to submit VICRegT1 training job..."
+sbatch <<EOT
 #SBATCH --ntasks=1              # Number of tasks
 #SBATCH --gres=gpu:v100l:1      # Number of Volta 100 GPUs
-#SBATCH --cpus-per-task=20       # CPU cores/threads, AKA number of workers (num_workers)
-#SBATCH --mem-per-cpu=16G       # memory per CPU core
+#SBATCH --cpus-per-task=8      # CPU cores/threads, AKA number of workers (num_workers)
+#SBATCH --mem-per-cpu=12G       # memory per CPU core
 #SBATCH --time="${time}"        # Time limit for the job  
 #SBATCH --job-name="${job_name}"
 #SBATCH --output="${xav}/ssl_epilepsy/jobs/training/${job_name}.out"
@@ -49,3 +52,11 @@ source ~/torch2_cuda11.7/bin/activate
 export WANDB_API_KEY="$WANDB_API_KEY"
 
 python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${classify}" "${split}" "${epochs}" "${project_id}"
+EOT
+
+if [ $? -ne 0 ]; then
+    echo "Error: sbatch submission failed."
+    exit 1
+fi
+
+echo "Job submission complete."
