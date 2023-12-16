@@ -277,6 +277,45 @@ class supervised_model(nn.Module):
             return torch.softmax(x, dim=1)
 
 
+class VICRegT1(nn.Module):
+    def __init__(self, config):
+        super(VICRegT1, self).__init__()
+        num_node_features = config["num_node_features"]
+        num_edge_features = config["num_edge_features"]
+        hidden_channels = config.get("hidden_channels", [64, 128, 128, 512, 512, 512])
+        batch_norm = config.get("batch_norm", True)
+        dropout = config.get("dropout", True)
+        p = config.get("p", 0.1)
+
+        # GNN embedders
+        self.embedder = gnn_embedder2(num_node_features, num_edge_features, hidden_channels, batch_norm, dropout, p)
+        
+        # Weight initialization
+        self.apply(init_weights)
+        
+    def forward(self, batch):
+        # Graph embeddings
+        z1 = self.embedder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
+        z2 = self.embedder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
+
+        return (z1, z2)
+
+
+
+def set_requires_grad(layers_dict, requires_grad=True):
+    """
+    Set the requires_grad attribute for all parameters in the layers contained in the given dictionary.
+
+    Args:
+        layers_dict (dict): A dictionary where keys are layer names and values are nn.Modules whose parameters will be set.
+        requires_grad (bool): Whether the layers' parameters should require gradients (unfrozen) or not (frozen).
+    """
+    for layer in layers_dict.values():
+        for param in layer.parameters():
+            param.requires_grad = requires_grad
+
+
+
 class downstream1(nn.Module):
     def __init__(self, config, pretrained_layers, frozen=False):
         super(downstream1, self).__init__()
@@ -458,29 +497,88 @@ class downstream2(nn.Module):
             return torch.softmax(x, dim=1)
 
 
+class downstream3(nn.Module):    
+    def __init__(self, config, pretrained_layers, requires_grad=False):
+        """
+        Downstream model for seizure detection (binary or multiclass). Trains a GNN encoder (frozen or unfrozen) and a simple nonlinear classifier ontop
+        (logistic regression or multinomial logistic regression) with frozen encoder or unfrozen encoder.
+        
+        Args:
+            config (dict): Dictionary containing the configuration of the model, containing hidden_channels which is a single value, and the dropout probability.
+            pretrained_layers (tuple): Tuple containing the pretrained layers.
+            requires_grad (bool): Whether to require gradients for pretrained layers. If True, the layers are unfrozen, if False the layers are frozen.
+        
+        """    
+        super(downstream3, self).__init__()
+        hidden_channels = config["hidden_channels"]
+        dropout = config["dropout"]
 
-class VICRegT1(nn.Module):
-    def __init__(self, config):
-        super(VICRegT1, self).__init__()
-        num_node_features = config["num_node_features"]
-        num_edge_features = config["num_edge_features"]
-        hidden_channels = config.get("hidden_channels", [64, 128, 128, 512, 512, 512])
-        batch_norm = config.get("batch_norm", True)
-        dropout = config.get("dropout", True)
-        p = config.get("p", 0.1)
+        # Graph layers (petrained)
+        self.conv1 = pretrained_layers["conv1"]
+        self.conv2 = pretrained_layers["conv2"]
+        self.conv3 = pretrained_layers["conv3"]
 
-        # GNN embedders
-        self.embedder = gnn_embedder2(num_node_features, num_edge_features, hidden_channels, batch_norm, dropout, p)
+        # Batch normalization layers (petrained)
+        self.bn_graph1 = pretrained_layers["bn_graph1"]
+        self.bn_graph2 = pretrained_layers["bn_graph2"]
+        self.bn_graph3 = pretrained_layers["bn_graph3"]
+        
+        # Batch Normalization for fully connected layers
+        self.bn1 = pretrained_layers["bn1"]
+        self.bn2 = pretrained_layers["bn2"]
+
+        # Assign the pretrained MLP to the NNConv1
+        self.conv1.edge_mlp = pretrained_layers["edge_mlp"]
+        
+        # Output feature dimensions of pretrained layers
+        num_node_features = self.conv1.out_channels
+        num_edge_features = self.conv1.edge_mlp.state_dict()['mlp.0.weight'].size()[1]
+        
+        # Conditionally freeze or unfreeze pretrained layers
+        set_requires_grad(pretrained_layers, requires_grad)
+
+        # Dropout
+        if dropout:
+            self.dropout = nn.Dropout(p=dropout)
+        else:
+            self.dropout = nn.Identity()
+
+        # Last fully connected layer
+        self.fc1 = nn.Linear(num_node_features, 1)
+        self.fc2 = nn.Linear(num_node_features, 3)
         
         # Weight initialization
         self.apply(init_weights)
+    
+    def forward(self, batch, classify="binary", head="linear", dropout=True):
         
-    def forward(self, batch):
-        # Graph embeddings
-        z1 = self.embedder(batch.x1, batch.edge_index1, batch.edge_attr1, batch.x1_batch)
-        z2 = self.embedder(batch.x2, batch.edge_index2, batch.edge_attr2, batch.x2_batch)
+        # ECC
+        x = F.relu(self.conv1(batch.x, batch.edge_index, batch.edge_attr))
 
-        return (z1, z2)
+        # GAT Layers
+        x = F.relu(self.conv2(x, batch.edge_index))
+        x = F.relu(self.conv3(x, batch.edge_index))
+
+        # Global average pooling
+        x = global_mean_pool(x, batch.batch)
+        
+        # Classification mode
+        if classify=="binary":
+            x = self.fc1(x)
+            x = x.squeeze(1)
+        if classify=="multiclass":
+            x = self.fc2(x)
+        
+        # Prediction head
+        if head=="linear":
+            return x
+        if head=="sigmoid":
+            return torch.sigmoid(x)
+        if head=="softmax":
+            return torch.softmax(x, dim=1)
+
+
+
 
 class CPC(nn.Module):
     def __init__(self):

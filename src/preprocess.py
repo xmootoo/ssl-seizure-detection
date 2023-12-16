@@ -969,9 +969,13 @@ def extract_layers(model_path, model_dict_path, transfer_id):
     # Load state dictionary
     model_dict = torch.load(model_dict_path)
 
-    if transfer_id == "relative_positioning" or transfer_id == "temporal_shuffling":
+    if transfer_id=="relative_positioning" or transfer_id=="temporal_shuffling":
         EdgeMLP_pretrained = copy.deepcopy(model.embedder.edge_mlp)
         NNConv_pretrained = copy.deepcopy(model.embedder.conv1)
         GATConv_pretrained = copy.deepcopy(model.embedder.conv2)
-        pretrained_layers = [EdgeMLP_pretrained, NNConv_pretrained, GATConv_pretrained]
+        pretrained_layers = {"edge_mlp": EdgeMLP_pretrained, "conv1": NNConv_pretrained, "conv2": GATConv_pretrained}
         return pretrained_layers
+    elif transfer_id=="VICRegT1":
+        return
+        
+
