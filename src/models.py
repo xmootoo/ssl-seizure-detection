@@ -211,7 +211,78 @@ class temporal_shuffling(nn.Module):
             z = torch.sigmoid(z)
 
         return z.squeeze(1)
-    
+
+
+class Encoder1(nn.Module):
+    def __init__(self, config):
+        super(Encoder1, self).__init__()
+        hidden_channels = config["hidden_channels"]
+        
+        # Initialize the MLP for NNConv
+        self.edge_mlp = EdgeMLP(config["num_edge_features"], config["num_node_features"], hidden_channels[0])
+        
+        # Encoder
+        self.conv1 = NNConv(config["num_node_features"], hidden_channels[0], self.edge_mlp)
+        self.conv2 = GATConv(hidden_channels[0], hidden_channels[1], heads=1, concat=False)
+        self.conv3 = GATConv(hidden_channels[1], hidden_channels[2], heads=1, concat=False)
+        
+        # Batch Normalization for graph layers
+        if config["batch_norm"]:
+            self.bn_graph1 = GraphBatchNorm(hidden_channels[0])
+            self.bn_graph2 = GraphBatchNorm(hidden_channels[1])
+            self.bn_graph3 = GraphBatchNorm(hidden_channels[2])
+        else:
+            self.bn_graph1 = self.bn_graph2 = self.bn_graph3 = nn.Identity()
+            
+    def forward(self, batch):
+        # NNConv layer
+        x = F.relu(self.bn_graph1(self.conv1(batch.x, batch.edge_index, batch.edge_attr)))
+        
+        # GATConv layers
+        x = F.relu(self.bn_graph2(self.conv2(x, batch.edge_index)))
+        x = F.relu(self.bn_graph3(self.conv3(x, batch.edge_index)))
+        
+        # Global average pooling
+        x = global_mean_pool(x, batch.batch)
+        
+        return x
+class Classifier1(nn.Module):
+    def __init__(self, config):
+        super(Classifier1, self).__init__()
+        # If binary classification, output dimension is 1, if multiclass classification, output dimension is 3.
+        self.classify = config["classify"]
+        self.head = config["head"]
+        self.fc1 = nn.Linear(config["hidden_channels"][2], 1)
+        self.fc2 = nn.Linear(config["hidden_channels"][2], 3)
+        
+    def forward(self, x):
+        
+        # Classification mode
+        if self.classify=="binary":
+            x = self.fc1(x)
+            x = x.squeeze(1)
+        elif self.classify=="multiclass":
+            x = self.fc2(x)
+        
+        # Prediction head
+        if self.head=="linear":
+            return x
+        elif self.head=="sigmoid":
+            return torch.sigmoid(x)
+        elif self.head=="softmax":
+            return torch.softmax(x, dim=1)
+
+
+class supervised(nn.Module):
+    def __init__(self, config):
+        super(supervised, self).__init__()
+        self.encoder = Encoder1(config)
+        self.classifier = Classifier1(config)
+
+    def forward(self, batch):
+        x = self.encoder(batch)
+        x = self.classifier(x)
+        return x
 
 class supervised_model(nn.Module):
     def __init__(self, config):
@@ -280,16 +351,10 @@ class supervised_model(nn.Module):
 class VICRegT1(nn.Module):
     def __init__(self, config):
         super(VICRegT1, self).__init__()
-        num_node_features = config["num_node_features"]
-        num_edge_features = config["num_edge_features"]
-        hidden_channels = config.get("hidden_channels", [64, 128, 128, 512, 512, 512])
-        batch_norm = config.get("batch_norm", True)
-        dropout = config.get("dropout", True)
-        p = config.get("p", 0.1)
-
-        # GNN embedders
-        self.embedder = gnn_embedder2(num_node_features, num_edge_features, hidden_channels, batch_norm, dropout, p)
         
+        # GNN embedders
+        self.embedder = gnn_embedder2(config["num_node_features"], config["num_edge_features"], config.get("hidden_channels", [64, 128, 128, 512, 512, 512]),
+                                      config.get("batch_norm", True), config.get("dropout", True), config.get("p", 0.1))
         # Weight initialization
         self.apply(init_weights)
         
@@ -301,21 +366,120 @@ class VICRegT1(nn.Module):
         return (z1, z2)
 
 
-
-def set_requires_grad(layers_dict, requires_grad=True):
+# Downstream models
+def set_requires_grad(model, requires_grad=True):
     """
-    Set the requires_grad attribute for all parameters in the layers contained in the given dictionary.
+    Set the requires_grad attribute for all parameters in the encoder (and classifier if needed) of the model.
 
     Args:
-        layers_dict (dict): A dictionary where keys are layer names and values are nn.Modules whose parameters will be set.
+        model (downstream3): An instance of the downstream3 model.
         requires_grad (bool): Whether the layers' parameters should require gradients (unfrozen) or not (frozen).
     """
-    for layer in layers_dict.values():
-        for param in layer.parameters():
-            param.requires_grad = requires_grad
+    # Set requires_grad for all parameters in the encoder
+    for param in model.encoder.parameters():
+        param.requires_grad = requires_grad
+
+
+class downstream3(nn.Module):    
+    class Encoder(nn.Module):
+        def __init__(self, pretrained_layers):
+            super(downstream3.Encoder, self).__init__()
+            
+            # Graph layers
+            self.conv1 = pretrained_layers["conv1"]
+            self.conv2 = pretrained_layers["conv2"]
+            self.conv3 = pretrained_layers["conv3"]
+            
+            # Batch normalization layers
+            self.bn_graph1 = pretrained_layers["bn_graph1"]
+            self.bn_graph2 = pretrained_layers["bn_graph2"]
+            self.bn_graph3 = pretrained_layers["bn_graph3"]
+
+            # Assign the pretrained EdgeMLP to the ECC layer
+            self.conv1.edge_mlp = pretrained_layers["edge_mlp"]
+            
+
+        def forward(self, batch):
+            # ECC layer
+            x = F.relu(self.bn_graph1(self.conv1(batch.x, batch.edge_index, batch.edge_attr)))
+            
+            # GATConv layers
+            x = F.relu(self.bn_graph2(self.conv2(x, batch.edge_index)))
+            x = F.relu(self.bn_graph3(self.conv3(x, batch.edge_index)))
+
+            # Global average pooling
+            x = global_mean_pool(x, batch.batch)
+            
+            return x
+                
+    class Classifier(nn.Module):
+        def __init__(self, node_dim, classify, head):
+            super(downstream3.Classifier, self).__init__()
+            # If binary classification, output dimension is 1, if multiclass classification, output dimension is 3.
+            self.classify = classify
+            self.head = head
+            self.fc1 = nn.Linear(node_dim, 1)
+            self.fc2 = nn.Linear(node_dim, 3)
+            
+        def forward(self, x):
+            # Classification mode
+            if self.classify=="binary":
+                x = self.fc1(x)
+                x = x.squeeze(1)
+            elif self.classify=="multiclass":
+                x = self.fc2(x)
+            
+            # Prediction head
+            if self.head=="linear":
+                return x
+            elif self.head=="sigmoid":
+                return torch.sigmoid(x)
+            elif self.head=="softmax":
+                return torch.softmax(x, dim=1)
+            
+
+    def __init__(self, config, pretrained_layers={}, requires_grad=False):
+        
+        """
+        Downstream model for seizure detection (binary or multiclass). Trains a GNN encoder (frozen or unfrozen) and a simple nonlinear classifier ontop
+        (logistic regression or multinomial logistic regression) with frozen encoder or unfrozen encoder.
+        
+        Args:
+            classify (str): Whether to perform binary or multiclass classification. Options: "binary" or "multiclass".
+            head (str): Whether to use a linear or nonlinear prediction head. Options: "linear", "sigmoid", or "softmax".
+            pretrained_layers (dict): Dictionary containing the pretrained layers.
+            requires_grad (bool): Whether to require gradients for pretrained layers. If True, the layers are unfrozen, if False the layers are frozen.
+            config (dict): Dictionary for configuration of the model. Not used in this model.
+        
+        """    
+        super(downstream3, self).__init__()
+        
+        # Initialize encoder and simple nonlinear classifier
+        self.encoder = downstream3.Encoder(pretrained_layers)
+        node_dim = self.encoder.conv3.out_channels
+        self.classifier = downstream3.Classifier(node_dim, config["classify"], config["head"])
+        
+        # Freeze or unfreeze the encoder
+        set_requires_grad(self, requires_grad=requires_grad)
+
+    def forward(self, batch):
+        x = self.encoder(batch)
+        x = self.classifier(x)
+        return x
+
+
+class CPC(nn.Module):
+    def __init__(self):
+        super(CPC, self).__init__()
+    
 
 
 
+
+
+
+
+# Deprecated
 class downstream1(nn.Module):
     def __init__(self, config, pretrained_layers, frozen=False):
         super(downstream1, self).__init__()
@@ -495,93 +659,3 @@ class downstream2(nn.Module):
             return torch.sigmoid(x)
         if head=="softmax":
             return torch.softmax(x, dim=1)
-
-
-class downstream3(nn.Module):    
-    def __init__(self, config, pretrained_layers, requires_grad=False):
-        """
-        Downstream model for seizure detection (binary or multiclass). Trains a GNN encoder (frozen or unfrozen) and a simple nonlinear classifier ontop
-        (logistic regression or multinomial logistic regression) with frozen encoder or unfrozen encoder.
-        
-        Args:
-            config (dict): Dictionary containing the configuration of the model, containing hidden_channels which is a single value, and the dropout probability.
-            pretrained_layers (tuple): Tuple containing the pretrained layers.
-            requires_grad (bool): Whether to require gradients for pretrained layers. If True, the layers are unfrozen, if False the layers are frozen.
-        
-        """    
-        super(downstream3, self).__init__()
-        hidden_channels = config["hidden_channels"]
-        dropout = config["dropout"]
-
-        # Graph layers (petrained)
-        self.conv1 = pretrained_layers["conv1"]
-        self.conv2 = pretrained_layers["conv2"]
-        self.conv3 = pretrained_layers["conv3"]
-
-        # Batch normalization layers (petrained)
-        self.bn_graph1 = pretrained_layers["bn_graph1"]
-        self.bn_graph2 = pretrained_layers["bn_graph2"]
-        self.bn_graph3 = pretrained_layers["bn_graph3"]
-        
-        # Batch Normalization for fully connected layers
-        self.bn1 = pretrained_layers["bn1"]
-        self.bn2 = pretrained_layers["bn2"]
-
-        # Assign the pretrained MLP to the NNConv1
-        self.conv1.edge_mlp = pretrained_layers["edge_mlp"]
-        
-        # Output feature dimensions of pretrained layers
-        num_node_features = self.conv1.out_channels
-        num_edge_features = self.conv1.edge_mlp.state_dict()['mlp.0.weight'].size()[1]
-        
-        # Conditionally freeze or unfreeze pretrained layers
-        set_requires_grad(pretrained_layers, requires_grad)
-
-        # Dropout
-        if dropout:
-            self.dropout = nn.Dropout(p=dropout)
-        else:
-            self.dropout = nn.Identity()
-
-        # Last fully connected layer
-        self.fc1 = nn.Linear(num_node_features, 1)
-        self.fc2 = nn.Linear(num_node_features, 3)
-        
-        # Weight initialization
-        self.apply(init_weights)
-    
-    def forward(self, batch, classify="binary", head="linear", dropout=True):
-        
-        # ECC
-        x = F.relu(self.conv1(batch.x, batch.edge_index, batch.edge_attr))
-
-        # GAT Layers
-        x = F.relu(self.conv2(x, batch.edge_index))
-        x = F.relu(self.conv3(x, batch.edge_index))
-
-        # Global average pooling
-        x = global_mean_pool(x, batch.batch)
-        
-        # Classification mode
-        if classify=="binary":
-            x = self.fc1(x)
-            x = x.squeeze(1)
-        if classify=="multiclass":
-            x = self.fc2(x)
-        
-        # Prediction head
-        if head=="linear":
-            return x
-        if head=="sigmoid":
-            return torch.sigmoid(x)
-        if head=="softmax":
-            return torch.softmax(x, dim=1)
-
-
-
-
-class CPC(nn.Module):
-    def __init__(self):
-        super(CPC, self).__init__()
-    
-

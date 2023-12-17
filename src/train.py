@@ -6,9 +6,10 @@ import torch.nn.functional as F
 import random
 import wandb
 from loss import VICRegT1Loss
+import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from preprocess import run_sorter, combiner, create_data_loaders, extract_layers
-from models import relative_positioning, temporal_shuffling, supervised_model, downstream1, downstream2, VICRegT1
+from models import relative_positioning, temporal_shuffling, supervised, VICRegT1, downstream1, downstream2, downstream3
 
 os.environ["WANDB_INIT_TIMEOUT"] = "300"
 
@@ -52,162 +53,120 @@ def load_data(data_path, run_type="all", data_size=1.0):
 
 
 def forward_pass(model, batch, model_id="supervised", classify="binary", head="linear", dropout=0.1):
-    if model_id=="supervised" or model_id=="downstream1" or model_id=="downstream2":
+    if model_id=="supervised":
+        return model(batch)
+    elif model_id=="downstream1" or model_id=="downstream2":
         return model(batch, classify, head, dropout)
     elif model_id=="relative_positioning" or model_id=="temporal_shuffling":
         return model(batch, head)
-    elif model_id=="VICRegT1":
+    elif model_id=="VICRegT1" or model_id=="downstream3":
         return model(batch)
 
 
-def train_model(model, train_loader, optimizer, criterion, device, classify="binary", head="linear", dropout=True, 
-                model_id="supervised", timing=True):
+def get_labels(batch, classify=None, model_id=None):
+    supervised_models = {"supervised", "downstream1", "downstream2", "downstream3"}
+    if classify=="binary" and model_id in supervised_models:
+        labels = batch.y[:, 0].float()  # Select the first column for binary classification
+    elif classify=="multiclass" and model_id in supervised_models:
+        labels = batch.y[:, 1].long()  # Select the second column and ensure it's 1D
+    else:
+        labels = batch.y.float()
     
-    model.train()
+    return labels
+
+
+def get_loss(model_id, outputs, labels, criterion, device):
+    if model_id=="VICRegT1":
+        loss = criterion(outputs[0].to(device), outputs[1].to(device), labels.to(device))
+    else:
+        loss = criterion(outputs.to(device), labels.to(device))
     
-    epoch_train_loss = 0
-    correct_train = 0
-    total_train = 0
+    return loss
+
+def get_predictions(classify, outputs, device):
+    if classify == "binary":
+        probabilities = torch.sigmoid(outputs).squeeze()
+        predictions = (probabilities > 0.5).float().to(device)
+    elif classify == "multiclass":
+        probabilities = torch.softmax(outputs, dim=1)
+        predictions = torch.argmax(probabilities, dim=1)
     
-    if timing:
-        start_time = time.time()
-    
-    for batch_idx, batch in enumerate(train_loader):
+    return predictions
 
-        # Zero the parameter gradients
-        optimizer.zero_grad()
+def update_time(start_time, mode="training"):
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Time elapsed after 100 batches ({mode}): {elapsed_time:.2f}s")
+    return end_time
 
-        # Send batch to device
-        batch = batch.to(device)
 
-        # Compute forward pass
-        outputs = forward_pass(model, batch, model_id, classify, head, dropout)
+def calculate_metrics(epoch_train_loss, correct_train, total_train, train_loader, model_id):
 
-        # Do not reshape output if batch size is 1
-
-        if model_id != "VICRegT1":
-            if outputs.shape[0] > 1:
-                outputs = outputs.squeeze()
-        
-        # Select the correct label column based on classification type
-        supervised_models = {"supervised", "downstream1", "downstream2"}
-        if classify=="binary" and model_id in supervised_models:
-            labels = batch.y[:, 0].float()  # Select the first column for binary classification
-        elif classify=="multiclass" and model_id in supervised_models:
-            labels = batch.y[:, 1].long().squeeze()  # Select the second column and ensure it's 1D
-        else:
-            labels = batch.y.float()
-        
-        # Calculate loss
-        if model_id=="VICRegT1":
-            loss = criterion(outputs[0].to(device), outputs[1].to(device), labels.to(device))
-        else:
-            loss = criterion(outputs.to(device), labels.to(device))
-        epoch_train_loss += loss.item()
-        
-        # Backward pass and optimization
-        loss.backward()
-        optimizer.step()
-        
-        # Compute predictions for binary or multiclass classification
-        if classify == "binary":
-            probabilities = torch.sigmoid(outputs).squeeze()
-            predictions = (probabilities > 0.5).float().to(device)
-        elif classify == "multiclass":
-            probabilities = torch.softmax(outputs, dim=1)
-            predictions = torch.argmax(probabilities, dim=1)
-
-        # Sum total correct predictions
-        if model_id!="VICRegT1":
-            correct_train += (predictions == labels).sum().item()
-            total_train += labels.size(0)
-        
-        # Compute 100 batch timing seconds
-        if timing:
-            if batch_idx % 100 == 0:
-                end_time = time.time()
-                print("Time elapsed after 100 batches (training):", end_time - start_time)
-                start_time = time.time()
-
-    # Compute average loss and accuracy
     avg_loss = epoch_train_loss / len(train_loader)
     
-    if model_id!="VICRegT1":
-        accuracy = 100.0 * correct_train / total_train
+    if model_id != "VICRegT1":
+        accuracy = 100.0 * correct_train / total_train if total_train > 0 else 0
         return avg_loss, accuracy
     else:
         return avg_loss, None
 
 
-def evaluate_model(model, loader, criterion, device, classify="binary", head="linear", dropout=False, 
-                   model_id="supervised", timing=True):
+def process_model(model, loader, criterion, device, classify="binary", head="linear", 
+                  dropout=True, model_id="supervised", timing=True, mode="training", optimizer=None):
+    """
+    Function to process the model, either in training or evaluation mode.
+
+    Args:
+        model (nn.Module): The model to be processed.
+        loader (DataLoader): DataLoader for the dataset.
+        criterion (nn.Module): Loss function.
+        device (torch.device): Device to run the model on.
+        classify (str): Classification type, 'binary' or 'multiclass'.
+        head (str): Type of head used in model, 'linear', 'sigmoid', or 'softmax'.
+        dropout (bool or float): Whether to use dropout or dropout rate.
+        model_id (str): Identifier for the model.
+        timing (bool): Whether to time the process.
+        mode (str): 'training' or 'evaluation'.
+        optimizer (torch.optim.Optimizer): Optimizer for training. Required if mode is 'training'.
+
+    Returns:
+        tuple: Tuple containing average loss and accuracy.
+    """
+    if mode == "training":
+        model.train()
+        if optimizer is None:
+            raise ValueError("Optimizer is required for training mode")
+    elif mode == "evaluation":
+        model.eval()
     
-    model.eval()
-    
-    epoch_eval_loss = 0
-    correct_eval = 0
-    total_eval = 0
-    
-    with torch.no_grad():
-        if timing:
-            start_time = time.time()
-        
-        for batch_idx, batch in enumerate(loader):
-            
-            # Send batch to device
-            batch = batch.to(device)
-            
-            # Compute forward pass
+    epoch_loss, correct, total = 0, 0, 0
+    if timing:
+        start_time = time.time()
+
+    for batch_idx, batch in enumerate(loader):
+        batch = batch.to(device)
+        with torch.set_grad_enabled(mode == "training"):
             outputs = forward_pass(model, batch, model_id, classify, head, dropout)
-            
-            # Do not reshape output if batch size is 1
-            if model_id != "VICRegT1":
-                if outputs.shape[0] > 1:
-                    outputs = outputs.squeeze()
+            labels = get_labels(batch, classify, model_id)
+            loss = get_loss(model_id, outputs, labels, criterion, device)
+            epoch_loss += loss.item()
 
-            # Select the correct label column based on classification type
-            supervised_models = {"supervised", "downstream1", "downstream2"}
-            if classify == "binary" and model_id in supervised_models:
-                labels = batch.y[:, 0].float()  # Select the first column for binary classification
-            elif classify == "multiclass" and model_id in supervised_models:
-                labels = batch.y[:, 1].long().squeeze()  # Select the second column and ensure it's 1D
-            else:
-                labels = batch.y.float()
- 
-            # Calculate loss
-            if model_id=="VICRegT1":
-                loss = criterion(outputs[0].to(device), outputs[1].to(device), labels.to(device))
-            else:
-                loss = criterion(outputs.to(device), labels.to(device))
-            epoch_eval_loss += loss.item()
-            
-            # Compute predictions for binary or multiclass classification
-            if classify == "binary":
-                probabilities = torch.sigmoid(outputs).squeeze()
-                predictions = (probabilities > 0.5).float()
-            elif classify == "multiclass":
-                probabilities = torch.softmax(outputs, dim=1)
-                predictions = torch.argmax(probabilities, dim=1)
+            if mode == "training":
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
+            if classify:
+                predictions = get_predictions(classify, outputs, device)
+                correct += (predictions == labels).sum().item()
+                total += labels.size(0)
 
-            # Sum total correct predictions
-            if model_id!="VICRegT1":
-                correct_eval += (predictions == labels).sum().item()
-                total_eval += labels.size(0)
-            
-            if timing:
-                if batch_idx % 100 == 0:
-                    end_time = time.time()
-                    print("Time elapsed after 100 batches (evaluation):", end_time - start_time)
-                    start_time = time.time()
+        if timing and batch_idx % 100 == 0:
+            start_time = update_time(start_time, mode=mode)
 
-    avg_loss = epoch_eval_loss / len(loader)
-    
-    if model_id!="VICRegT1":
-        accuracy = 100.0 * correct_eval / total_eval
-        return avg_loss, accuracy
-    else:
-        return avg_loss, None
+    avg_loss, accuracy = calculate_metrics(epoch_loss, correct, total, loader, model_id)
+    return avg_loss, accuracy
+
 
 
 def save_model(model, logdir, model_name):
@@ -246,11 +205,84 @@ def save_to_json(data, logdir, file_name):
         json.dump(data, f)
 
 
+
+def initialize_model(model_id, config, device, requires_grad, model_path=None, model_dict_path=None, transfer_id=None):
+    """ 
+    Initializes the model based on the model ID.
+
+    """
+    
+    if model_id=="supervised":
+        model = supervised(config).to(device)
+    elif model_id=="relative_positioning":
+        model = relative_positioning(config).to(device)
+    elif model_id=="temporal_shuffling":
+        model = temporal_shuffling(config).to(device)
+    elif model_id.startswith("downstream"):
+        model_class = eval(model_id) 
+        extracted_layers = extract_layers(model_path, model_dict_path, transfer_id) 
+        model = model_class(config=config, pretrained_layers=extracted_layers, requires_grad=requires_grad).to(device)
+    elif model_id=="VICRegT1":
+        model = VICRegT1(config).to(device)
+    
+    return model
+
+
+def initialize_optimizer(model, model_id, lr, weight_decay):
+    """
+    Initialize the optimizer with different learning rates for the encoder and classifier
+    parts of the downstream model, if the model_id starts with 'downstream'.
+
+    Args:
+        model (downstream3): The downstream3 model instance.
+        model_id (str): Identifier for the model.
+        lr (list): A list where the first element is the learning rate for the encoder and the 
+                   second element is the learning rate for the classifier.
+        weight_decay (float): Weight decay factor for regularization.
+
+    Returns:
+        torch.optim.Optimizer: Configured optimizer.
+    """
+
+    # For downstream and supervised comparison
+    if type(lr) == list:
+        lr_encoder, lr_classifier = lr  # Unpack the learning rates
+
+        # Create parameter groups for encoder and classifier
+        encoder_params = {'params': model.encoder.parameters(), 'lr': lr_encoder}
+        classifier_params = {'params': model.classifier.parameters(), 'lr': lr_classifier}
+
+        # Initialize the optimizer with these parameter groups
+        optimizer = optim.Adam([encoder_params, classifier_params], weight_decay=weight_decay)
+    
+    # Stanrd optimizer for SSL models
+    else:
+        optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+
+    return optimizer
+
+
+def initialize_criterion(classify, head, model_id, loss_config):
+    
+    if classify=="binary" and head=="linear":
+        criterion = torch.nn.BCEWithLogitsLoss()
+    elif classify=="binary" and head=="sigmoid":
+        criterion = torch.nn.BCELoss()
+    elif classify=="multiclass" and head=="linear":
+        criterion = torch.nn.CrossEntropyLoss()
+    elif classify=="multiclass" and head=="softmax":
+        criterion = torch.nn.NLLLoss()
+    if model_id=="VICRegT1":
+        criterion = VICRegT1Loss(loss_config)
+    
+    return criterion
+
+
 def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_ratio=0.2, test_ratio=0.1, 
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id="supervised", timing=True, 
-          classify="binary", head="linear", dropout=True, datetime_id=None, run_type="all", frozen=False,
+          classify="binary", head="linear", dropout=True, datetime_id=None, run_type="all", requires_grad=True,
           model_path=None, model_dict_path=None, transfer_id=None, train_ratio=None, loss_config=None,
-          project_id="Test Bay", patience = 20):
+          project_id="Test Bay", patience = 20, eta_min=0.002):
     """
     Trains the supervised GNN model, relative positioning model, or temporal shuffling model.
 
@@ -280,7 +312,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         run_type (str, optional): Specifies which runs to load. Options are "all", "combined", or "runx" where x is the run number. Defaults to "all".
                                   If "all" is selected, then all runs will be loaded and combined. The "combined" selection is only available for the list of
                                    PyG Data objects used for supervised learning, it is not available for pseudo-datasets.
-        frozen (bool, optional): Whether to freeze the weights of the pretrained model. Defaults to False.
+        requires_grad (bool, optional): Whether to freeze the weights of the pretrained encoder. False = frozen and True = Unfrozen. Defaults to True.
         model_path (str, optional): Path to the pretrained model. Defaults to None.
         model_dict_path (str, optional): Path to the pretrained model's state_dict. Defaults to None.
         transfer_id (str, optional): The model ID of the pretrained model, such as "relative_positioning" or "temporal_shuffling". Defaults to None.
@@ -310,14 +342,14 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     # Load data
     data = load_data(data_path, run_type, data_size)
     
-    # Assign GPU if available
+    # Initialize device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if torch.backends.mps.is_available() and torch.backends.mps.is_built():
         print(f"Using MPS Device Acceleration.")
     else:
          print(f"Using device: {device}")
     
-    # Initialize loaders, scaler, model, optimizer, and loss
+    # Initialize loaders
     loaders, loader_stats = create_data_loaders(data, val_ratio=val_ratio, test_ratio=test_ratio, batch_size=batch_size, 
                                                 num_workers=num_workers, model_id=model_id, train_ratio=train_ratio)
     if test_ratio != 0:
@@ -325,41 +357,18 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
     else:
         train_loader, val_loader = loaders
     
-    
-    # Select model
-    if model_id=="supervised":
-        model = supervised_model(config).to(device)
-    elif model_id=="relative_positioning":
-        model = relative_positioning(config).to(device)
-    elif model_id=="temporal_shuffling":
-        model = temporal_shuffling(config).to(device)
-    elif model_id=="downstream1":
-        extracted_layers = extract_layers(model_path, model_dict_path, transfer_id) 
-        model = downstream1(config, extracted_layers, frozen).to(device)
-    elif model_id=="downstream2":
-        extracted_layers = extract_layers(model_path, model_dict_path, transfer_id) 
-        model = downstream2(config, extracted_layers, frozen).to(device)
-    elif model_id=="VICRegT1":
-        model = VICRegT1(config).to(device)
+    # Initialize model
+    model = initialize_model(model_id=model_id, config=config, device=device, requires_grad=requires_grad, model_path=model_path, 
+                             model_dict_path=model_dict_path, transfer_id=transfer_id)
         
-    
     # Initialize optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    optimizer = initialize_optimizer(model, model_id, lr, weight_decay)
 
     # Initialize learning rate scheduler
-    scheduler = CosineAnnealingLR(optimizer, T_max=epochs, eta_min=0.002)
+    scheduler = CosineAnnealingLR(optimizer, T_max=epochs, eta_min=eta_min)
     
     # Initialize loss based on classification method and head
-    if classify=="binary" and head=="linear":
-        criterion = torch.nn.BCEWithLogitsLoss()
-    elif classify=="binary" and head=="sigmoid":
-        criterion = torch.nn.BCELoss()
-    elif classify=="multiclass" and head=="linear":
-        criterion = torch.nn.CrossEntropyLoss()
-    elif classify=="multiclass" and head=="softmax":
-        criterion = torch.nn.NLLLoss()
-    if model_id=="VICRegT1":
-        criterion = VICRegT1Loss(loss_config)
+    criterion = initialize_criterion(classify, head, model_id, loss_config)
     
     # Training statistics
     best_val_loss = float('inf')
@@ -381,14 +390,16 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
 
     # Train our model for multiple epochs
     for epoch in range(epochs):
-        
+
         #<----------Training---------->
-        epoch_train_loss, epoch_train_acc = train_model(model, train_loader, optimizer, criterion, device, classify, head, dropout, 
-                                                        model_id, timing)
+        epoch_train_loss, epoch_train_acc = process_model(model=model, loader=train_loader, criterion=criterion, device=device, classify=classify, head=head, 
+                                                           dropout=dropout, model_id=model_id, timing=timing, mode="training", optimizer=optimizer)
         
         #<----------Validation---------->
-        epoch_val_loss, epoch_val_acc = evaluate_model(model, val_loader, criterion, device, classify, head, dropout=False, model_id=model_id, timing=timing)
-
+        epoch_val_loss, epoch_val_acc = process_model(model=model, loader=val_loader, criterion=criterion, device=device, classify=classify, head=head, 
+                                                           dropout=False, model_id=model_id, timing=timing, mode="evaluation", optimizer=optimizer)
+        
+        
         print(f'Epoch: {epoch+1}, Train Loss: {epoch_train_loss}, Train Accuracy: {epoch_train_acc}, Validation Loss: {epoch_val_loss}, Validation Accuracy: {epoch_val_acc}')
 
 
@@ -414,12 +425,17 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
                 break
         
         scheduler.step()
+        
+        # Print learning rate
+        current_lr = optimizer.param_groups[0]['lr']
+        print(f"Epoch {epoch+1}/{epochs} - Current Learning Rate: {current_lr}")
     
-           
+    
     #<----------Testing---------->
     if test_ratio!=0:
-        test_loss, test_acc = evaluate_model(model, test_loader, criterion, device, classify, head, dropout=False, model_id=model_id, 
-                                             timing=timing)
+        test_loss, test_acc = process_model(model=model, loader=test_loader, criterion=criterion, device=device, classify=classify, head=head, 
+                                            dropout=False, model_id=model_id, timing=False, mode="evaluation", optimizer=optimizer)
+        
         save_to_json(test_loss, stats_dir, "test_loss.json")
         save_to_json(test_acc, stats_dir, "test_acc.json")
         print(f"Training complete. Test Loss: {test_loss}. Test Accuracy: {test_acc}.")
@@ -436,9 +452,9 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         'Patient ID': patient_id,
         'Model ID': model_id,
         'Transfer ID': transfer_id,
-        'Classify': classify,
-        'Frozen': frozen,
-        'Predictive Head': head,
+        'Classify': config["classify"],
+        'Frozen': not requires_grad,
+        'Predictive Head': config["head"],
         'Date & Time': datetime_id,
         'Data size': data_size,
         'Total examples': loader_stats["total_examples"],

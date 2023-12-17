@@ -810,7 +810,6 @@ def create_data_loaders(data,val_ratio=0.2, test_ratio=0.1, batch_size=32, num_w
     test_size = int(test_ratio) if test_ratio >= 1 else int(n * test_ratio)
     
     # If train_ratio is specified, compute train_size. Otherwise, compute based on remaining samples.
-    print(train_ratio)
     if train_ratio:
         train_size = int(train_ratio) if train_ratio >= 1 else int(n * train_ratio)
     else:
@@ -842,7 +841,7 @@ def create_data_loaders(data,val_ratio=0.2, test_ratio=0.1, batch_size=32, num_w
         
         
     # Create data loaders
-    if model_id=="supervised" or model_id=="downstream1" or model_id=="downstream2":
+    if model_id in {"supervised", "downstream1", "downstream2", "downstream3"}:
         train_loader = DataLoader(train_data, batch_size=batch_size, num_workers=num_workers)
         val_loader = DataLoader(val_data, batch_size=batch_size, num_workers=num_workers)
         if test_ratio != 0:
@@ -968,14 +967,28 @@ def extract_layers(model_path, model_dict_path, transfer_id):
 
     # Load state dictionary
     model_dict = torch.load(model_dict_path)
-
+    
     if transfer_id=="relative_positioning" or transfer_id=="temporal_shuffling":
         EdgeMLP_pretrained = copy.deepcopy(model.embedder.edge_mlp)
         NNConv_pretrained = copy.deepcopy(model.embedder.conv1)
         GATConv_pretrained = copy.deepcopy(model.embedder.conv2)
         pretrained_layers = {"edge_mlp": EdgeMLP_pretrained, "conv1": NNConv_pretrained, "conv2": GATConv_pretrained}
-        return pretrained_layers
+    
     elif transfer_id=="VICRegT1":
-        return
-        
-
+        edge_mlp = copy.deepcopy(model.embedder.edge_mlp)
+        conv1 = copy.deepcopy(model.embedder.conv1)
+        conv2 = copy.deepcopy(model.embedder.conv2)
+        conv3 = copy.deepcopy(model.embedder.conv3)
+        bn_graph1 = copy.deepcopy(model.embedder.bn_graph1)
+        bn_graph2 = copy.deepcopy(model.embedder.bn_graph2)
+        bn_graph3 = copy.deepcopy(model.embedder.bn_graph3)
+        pretrained_layers = {"edge_mlp": edge_mlp,
+                        "conv1": conv1,
+                        "conv2": conv2,
+                        "conv3": conv3,
+                        "bn_graph1": bn_graph1,
+                        "bn_graph2": bn_graph2,
+                        "bn_graph3": bn_graph3,
+                        }
+    
+    return pretrained_layers
