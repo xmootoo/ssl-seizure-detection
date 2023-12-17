@@ -44,12 +44,12 @@ if __name__ == '__main__':
         model_path = str(sys.argv[11])
         model_dict_path = str(sys.argv[12])
         transfer_id = str(sys.argv[13])
-        frozen = bool(int(sys.argv[14])) # convert 0 or 1 to False or True
+        requires_grad = not bool(int(sys.argv[14])) # convert 0 or 1 to False or True
     else:
         model_path=None
         model_dict_path=None
         transfer_id=None
-        frozen=None
+        requires_grad=True
 
     # Node feature dimension configuration (some patients have less node features)
     if patient_id in {"ummc003", "ummc004", "ummc006"}:
@@ -122,8 +122,8 @@ if __name__ == '__main__':
         dropout=True
         eta_min=1e-5
 
-    
+
     train(data_path=data_path, logdir=logdir, patient_id=patient_id, epochs=epochs, config=config, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
           batch_size=batch_size, num_workers=8, lr=lr, weight_decay=weight_decay, model_id=model_id, timing=True, classify=config["classify"], head=config["head"], 
-          dropout=dropout, datetime_id=datetime_id, run_type=run_type, frozen=frozen, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id, train_ratio=train_ratio, 
-          loss_config=loss_config, project_id=project_id, patience=patience, eta_min=eta_min)
+          dropout=dropout, datetime_id=datetime_id, run_type=run_type, requires_grad=requires_grad, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id,
+          train_ratio=train_ratio, loss_config=loss_config, project_id=project_id, patience=patience, eta_min=eta_min)
