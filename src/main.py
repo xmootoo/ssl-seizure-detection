@@ -43,12 +43,15 @@ if __name__ == '__main__':
     # Experiment id
     exp_id = str(sys.argv[11])
     
+    # Data size (total number of examples available)
+    data_size=float(sys.argv[12])
+    
     # Transfer learning (optional arguments)
-    if len(sys.argv) > 12:
-        model_path = str(sys.argv[12])
-        model_dict_path = str(sys.argv[13])
-        transfer_id = str(sys.argv[14])
-        requires_grad = bool(int(sys.argv[15])) # convert 0 or 1 to False or True
+    if len(sys.argv) > 13:
+        model_path = str(sys.argv[13])
+        model_dict_path = str(sys.argv[14])
+        transfer_id = str(sys.argv[15])
+        requires_grad = bool(int(sys.argv[16])) # convert 0 or 1 to False or True
     else:
         model_path=None
         model_dict_path=None
@@ -62,7 +65,6 @@ if __name__ == '__main__':
         num_node_features = 8
     else:
         num_node_features = 9
-
     
     # Training parameters
     if model_id == "supervised" or model_id=="downstream3":
@@ -74,19 +76,12 @@ if __name__ == '__main__':
         "classify": classify,
         "head": "linear",
         }
-        
-        batch_size=32
-        weight_decay=1e-3
-        
-        # Change this for varying experiments
 
         # Exp 1 (10% training examples)
-        data_size=float(0.1 / 0.7)
         lr=[0.01, 0.1]
         eta_min=0.001
 
         # # Exp 2 (1% training examples)
-        # data_size = float(0.01 / 0.7)
         # lr=[0.03, 0.08]
         # eta_min=0.001
         
@@ -94,6 +89,8 @@ if __name__ == '__main__':
         patience=float("inf")
         loss_config=None
         num_workers=4
+        batch_size=32
+        weight_decay=1e-3
     
         
     elif model_id == "relative_positioning" or model_id == "temporal_shuffling":
@@ -102,22 +99,19 @@ if __name__ == '__main__':
         "num_edge_features": 3,
         "hidden_channels": [64, 32, 64, 128, 256],
         }
-        data_size=115000
     
     elif model_id == "downstream1":
         config = {
         "hidden_channels": [64, 64, 32],
         "dropout": 0.1,
         }
-        data_size=1.0
         
     elif model_id == "downstream2":
         config = {
         "hidden_channels": 32,
         "dropout": 0.1,
         }
-        data_size=1.0
-
+    
     elif model_id == "VICRegT1":
         
         # Model and loss parameters
@@ -142,7 +136,6 @@ if __name__ == '__main__':
             }
         lr=0.01
         patience=float("inf")
-        data_size=100000
         batch_size=256
         weight_decay=1e-5
         dropout=True

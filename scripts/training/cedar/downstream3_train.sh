@@ -27,6 +27,9 @@ requires_grad="${10}"
 # Transfer ID
 transfer_id="${11}"
 
+# Data size
+data_size="${12}"
+
 # Run time
 time="00:10:00"
 

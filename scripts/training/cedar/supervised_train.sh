@@ -17,6 +17,11 @@ classify="$7"
 
 # Experimental ID
 exp_id="$8"
+
+# Data size
+data_size="$9"
+
+# Time limit
 time="00:10:00"
 
 # Directories
