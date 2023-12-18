@@ -20,5 +20,8 @@ for patient_id in "${patients[@]}"; do
         tau="$6"
         sr="$7"
         bash vicregt1_train.sh "${patient_id}" "VICRegT1" "${datetime_id}" "${sigma}" "${tau}" "${sr}" "${epochs}" "${project_id}" "${split}"
+    elif [ "$model" = "supervised" ]; then
+        bash supervised_train.sh "${patient_id}" "supervised" "${datetime_id}" "${epochs}" "${project_id}" "${split}"
+    
     fi
 done

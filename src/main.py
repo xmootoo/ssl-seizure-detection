@@ -63,14 +63,30 @@ if __name__ == '__main__':
     # Training parameters
     if model_id == "supervised":
         config = {
-            "num_node_features": num_node_features,
-            "num_edge_features": 3,
-            "hidden_channels": 64,
-            "out_channels": 32,
-            "dropout": 0.1,
+        "num_node_features": 9,
+        "num_edge_features": 3,
+        "hidden_channels": [32, 16, 16],
+        "batch_norm": True,
+        "classify": "binary",
+        "head": "linear",
         }
-        data_size=1.0
-    
+        
+        batch_size=32
+        weight_decay=1e-3
+        eta_min=1e-3
+        
+        data_size=0.1
+        
+        if data_size==0.1:
+            lr=[0.01, 0.1]
+        elif data_size==0.01:
+            lr=[0.03, 0.08]
+            
+        dropout=False
+        patience=float("inf")
+        loss_config=None
+        
+        
     elif model_id == "relative_positioning" or model_id == "temporal_shuffling":
         config = {
         "num_node_features": num_node_features,
