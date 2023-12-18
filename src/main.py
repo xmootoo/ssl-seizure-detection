@@ -63,11 +63,11 @@ if __name__ == '__main__':
     # Training parameters
     if model_id == "supervised":
         config = {
-        "num_node_features": 9,
+        "num_node_features": num_node_features,
         "num_edge_features": 3,
         "hidden_channels": [32, 16, 16],
         "batch_norm": True,
-        "classify": "binary",
+        "classify": classify,
         "head": "linear",
         }
         
@@ -75,6 +75,7 @@ if __name__ == '__main__':
         weight_decay=1e-3
         eta_min=1e-3
         
+        # Change this for varying experiments
         data_size=0.1
         
         if data_size==0.1:
