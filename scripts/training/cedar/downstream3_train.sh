@@ -17,6 +17,17 @@ classify="$7"
 
 # Experimental ID
 exp_id="$8"
+
+# Pretrainted datetime ID
+pretrained_datetime_id="$9"
+
+# Frozen (0) or unfrozen (1)
+requires_grad="${10}"
+
+# Transfer ID
+transfer_id="${11}"
+
+# Run time
 time="00:10:00"
 
 # Directories
@@ -24,15 +35,17 @@ base_dir="${xav}/ssl_epilepsy/models/${patient_id}"
 mkdir -p "${base_dir}" || { echo "Error: Cannot create directory ${base_dir}"; exit 1; }
 logdir="${base_dir}/${model_id}/${datetime_id}"
 mkdir -p "${logdir}" || { echo "Error: Cannot create directory ${logdir}"; exit 1; }
-data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/${model_id}"
+data_path="${xav}/ssl_epilepsy/data/patient_pyg/${patient_id}/supervised"
+model_path="${xav}/ssl_epilepsy/models/${patient_id}/${transfer_id}/${pretrained_datetime_id}/model/${transfer_id}.pth"
+model_dict_path="${xav}/ssl_epilepsy/models/${patient_id}/${transfer_id}/${pretrained_datetime_id}/model/${transfer_id}_state_dict.pth"
+
 
 # Training arguments
-job_name="training_${patient_id}_${model_id}_${time}_${datetime_id}"
+job_name="transfer_learning_${patient_id}_${model_id}_${transfer_id}_${pretrained_datetime_id}_${datetime_id}"
 run_type="all"
 
 
-
-echo "Preparing to submit supervised training job..."
+echo "Preparing to submit downstream3 training job..."
 sbatch <<EOT
 #!/bin/bash
 #SBATCH --ntasks=1              # Number of tasks
@@ -53,7 +66,11 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${classify}" "${split}" "${epochs}" "${project_id}" "${exp_id}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" \
+"${model_id}" "${datetime_id}" "${run_type}" "${classify}" \
+"${split}" "${epochs}" "${project_id}" "${exp_id}" "${model_path}" \
+"${model_dict_path}" "${transfer_id}" "${requires_grad}"
+
 EOT
 
 if [ $? -ne 0 ]; then

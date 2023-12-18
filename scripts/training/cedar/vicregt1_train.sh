@@ -16,6 +16,9 @@ project_id="$8"
 
 # Train, val, test split
 split="$9"
+
+# Experimental ID
+exp_id="${10}"
 time="18:00:00"
 
 # Directories

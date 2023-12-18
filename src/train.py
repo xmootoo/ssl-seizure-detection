@@ -163,7 +163,7 @@ def process_model(model, loader, criterion, device, classify="binary", head="lin
 
         if timing and batch_idx % 100 == 0:
             start_time = update_time(start_time, mode=mode)
-
+    
     avg_loss, accuracy = calculate_metrics(epoch_loss, correct, total, loader, model_id)
     return avg_loss, accuracy
 
@@ -275,6 +275,10 @@ def initialize_criterion(classify, head, model_id, loss_config):
     if model_id=="VICRegT1":
         criterion = VICRegT1Loss(loss_config)
     
+    if criterion is None:
+        raise ValueError("Invalid configuration for 'classify', 'head', or 'model_id'")
+
+    
     return criterion
 
 
@@ -282,7 +286,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
           batch_size=32, num_workers=4, lr=1e-3, weight_decay=1e-3, model_id="supervised", timing=True, 
           classify="binary", head="linear", dropout=True, datetime_id=None, run_type="all", requires_grad=True,
           model_path=None, model_dict_path=None, transfer_id=None, train_ratio=None, loss_config=None,
-          project_id="Test Bay", patience = 20, eta_min=0.002):
+          project_id="Test Bay", patience = 20, eta_min=0.002, exp_id=None):
     """
     Trains the supervised GNN model, relative positioning model, or temporal shuffling model.
 
@@ -363,10 +367,10 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         
     # Initialize optimizer
     optimizer = initialize_optimizer(model, model_id, lr, weight_decay)
-
+        
     # Initialize learning rate scheduler
     scheduler = CosineAnnealingLR(optimizer, T_max=epochs, eta_min=eta_min)
-    
+
     # Initialize loss based on classification method and head
     criterion = initialize_criterion(classify, head, model_id, loss_config)
     
@@ -427,8 +431,13 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         scheduler.step()
         
         # Print learning rate
-        current_lr = optimizer.param_groups[0]['lr']
-        print(f"Epoch {epoch+1}/{epochs} - Current Learning Rate: {current_lr}")
+        if model_id in {"supervised", "downstream3"}:
+            encoder_lr = optimizer.param_groups[0]['lr']
+            classifier_lr = optimizer.param_groups[1]['lr']
+            print(f"New encoder lr: {encoder_lr:.6f}. New classifier lr: {classifier_lr:.6f}")
+        else:
+            current_lr = optimizer.param_groups[0]['lr']
+            print(f"New lr: {current_lr:.6f}")
     
     
     #<----------Testing---------->
@@ -452,8 +461,9 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         'Patient ID': patient_id,
         'Model ID': model_id,
         'Transfer ID': transfer_id,
+        'Experiment ID': exp_id,
         'Classify': config["classify"],
-        'Frozen': not requires_grad,
+        'Frozen (Encoder)': not requires_grad,
         'Predictive Head': config["head"],
         'Date & Time': datetime_id,
         'Data size': data_size,

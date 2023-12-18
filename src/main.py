@@ -27,6 +27,7 @@ if __name__ == '__main__':
 
     # Train, val, test split. Must formatted as "train,val,test" in the command line.
     split = [float(x) for x in sys.argv[8].split(",")]
+    
     if len(split) == 3:
         train_ratio, val_ratio, test_ratio = split[0], split[1], split[2]
     elif len(split) == 2:
@@ -38,13 +39,16 @@ if __name__ == '__main__':
     
     # Project id
     project_id = str(sys.argv[10])
+
+    # Experiment id
+    exp_id = str(sys.argv[11])
     
     # Transfer learning (optional arguments)
-    if len(sys.argv) > 11:
-        model_path = str(sys.argv[11])
-        model_dict_path = str(sys.argv[12])
-        transfer_id = str(sys.argv[13])
-        requires_grad = not bool(int(sys.argv[14])) # convert 0 or 1 to False or True
+    if len(sys.argv) > 12:
+        model_path = str(sys.argv[12])
+        model_dict_path = str(sys.argv[13])
+        transfer_id = str(sys.argv[14])
+        requires_grad = bool(int(sys.argv[15])) # convert 0 or 1 to False or True
     else:
         model_path=None
         model_dict_path=None
@@ -61,7 +65,7 @@ if __name__ == '__main__':
 
     
     # Training parameters
-    if model_id == "supervised":
+    if model_id == "supervised" or model_id=="downstream3":
         config = {
         "num_node_features": num_node_features,
         "num_edge_features": 3,
@@ -73,20 +77,24 @@ if __name__ == '__main__':
         
         batch_size=32
         weight_decay=1e-3
-        eta_min=1e-3
         
         # Change this for varying experiments
-        data_size=0.1
+
+        # Exp 1 (10% training examples)
+        data_size=float(0.1 / 0.7)
+        lr=[0.01, 0.1]
+        eta_min=0.001
+
+        # # Exp 2 (1% training examples)
+        # data_size = float(0.01 / 0.7)
+        # lr=[0.03, 0.08]
+        # eta_min=0.001
         
-        if data_size==0.1:
-            lr=[0.01, 0.1]
-        elif data_size==0.01:
-            lr=[0.03, 0.08]
-            
         dropout=False
         patience=float("inf")
         loss_config=None
-        
+        num_workers=4
+    
         
     elif model_id == "relative_positioning" or model_id == "temporal_shuffling":
         config = {
@@ -139,9 +147,10 @@ if __name__ == '__main__':
         weight_decay=1e-5
         dropout=True
         eta_min=1e-4
+        num_workers=8
 
 
     train(data_path=data_path, logdir=logdir, patient_id=patient_id, epochs=epochs, config=config, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
-          batch_size=batch_size, num_workers=8, lr=lr, weight_decay=weight_decay, model_id=model_id, timing=True, classify=config["classify"], head=config["head"], 
+          batch_size=batch_size, num_workers=num_workers, lr=lr, weight_decay=weight_decay, model_id=model_id, timing=True, classify=config["classify"], head=config["head"], 
           dropout=dropout, datetime_id=datetime_id, run_type=run_type, requires_grad=requires_grad, model_path=model_path, model_dict_path=model_dict_path, transfer_id=transfer_id,
-          train_ratio=train_ratio, loss_config=loss_config, project_id=project_id, patience=patience, eta_min=eta_min)
+          train_ratio=train_ratio, loss_config=loss_config, project_id=project_id, patience=patience, eta_min=eta_min, exp_id=exp_id)
