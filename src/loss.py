@@ -65,6 +65,5 @@ class VICRegT1Loss(nn.Module):
         covar_loss =  covar_loss1 + covar_loss2
         
         print(f"Invariance loss unscaled: {inv_loss:.4f}, Variance loss unscaled: {var_loss:.4f}, Covariance loss unscaled: {covar_loss:.4f}")
-        print(f"Invariance loss: {self.inv_coeff*inv_loss:.4f}, Variance loss: {self.var_coeff*var_loss:.4f}, Covariance loss: {self.covar_coeff*covar_loss:.4f}")
         
         return self.inv_coeff * inv_loss + self.covar_coeff * covar_loss + self.var_coeff * var_loss

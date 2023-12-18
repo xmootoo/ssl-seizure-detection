@@ -16,7 +16,7 @@ project_id="$8"
 
 # Train, val, test split
 split="$9"
-time="15:00:00"
+time="18:00:00"
 
 # Directories
 base_dir="${xav}/ssl_epilepsy/models/${patient_id}"

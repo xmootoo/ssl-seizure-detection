@@ -99,7 +99,8 @@ if __name__ == '__main__':
         config = {
             "num_node_features": num_node_features,
             "num_edge_features": 3,
-            "hidden_channels": [64, 128, 128, 512, 512, 512],
+            "hidden_channels": [32, 16, 16, 64, 64, 64],
+            # "hidden_channels": [64, 128, 128, 512, 512, 512],
             "batch_norm": True,
             "dropout": True,
             "p": 0.1,
@@ -109,18 +110,18 @@ if __name__ == '__main__':
         
         # Data size
         loss_config = {
-            "loss_coeffs": (25, 25, 1), 
+            "loss_coeffs": (1, 30, 1), 
             "y_scale": True, 
-            "gamma": 1, 
+            "gamma": 2, 
             "epsilon": 1e-4,
             }
         lr=0.01
         patience=float("inf")
         data_size=100000
         batch_size=256
-        weight_decay=1e-6
+        weight_decay=1e-5
         dropout=True
-        eta_min=1e-5
+        eta_min=1e-4
 
 
     train(data_path=data_path, logdir=logdir, patient_id=patient_id, epochs=epochs, config=config, data_size=data_size, val_ratio=val_ratio, test_ratio=test_ratio, 
