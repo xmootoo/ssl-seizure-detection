@@ -45,12 +45,6 @@ To run the entire pipeline, please refer to the `train()` function in [`train.py
 - **[`preprocess.py`](/src/preprocess.py)**: Includes helper functions for all preprocessing tasks, such as converting initial graph representations to PyG-compatible structures.
 - **[`patch.py`](/src/patch.py)**: Patches pre-existing Numpy data from our lab to the PyG-compatible format, not recommended for general use unless your existing data fits the specifications as outlined in [`preprocess.ipynb`](/notebooks/preprocess.ipynb).
 
-## License
-
-Until the release of the paper, code within this repository is proprietary and for viewing and educational purposes only. Any use, reproduction, or distribution of the contents of this repository without the express written consent of the author(s) is strictly prohibited. For any requests or inquiries regarding the use or licensing of the work contained herein, please see [Contact](#contact). 
-
-Please note that while this repository uses the original data from OpenNeuro with Accession Number ds003029, the restrictions mentioned above do not apply to that dataset, which is governed by its own terms and conditions as provided by [OpenNeuro](https://openneuro.org/).
-
 ## Acknowledgements
 I would like to sincerely thank both [Dr. Alan A. Díaz-Montiel](https://github.com/adiazmont) and [Dr. Milad Lankarany](https://www.uhnresearch.ca/researcher/milad-lankarany) for their continued support throughout this research endeavour and for their expert guidance. I am also extremely grateful for the support from the [Temerty Faculty of Medicine, University of Toronto](https://temertymedicine.utoronto.ca/) through the esteemed [T-CAIREM](https://tcairem.utoronto.ca/) Summer Studentship, which allowed me to focus on this work.
 
