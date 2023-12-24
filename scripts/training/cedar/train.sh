@@ -33,7 +33,7 @@ for patient_id in "${patients[@]}"; do
         "${data_size}"
     
     elif [ "$model" = "supervised" ]; then
-        classify="$6"
+        classify="$7"
         bash supervised_train.sh \
         "${patient_id}" \
         "supervised" \
@@ -46,10 +46,13 @@ for patient_id in "${patients[@]}"; do
         "${data_size}"
             
     elif [ "$model" = "downstream3" ]; then
-        classify="$6"
-        pretrained_datetime_id="$7"
-        requires_grad="$8" # Frozen (0), unfrozen (1)
-        transfer_id="$9"
+
+        
+        classify="$7"
+        pretrained_datetime_id="$8"
+        requires_grad="$9" # Frozen (0), unfrozen (1)
+        transfer_id="${10}"
+
         bash downstream3_train.sh \
         "${patient_id}" \
         "downstream3" \
@@ -63,5 +66,6 @@ for patient_id in "${patients[@]}"; do
         "${requires_grad}" \
         "${transfer_id}" \
         "${data_size}"
+
     fi
 done

@@ -22,7 +22,7 @@ exp_id="$8"
 data_size="$9"
 
 # Time limit
-time="00:10:00"
+time="00:25:00"
 
 # Directories
 base_dir="${xav}/ssl_epilepsy/models/${patient_id}"
@@ -41,7 +41,7 @@ echo "Preparing to submit supervised training job..."
 sbatch <<EOT
 #!/bin/bash
 #SBATCH --ntasks=1              # Number of tasks
-#SBATCH --gres=gpu:v100l:1      # Number of Volta 100 GPUs
+#SBATCH --gpus-per-node=1     # Number of Volta 100 GPUs
 #SBATCH --cpus-per-task=4      # CPU cores/threads, AKA number of workers (num_workers)
 #SBATCH --mem-per-cpu=12G       # memory per CPU core
 #SBATCH --time="${time}"        # Time limit for the job  
@@ -58,7 +58,10 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${classify}" "${split}" "${epochs}" "${project_id}" "${exp_id}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" \
+"${run_type}" "${classify}" "${split}" "${epochs}" "${project_id}" "${exp_id}" \
+"${data_size}"
+
 EOT
 
 if [ $? -ne 0 ]; then

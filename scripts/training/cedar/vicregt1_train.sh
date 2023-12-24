@@ -19,6 +19,11 @@ split="$9"
 
 # Experimental ID
 exp_id="${10}"
+
+# Data size
+data_size="${11}"
+
+
 time="18:00:00"
 
 # Directories
@@ -55,7 +60,9 @@ source ~/torch2_cuda11.7/bin/activate
 
 export WANDB_API_KEY="$WANDB_API_KEY"
 
-python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" "${classify}" "${split}" "${epochs}" "${project_id}"
+python main.py "${data_path}" "${logdir}" "${patient_id}" "${model_id}" "${datetime_id}" "${run_type}" \
+"${classify}" "${split}" "${epochs}" "${project_id}" "${exp_id}" "${data_size}"
+
 EOT
 
 if [ $? -ne 0 ]; then

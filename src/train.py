@@ -391,7 +391,7 @@ def train(data_path, logdir, patient_id, epochs, config, data_size=1.0, val_rati
         os.makedirs(model_dir)
     if not os.path.exists(stats_dir):
         os.makedirs(stats_dir)
-
+    
     # Train our model for multiple epochs
     for epoch in range(epochs):
 
