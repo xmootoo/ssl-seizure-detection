@@ -16,14 +16,14 @@ def off_diagonal(x):
     return x.flatten()[:-1].view(n - 1, n + 1)[:, 1:].flatten()
 
 class VICRegT1Loss(nn.Module):
-    def __init__(self, loss_config = {"loss_coeffs":(25, 25, 1), "y_scale":True, "gamma":1, "epsilon":1e-4}):
-        # loss_coeffs=(1, 1, 1), y_scale=True, gamma=1, epsilon=1e-4
+    def __init__(self, config):
+        # loss_coeffs=(1, 1, 1), TSF_scale=True, gamma=1, epsilon=1e-4
         super(VICRegT1Loss, self).__init__()
         
-        self.inv_coeff, self.var_coeff, self.covar_coeff = loss_config["loss_coeffs"]
-        self.y_scale = loss_config["y_scale"]
-        self.gamma = loss_config["gamma"]
-        self.epsilon = loss_config["epsilon"]
+        self.inv_coeff, self.var_coeff, self.covar_coeff = config.loss_coeffs
+        self.TSF_scale = config.TSF_scale
+        self.gamma = config.gamma
+        self.epsilon = config.epsilon
 
     def forward(self, z1, z2, labels):
 
@@ -33,7 +33,7 @@ class VICRegT1Loss(nn.Module):
         # Temporal Invariance Loss
         sqr_diff = torch.norm(z1 - z2, p=2, dim=-1)**2
 
-        if self.y_scale:
+        if self.TSF_scale:
             inv_terms = labels * sqr_diff
         else:
             inv_terms = sqr_diff

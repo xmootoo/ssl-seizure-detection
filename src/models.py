@@ -353,8 +353,8 @@ class VICRegT1(nn.Module):
         super(VICRegT1, self).__init__()
         
         # GNN embedders
-        self.embedder = gnn_embedder2(config["num_node_features"], config["num_edge_features"], config.get("hidden_channels", [64, 128, 128, 512, 512, 512]),
-                                      config.get("batch_norm", True), config.get("dropout", True), config.get("p", 0.1))
+        self.embedder = gnn_embedder2(config.num_node_features, config.num_edge_features, config.hidden_channels,
+                                      config.batch_norm, config.dropout, config.p)
         # Weight initialization
         self.apply(init_weights)
         
