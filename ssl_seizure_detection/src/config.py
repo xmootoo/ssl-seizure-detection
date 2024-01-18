@@ -14,6 +14,7 @@ class LossConfig(BaseModel):
     TSF_scale: bool=True 
     gamma: float=1
     epsilon: float=1e-4
+    
 class TrainConfig(BaseModel):
     data_path: str
     logdir: str

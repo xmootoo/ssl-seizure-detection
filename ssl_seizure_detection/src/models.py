@@ -246,6 +246,7 @@ class Encoder1(nn.Module):
         x = global_mean_pool(x, batch.batch)
         
         return x
+
 class Classifier1(nn.Module):
     def __init__(self, config):
         super(Classifier1, self).__init__()
