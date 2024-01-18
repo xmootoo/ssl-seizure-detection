@@ -1,0 +1,6 @@
+Intel MKL WARNING: Support of Intel(R) Streaming SIMD Extensions 4.2 (Intel(R) SSE4.2) enabled only processors has been deprecated. Intel oneAPI Math Kernel Library 2025.0 will require Intel(R) Advanced Vector Extensions (Intel(R) AVX) instructions.
+Intel MKL WARNING: Support of Intel(R) Streaming SIMD Extensions 4.2 (Intel(R) SSE4.2) enabled only processors has been deprecated. Intel oneAPI Math Kernel Library 2025.0 will require Intel(R) Advanced Vector Extensions (Intel(R) AVX) instructions.
+submitit INFO (2024-01-17 22:33:55,110) - Starting with JobEnvironment(job_id=18758, hostname=Xavs-MacBook-Air.local, local_rank=0(1), node=0(1), global_rank=0(1))
+submitit INFO (2024-01-17 22:33:55,110) - Loading pickle: /Users/xaviermootoo/Documents/VScode/ssl-seizure-detection/notebooks/log_test/18758/18758_submitted.pkl
+submitit INFO (2024-01-17 22:33:55,111) - Job completed successfully
+submitit INFO (2024-01-17 22:33:55,111) - Exiting after successful completion
