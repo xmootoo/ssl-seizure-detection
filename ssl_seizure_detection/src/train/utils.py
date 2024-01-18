@@ -5,11 +5,11 @@ import torch
 import torch.nn.functional as F
 import random
 import wandb
-from loss import VICRegT1Loss
+from ssl_seizure_detection.src.modules.loss import VICRegT1Loss
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
-from preprocess import run_sorter, combiner, create_data_loaders, extract_layers
-from models import relative_positioning, temporal_shuffling, supervised, VICRegT1, downstream1, downstream2, downstream3
+from ssl_seizure_detection.src.data.preprocess import run_sorter, combiner, create_data_loaders, extract_layers
+from ssl_seizure_detection.src.modules.models import relative_positioning, temporal_shuffling, supervised, VICRegT1, downstream1, downstream2, downstream3
 
 
 def load_data(config):

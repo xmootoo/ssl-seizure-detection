@@ -1,5 +1,5 @@
 import sys
-from train import train
+from ssl_seizure_detection.src.train.train import train
 
     
 if __name__ == '__main__':

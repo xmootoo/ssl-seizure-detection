@@ -2,7 +2,7 @@ import os
 import pickle
 import torch
 import re
-from preprocess import new_grs, create_tensordata_new, convert_to_Data, pseudo_data, convert_to_PairData, convert_to_TripletData, cpc_tuples
+from ssl_seizure_detection.src.data.preprocess import new_grs, create_tensordata_new, convert_to_Data, pseudo_data, convert_to_PairData, convert_to_TripletData, cpc_tuples
 
 def patch(graphrep_dir=None,  logdir=None, file_name="", tau_pos=12//0.12, tau_neg=60//0.12, 
           model="supervised", stats=True, save=True, sample_ratio=1.0, K=5, N=5, P=1, data_size=100000,

@@ -2,7 +2,7 @@
 import os
 import wandb
 from torch.optim.lr_scheduler import CosineAnnealingLR
-from training_utils import *
+from ssl_seizure_detection.src.train.utils import *
 
 
 os.environ["WANDB_INIT_TIMEOUT"] = "300"
