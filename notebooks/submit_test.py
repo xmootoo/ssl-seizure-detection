@@ -18,6 +18,7 @@ def run_training(x):
     os.system(command)
 
 def submit_job(x):
+    
     # Create an executor for SLURM
     logdir="/home/xmootoo/projects/def-milad777/xmootoo/ssl_epilepsy/jobs"
     executor = submitit.AutoExecutor(folder=logdir)
@@ -28,9 +29,10 @@ def submit_job(x):
         tasks_per_node=1,
         cpus_per_task=1,
         mem_gb=4,  # Adjust memory as needed
-        time="00:01:00",
+        slurm_time="00:01:00",
         slurm_partition="def-milad777",  # Replace with your SLURM partition
-        slurm_array_parallelism=1
+        slurm_array_parallelism=1,
+        slurm_account="def-milad777", # Replace with your account
     )
 
     # Submit the job
