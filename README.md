@@ -32,6 +32,7 @@ For more information on SSL and GNNs, please refer to the relevant papers:
 6. [Contact](#contact)
 
 ## T-VICReg
+
 The T-VICReg loss defined in the [paper](https://xaviermootoo.com/s/T_VICReg-xyjd.pdf), given by:
 
 $$\mathcal{L}(\mathbf{Z}, \mathbf{Z}') = \lambda \mathcal{L}_{\text{inv}}(\mathbf{Z}, \mathbf{Z}') +\mu \mathcal{L}_{\text{var}}(\mathbf{Z}, \mathbf{Z}') +\nu\mathcal{L}_{\text{cov}}(\mathbf{Z}, \mathbf{Z}')$$
@@ -40,16 +41,15 @@ is implemented in [`loss.py`](ssl_seizure_detection/src/modules/loss.py) given b
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="ssl_seizure_detection/assets/T-VICreg_light.png">
-    <source media="(prefers-color-scheme: light)" srcset="ssl_seizure_detection/assets/T-VICReg_dark.png">
-    <img src="ssl_seizure_detection/assets/T-VICReg_light.png" alt="T-VICReg pipeline" style="width: 80%;">
+    <source media="(prefers-color-scheme: dark)" srcset="./ssl_seizure_detection/assets/T-VICreg_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="./ssl_seizure_detection/assets/T-VICReg_light.png">
+    <img src="./ssl_seizure_detection/assets/T-VICReg_light.png" alt="T-VICReg pipeline" width="70%" max-width="800px">
   </picture>
 </p>
 
 <p align="center">
-  <em style="font-size: small; opacity: 0.3;">The T-VICReg pipeline.</em>
+  <em>The T-VICReg pipeline.</em>
 </p>
-
 
 
 ## Installation
