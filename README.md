@@ -35,7 +35,7 @@ Processed data formatted as PyTorch Geometric Data objects is not yet available 
 
 
 ## Usage
-To run the entire pipeline, please refer to the `train()` function in [`train.py`](/src/train.py) and the relevant docstring. Please see the notebook [`train.ipynb`](/notebooks/train.ipynb) for guidance on how to train each model. The [`main.py`](/src/main.py) script is optimized for HPC on the Cledar cluster (Digital Research Alliance of Canada), and is not recommended for general use. For a tutorial on PyTorch Geometric and customized GNN models, please refer to [`tutorial.ipynb`](/notebooks/tutorial.ipynb). To see how the initial graph representations are created, please refer to [`preprocess.ipynb`](/notebooks/preprocess.ipynb). For a information on the transfer learning process (implemented in [`train.py`](/src/train.py)), please refer to [`transfer.ipynb`](/notebooks/transfer.ipynb). 
+To run the entire pipeline, please refer to the `train()` function in [`train.py`](/src/train.py) and the relevant docstring. Please see the notebook [`train.ipynb`](/notebooks/train.ipynb) for guidance on how to train each model. The [`main.py`](/src/main.py) script is optimized for HPC on the Cledar cluster (Digital Research Alliance of Canada), and is not recommended for general use.
 
 ## File Descriptions
 
