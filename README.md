@@ -33,11 +33,7 @@ For more information on SSL and GNNs, please refer to the relevant papers:
 
 ## T-VICReg
 
-The T-VICReg loss defined in the [paper](https://xaviermootoo.com/s/T_VICReg-xyjd.pdf), given by:
-
-$$\mathcal{L}(\mathbf{Z}, \mathbf{Z}') = \lambda \mathcal{L}_{\text{inv}}(\mathbf{Z}, \mathbf{Z}') +\mu \mathcal{L}_{\text{var}}(\mathbf{Z}, \mathbf{Z}') +\nu\mathcal{L}_{\text{cov}}(\mathbf{Z}, \mathbf{Z}')$$
-
-is implemented in [`loss.py`](ssl_seizure_detection/src/modules/loss.py) given by the `VICRegT1Loss` nn.Module.
+The T-VICReg loss defined in the [paper](https://xaviermootoo.com/s/T_VICReg-xyjd.pdf), is implemented in [`loss.py`](ssl_seizure_detection/src/modules/loss.py) through the `VICRegT1Loss` nn.Module.
 
 <p align="center">
   <picture>
